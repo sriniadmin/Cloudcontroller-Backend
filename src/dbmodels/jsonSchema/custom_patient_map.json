@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$comment": "JSON Schema for test_users_secure table",
+    "$id": "test_users_secure",
+    "title": "test_users_secure",
+    "type": "object",
+    "required": ["demographic_map"],
+    "properties": {
+        "demographic_map": {
+            "$ref": "patient_data"
+        }
+    }
+}

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<% include partials/cssdarkhead1.ejs %>
+
+    <body>
+        <div class="main-wrapper" id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Preloader - style you can find in spinners.css -->
+            <!-- ============================================================== -->
+
+            <% include partials/preloader.ejs %> 
+            <% include partials/header.ejs %> 
+            <% include partials/sidebar.ejs %>
+
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Title and breadcrumb -->
+                <!-- ============================================================== -->
+                <% include partials/breadcrumb.ejs %>
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <h3>Search Patch</h3>
+                        <div class="col m4 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default" id="hospitalList">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <% for(var i=0; i < hospitalDetails.length; i++)
+                                { %>
+                                <option value="<%= hospitalDetails[i].name %>">
+                                    <%= hospitalDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patients</label>
+                            <select class="browser-default" id="patientList">
+                                <option value="" disabled selected>
+                                    Choose Patients
+                                </option>
+                                <% for(var i=0; i < patientDetails.length; i++)
+                                { %>
+                                <option
+                                    value="<%= patientDetails[i].name %>"
+                                    patiendId="<%= patientDetails[i]._id %>"
+                                >
+                                    <%= patientDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patches</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Patches</option
+                                >
+                                <option value="1">P-MY-5436234324</option>
+                                <option value="2">P-MY-54362345648</option>
+                                <option value="3">P-MY-38745893444</option>
+                                <option value="4">P-MY-72349893445</option>
+                                <option value="5">P-MY-37584858448</option>
+                            </select>
+                        </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col m4 s12"></div>
+                        <div class="col m4 s12"><center><b>-OR-</b></center></div></div>
+                        <br/>
+                    <div class="row">
+                        <div class="col m4 s12"></div>
+                        <div class="col m4 s12">
+                            <label>Patch ID</label>
+                            <input
+                                placeholder="Enter the patch ID"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                        <center> <a
+                                class="waves-effect waves-light btn btn-round green" onclick="location.href='/patchinventorydetails';" style="cursor: pointer"
+                                >Search</a
+                            ></center>
+                        </div>
+                    </div>
+                    <hr style="background-color: white" />
+                    <div class="row">
+                        <h3>Add New</h3>
+                        <div class="col m4 s12">
+                            <label>Patch ID</label>
+                            <input
+                                placeholder="Enter the patch ID"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patch Functionality</label>
+                            <input
+                                placeholder="Patch Functionality"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Hardware Info</label>
+                            <input
+                                placeholder="Hardware Info"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row">
+                    <h4>Link Patch</h4>
+                        <div class="col m6 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <option value="1">Mayo Clinic</option>
+                                <option value="2">UCSF Medical Center</option>
+                                <option value="3"
+                                    >Johns Hopkins Hospital</option
+                                >
+                            </select>
+                        </div>
+                        <div class="col m6 s12">
+                            <label>Patients</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Patients</option
+                                >
+                                <option value="1">Jamie Vardy</option>
+                                <option value="2">Christiano Ronaldo</option>
+                                <option value="3">Ram Kashyap</option>
+                                <option value="4">Sergio Aguero</option>
+                                <option value="5">Chu Wu Chi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br/>
+                        
+                    <div class="row">
+                        <h3>Enable Sensors</h3>
+                        <div class="col s12">
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>Blood Pressure</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>Sugar Levels</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>ECG</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>Temperature Sensor</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>SpO2</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>Geo Monitoring</span>
+                            </label><br/>
+                            <label>
+                                <input type="checkbox" class="filled-in" checked="checked" />
+                                <span>Monitoring Interval(No. of times a day)</span>
+                            </label><br/>
+                            
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                           <center> <a
+                                class="waves-effect waves-light btn btn-round green"
+                                >Add</a
+                            ></center>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <% include partials/footer.ejs %>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="chat-windows"></div>
+            <!-- ============================================================== -->
+            <!-- Right Sidebar -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- All Required js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+        <script src="/dist/js/materialize.min.js"></script>
+        <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Apps -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/app.js"></script>
+        <script src="/dist/js/app.init.dark.js"></script>
+        <script src="/dist/js/app-style-switcher.js"></script>
+        <!-- ============================================================== -->
+        <!-- Custom js -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/custom.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Prod Js-->
+        <!-- ============================================================== -->
+        <script src="/dist/js/dark.js"></script>
+    </body>
+</html>

@@ -1,0 +1,864 @@
+/*============================================================== 
+ For all pages 
+ ============================================================== */
+* {
+    outline: none;
+}
+
+html {
+    color: #9098ac;
+}
+
+body {
+    background: #eef5f9;
+    font-family: "Nunito Sans", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #5b616e;
+}
+
+dl,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ol,
+p,
+pre,
+ul {
+    margin-top: 0;
+}
+
+.pre-scroll {
+    position: relative;
+}
+
+a.link {
+    color: #9098ac;
+}
+
+a.link:hover {
+    color: #2962ff;
+}
+
+.preloader {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: fixed;
+    z-index: 999999999;
+    background: #fff;
+}
+
+nav i,
+nav i.material-icons {
+    height: 64px;
+    line-height: 64px;
+}
+
+/*============================================================== 
+ Topbar
+ ============================================================== */
+.topbar {
+    position: relative;
+    z-index: 10;
+}
+
+.topbar nav {
+    background: rgb(45, 76, 105);
+    padding-right: 10px;
+    height: 64px;
+    line-height: 64px;
+}
+
+.topbar nav .nav-wrapper .brand-logo {
+    left: auto;
+    transform: none;
+    width: 250px;
+    display: flex;
+    z-index: 101;
+    align-items: center;
+    height: 64px;
+    transition: width 0.3s;
+}
+
+.topbar nav .nav-wrapper .brand-logo .icon {
+    flex-shrink: 0;
+    padding: 0 5px 0 15px;
+    text-align: center;
+    line-height: 21px;
+}
+
+.topbar nav .nav-wrapper .brand-logo .dark-logo {
+    display: none;
+}
+
+.topbar nav .nav-wrapper .brand-logo:after {
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 100%;
+}
+
+.topbar nav .nav-wrapper ul li a {
+    color: #fff;
+}
+
+.topbar nav .nav-wrapper ul li a .profile-pic {
+    width: 27px;
+    vertical-align: middle;
+    margin-top: -5px;
+}
+
+.topbar nav .nav-wrapper>ul.left {
+    margin-left: 250px;
+    transition: all 0.3s;
+}
+
+.topbar nav .nav-wrapper .search-box {
+    position: relative;
+}
+
+.topbar nav .nav-wrapper .search-box .app-search {
+    z-index: 110;
+    width: 260px;
+    position: absolute;
+    top: 0px;
+    display: none;
+    left: 0px;
+}
+
+.topbar nav .nav-wrapper .search-box .app-search .form-control {
+    padding: 10px 40px 10px 15px;
+    height: auto;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    box-sizing: border-box;
+    border-radius: 60px;
+    box-shadow: none;
+}
+
+.topbar nav .nav-wrapper .search-box .app-search .srh-btn {
+    position: absolute;
+    top: 0;
+    color: #414755;
+    cursor: pointer;
+    left: 222px;
+}
+
+.topbar nav .nav-wrapper .search-box .app-search .srh-btn:hover {
+    background: none;
+}
+
+.topbar nav .nav-wrapper .search-box .app-search .srh-btn i {
+    font-size: 12px;
+}
+
+.topbar nav .nav-wrapper .sidenav-trigger {
+    margin: 0;
+}
+
+.topbar nav .dropdown-content li:hover,
+.topbar nav .dropdown-content li.active {
+    background-color: transparent;
+}
+
+.topbar nav .mailbox.dropdown-content {
+    min-width: 300px;
+}
+
+.topbar nav .mailbox.dropdown-content li .drop-title {
+    font-weight: 700;
+    padding: 11px 20px 15px;
+    border-bottom: 1px solid rgba(120, 130, 140, 0.13);
+}
+
+.topbar nav .mailbox.dropdown-content li a {
+    color: #9098ac;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center {
+    height: 200px;
+    overflow: auto;
+    position: relative;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a {
+    border-bottom: 1px solid rgba(120, 130, 140, 0.13);
+    display: flex;
+    text-decoration: none;
+    padding: 9px 15px;
+    transition: 0.1s ease-in;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a:hover {
+    background: #e9edf2;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .user-img {
+    width: 50px;
+    position: relative;
+    display: inline-block;
+    margin: 0 0px 15px 0;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .user-img img {
+    width: 100%;
+    vertical-align: middle;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .user-img .profile-status {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    left: 30px;
+    position: absolute;
+    top: 1px;
+    width: 10px;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .mail-contnet {
+    width: 100%;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .mail-contnet h5 {
+    margin: 5px 0px 0;
+    font-size: 16px;
+    color: #455a64;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .mail-contnet .mail-desc,
+.topbar nav .mailbox.dropdown-content .message-center a .mail-contnet .time {
+    font-size: 12px;
+    display: block;
+    margin: 1px 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: #9098ac;
+    white-space: nowrap;
+    width: 80%;
+}
+
+.topbar nav .mailbox.dropdown-content .message-center a .btn-floating {
+    flex-shrink: 0;
+}
+
+.topbar nav ul.dropdown-user {
+    min-width: 300px;
+}
+
+.topbar nav ul.dropdown-user li {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box {
+    padding: 20px 15px;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-img {
+    width: 80px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-img img {
+    width: 100%;
+    border-radius: 5px;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-text {
+    display: inline-block;
+    padding-left: 10px;
+    vertical-align: middle;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-text h4 {
+    margin: 0px;
+    font-size: 18px;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-text p {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #9098ac;
+}
+
+.topbar nav ul.dropdown-user li .dw-user-box .u-text .btn,
+.topbar nav ul.dropdown-user li .dw-user-box .u-text .btn-large,
+.topbar nav ul.dropdown-user li .dw-user-box .u-text .btn-small {
+    margin: 5px 0 0 0;
+}
+
+.topbar nav ul.dropdown-user li a {
+    color: #9098ac;
+}
+
+.topbar nav ul.dropdown-user li a:hover {
+    background: #e9edf2;
+}
+
+.topbar nav .lang-dropdown a i {
+    font-size: 16px;
+}
+
+.topbar nav .lang-dropdown ul.dropdown-content {
+    min-width: 150px;
+}
+
+.topbar .nav-toggle,
+.topbar .sidebar-toggle {
+    padding: 23px 20px;
+}
+
+.topbar .nav-toggle:hover .bars,
+.topbar .sidebar-toggle:hover .bars {
+    width: 20px;
+}
+
+.topbar .bars {
+    height: 2px;
+    background: #fff;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    display: block;
+    width: 10px;
+    transition: 0.2s ease-in;
+}
+
+.topbar .bars.bar2 {
+    width: 20px;
+}
+
+/*============================================================== 
+ sidebar
+ ============================================================== */
+.left-sidebar {
+    position: absolute;
+    height: 100%;
+    top: 64px;
+    width: 250px;
+    z-index: 99;
+    transition: 0.2s ease-in;
+}
+
+.left-sidebar .sidenav {
+    width: 250px;
+    height: 100%;
+    position: relative;
+    transform: translateX(0);
+    padding-bottom: 64px;
+    transition: width 0.3s;
+}
+
+.left-sidebar .sidenav ul li a i {
+    text-align: center;
+}
+
+.left-sidebar .sidenav ul>li.small-cap {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 20px 0 0px 20px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+}
+
+.left-sidebar .sidenav ul>li a {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 11px;
+    padding: 0 12px;
+}
+
+.left-sidebar .sidenav ul>li a::after {
+    border-color: #adb5bd;
+}
+
+.left-sidebar .sidenav ul>li a>i.material-icons {
+    color: rgba(255, 255, 255, 0.5);
+    margin-right: 10px;
+}
+
+.left-sidebar .sidenav ul>li a:hover {
+    background-color: transparent;
+    color: white;
+}
+
+.left-sidebar .sidenav ul>li a:hover i {
+    color: white;
+}
+
+.left-sidebar .sidenav ul>li.active {
+    background-color: transparent;
+}
+
+.left-sidebar .sidenav ul>li.active>.collapsible-header {
+    /* fallback/image non-cover color */
+    background-color: #11d7e4;
+    /* Firefox 3.6+ */
+    background-image: -moz-linear-gradient(left, #11d7e4 0%, #48eaa1 100%);
+    /* Safari 4+, Chrome 1+ */
+    background-image: -webkit-gradient(linear,
+            left top,
+            right top,
+            color-stop(0%, #11d7e4),
+            color-stop(100%, #48eaa1));
+    /* Safari 5.1+, Chrome 10+ */
+    background-image: -webkit-linear-gradient(left, #11d7e4 0%, #48eaa1 100%);
+    /* Opera 11.10+ */
+    background-image: -o-linear-gradient(left, #11d7e4 0%, #48eaa1 100%);
+    /* IE10+ */
+    background: -ms-linear-gradient(left, #11d7e4 0%, #48eaa1 100%);
+    /* Standard */
+    background: linear-gradient(to right, #11d7e4 0%, #48eaa1 100%);
+    /* IE6-9 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$from', endColorstr='$to', GradientType=1);
+    border-radius: 60px;
+}
+
+.left-sidebar .sidenav ul>li.active>.collapsible-header i,
+.left-sidebar .sidenav ul>li.active>.collapsible-header .hide-menu {
+    color: #fff;
+}
+
+.left-sidebar .sidenav ul>li.active>.collapsible-header::after {
+    border-color: #fff;
+}
+
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li a {
+    color: rgba(255, 255, 255, 0.5) !important;
+    margin: 0 15px;
+    padding: 0 10px;
+    transition: 0.2s ease-in;
+}
+
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li a i {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li.active,
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li:hover {
+    background-color: transparent;
+}
+
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li.active a,
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li:hover a {
+    color: #fff !important;
+}
+
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li.active a i,
+.left-sidebar .sidenav .collapsible-body>ul:not(.collapsible)>li:hover a i {
+    text-align: center;
+    font-weight: 700;
+    color: #fff !important;
+}
+
+.collapsible .has-arrow {
+    position: relative;
+}
+
+.collapsible .has-arrow::after {
+    position: absolute;
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-width: 1px 0 0 1px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.5);
+    right: 1em;
+    -webkit-transform: rotate(135deg) translate(0, -50%);
+    -ms-transform: rotate(135deg) translate(0, -50%);
+    -o-transform: rotate(135deg) translate(0, -50%);
+    transform: rotate(135deg) translate(0, -50%);
+    -webkit-transform-origin: top;
+    -ms-transform-origin: top;
+    -o-transform-origin: top;
+    transform-origin: top;
+    top: 47%;
+    -webkit-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+}
+
+.collapsible .active>.has-arrow::after,
+.collapsible li>.has-arrow.active::after,
+.collapsible .has-arrow[aria-expanded="true"]::after {
+    -webkit-transform: rotate(-135deg) translate(0, -50%);
+    -ms-transform: rotate(-135deg) translate(0, -50%);
+    -o-transform: rotate(-135deg) translate(0, -50%);
+    top: 45%;
+    width: 7px;
+    transform: rotate(-135deg) translate(0, -50%);
+}
+
+.user-profile {
+    padding: 50px 15px 15px;
+    line-height: 22px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.user-profile .user-name {
+    vertical-align: middle;
+    cursor: pointer;
+    width: 100%;
+    overflow: hidden;
+}
+
+.user-profile .user-name .name {
+    font-weight: 400;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.user-profile .user-name .name i {
+    margin-right: 10px;
+}
+
+.user-profile #dropdownuser li a,
+.user-profile #dropdownuser li i {
+    color: #9098ac;
+}
+
+.user-profile #dropdownuser li a {
+    padding: 0 17px;
+}
+
+.user-profile #dropdownuser li a i {
+    margin-right: 5px;
+}
+
+.right-side-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 25px;
+    z-index: 10;
+}
+
+.right-sidebar .sidenav.right-sidenav {
+    position: fixed;
+    width: 300px;
+    top: 0;
+    z-index: 999;
+    padding-bottom: 10px;
+}
+
+.right-sidebar .sidenav.right-sidenav li {
+    line-height: 20px;
+}
+
+.right-sidebar .sidenav.right-sidenav .tabs .tab a {
+    opacity: 0.7;
+    font-size: 20px;
+}
+
+.right-sidebar .sidenav.right-sidenav .tabs .tab a:hover,
+.right-sidebar .sidenav.right-sidenav .tabs .tab a.active {
+    opacity: 1;
+}
+
+.theme-color {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+}
+
+.theme-color .theme-item {
+    list-style: none;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.theme-color .theme-item .theme-link {
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    display: block;
+    padding: 0;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin1"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin1"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin1"] {
+    background: #2962ff;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin2"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin2"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin2"] {
+    background: #fe5419;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin3"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin3"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin3"] {
+    background: #00b0ff;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin4"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin4"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin4"] {
+    background: #6659f7;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin5"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin5"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin5"] {
+    background: #273146;
+}
+
+.theme-color .theme-item .theme-link[data-logobg="skin6"],
+.theme-color .theme-item .theme-link[data-navbarbg="skin6"],
+.theme-color .theme-item .theme-link[data-sidebarbg="skin6"] {
+    background: #e9ecef;
+}
+
+.right-sidebar .sidenav.right-sidenav {
+    position: fixed;
+    width: 300px;
+    top: 0;
+    z-index: 999;
+    padding-bottom: 10px;
+}
+
+.right-sidebar .sidenav.right-sidenav li {
+    line-height: 20px;
+}
+
+.right-sidebar .sidenav.right-sidenav .tabs .tab a {
+    opacity: 0.7;
+    font-size: 20px;
+}
+
+.right-sidebar .sidenav.right-sidenav .tabs .tab a:hover,
+.right-sidebar .sidenav.right-sidenav .tabs .tab a.active {
+    opacity: 1;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox li .drop-title {
+    font-weight: 700;
+    padding: 11px 20px 15px;
+    border-bottom: 1px solid rgba(120, 130, 140, 0.13);
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox li a {
+    color: #9098ac;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center {
+    position: relative;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a {
+    border-bottom: 1px solid rgba(120, 130, 140, 0.13);
+    display: flex;
+    text-decoration: none;
+    padding: 9px 15px;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a:hover {
+    background: #e9edf2;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .user-img {
+    width: 50px;
+    position: relative;
+    display: inline-block;
+    margin: 0 0px 15px 0;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .user-img img {
+    width: 100%;
+    vertical-align: middle;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .user-img .profile-status {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    left: 30px;
+    position: absolute;
+    top: 1px;
+    width: 10px;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .mail-contnet {
+    width: 100%;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .mail-contnet h5 {
+    margin: 5px 0px 0;
+    font-size: 16px;
+    color: #455a64;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .mail-contnet .mail-desc,
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .mail-contnet .time {
+    font-size: 12px;
+    display: block;
+    margin: 1px 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: #9098ac;
+    white-space: nowrap;
+    width: 80%;
+}
+
+.right-sidebar .sidenav.right-sidenav .mailbox .message-center a .btn-floating {
+    flex-shrink: 0;
+}
+
+.chat-windows {
+    position: fixed;
+    bottom: 0px;
+    right: 300px;
+    height: 350px;
+    max-height: 350px;
+    z-index: 9999;
+    transition: 600ms;
+}
+
+.chat-windows.show-chat {
+    bottom: 0px;
+}
+
+.chat-windows.hide-chat {
+    bottom: -350px;
+}
+
+.chat-windows .user-chat {
+    min-width: 300px;
+    min-height: 350px;
+    background-color: #fff;
+    float: right;
+    margin: 0 2px 0 0;
+}
+
+.chat-windows .user-chat.mini-chat {
+    min-width: 40px;
+    min-height: 40px;
+    bottom: 0px;
+    top: 310px;
+    position: relative;
+}
+
+.chat-windows .user-chat.mini-chat .chat-head .name,
+.chat-windows .user-chat.mini-chat .chat-head i,
+.chat-windows .user-chat.mini-chat .chat-footer,
+.chat-windows .user-chat.mini-chat .chat-body {
+    display: none;
+}
+
+.chat-windows .user-chat.mini-chat .chat-head img {
+    margin: 0;
+}
+
+.chat-windows .user-chat.mini-chat .chat-head .status {
+    left: 28px;
+    top: 10px;
+}
+
+.chat-windows .user-chat .chat-head {
+    height: 40px;
+    padding: 10px;
+    background-color: #2962ff;
+    color: #fff;
+    position: relative;
+}
+
+.chat-windows .user-chat .chat-head img {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    vertical-align: middle;
+    margin: -4px 8px 0 0;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.chat-windows .user-chat .chat-head .status {
+    border: 1px solid #fff;
+    border-radius: 50%;
+    position: absolute;
+    height: 8px;
+    width: 8px;
+    left: 28px;
+    top: 7px;
+}
+
+.chat-windows .user-chat .chat-head i {
+    font-size: 14px;
+    float: right;
+    color: #fff;
+    margin: 3px 0 0 5px;
+    cursor: pointer;
+}
+
+.chat-windows .user-chat .chat-footer {
+    padding: 0px 15px;
+    border-top: 1px solid rgba(120, 130, 140, 0.13);
+}
+
+.chat-windows .user-chat .chat-footer .form-control {
+    background-color: transparent;
+    color: #9098ac;
+    font-size: 14px;
+    border: 0px;
+    width: 100%;
+    height: 40px;
+}
+
+.chat-windows .user-chat .chat-footer .form-control:focus,
+.chat-windows .user-chat .chat-footer .form-control:hover {
+    border: 0px;
+}
+
+.chat-windows .user-chat .chat-body {
+    height: 270px;
+    padding: 15px 15px 0;
+    background-color: #fff;
+    overflow: hidden;
+    max-width: 300px;
+    position: relative;
+}
+
+.chat-windows .user-chat .chat-body .chat-list li {
+    margin-top: 10px;
+}
+
+.chat-windows .user-chat .chat-body .chat-list li .chat-content {
+    padding-left: 0;
+}
+
+.chat-windows .user-chat .chat-body .chat-list li .chat-time {
+    margin: 5px 0 15px;
+}
+
+@media (max-width: 767px) {
+    .chat-windows.show-chat {
+        right: 0;
+    }
+}

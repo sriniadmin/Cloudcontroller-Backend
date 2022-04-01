@@ -1,0 +1,121 @@
+{
+  "appenders": {
+    "file": {
+      "type": "file",
+      "filename": "log/access.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    "liveapi": {
+      "type": "file",
+      "filename": "log/liveaccess1.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    "mware": {
+      "type": "file",
+      "filename": "log/mware.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    "liveapidata": {
+      "type": "file",
+      "filename": "log/liveaccessdata.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    "devicefactory": {
+      "type": "file",
+      "filename": "log/devicefactory.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    
+    "liveapiReg": {
+      "type": "file",
+      "filename": "log/liveaccessReg.log",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      }
+    },
+    "app": {
+      "type": "console",
+      "layout": {
+        "type": "pattern",
+        "pattern": "%d - AppType:%c:[%p]:%f{2}:[%l]: %m"
+      },
+      "filename": "log/app.log",
+      "maxLogSize": 10485760,
+      "numBackups": 3
+    },
+    "errorFile": {
+      "type": "file",
+      "filename": "log/errors.log"
+    },
+    "errors": {
+      "type": "logLevelFilter",
+      "level": "ERROR",
+      "appender": "errorFile"
+    },
+    "typeUrl": {
+      "type": "string",
+      "url": "http://51.143.17.177:7120/api/patients/patientinventory",
+      "category": "http"
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "file"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    },
+    "liveapi": {
+      "appenders": [
+        "liveapi"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    },
+    "liveapiReg": {
+      "appenders": [
+        "liveapiReg"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    },
+    "liveapidata": {
+      "appenders": [
+        "liveapidata"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    },
+    "devicefactory": {
+      "appenders": [
+        "devicefactory"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    },
+    "mware": {
+      "appenders": [
+        "mware"
+      ],
+      "level": "DEBUG",
+      "enableCallStack": true
+    }
+  }
+}

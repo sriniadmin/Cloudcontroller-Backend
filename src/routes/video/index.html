@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        font-family: "Courier New", Courier, monospace;
+        color: #444;
+        padding: 0 10px;
+      }
+      h2 {
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>HTTP Video Streaming</h2>
+    <p>Live247 Guides - autoplay</p>
+   
+    <video id="videoPlayer" width="650" controls muted="muted" >
+      <source src="/video/guide/helpvideo?type=spo2" type="video/mp4" />
+    </video>
+    <i>Spo2</i>
+
+
+     <video id="videoPlayer" width="650" controls muted="muted" >
+      <source src="/video/guide/helpvideo?type=ecg" type="video/mp4" />
+    </video>
+    <i>ECG</i>
+
+     <video id="videoPlayer" width="650" controls muted="muted" >
+      <source src="/video/guide/helpvideo?type=temp" type="video/mp4" />
+    </video>
+    <i>Temp</i>
+  </body>
+</html>

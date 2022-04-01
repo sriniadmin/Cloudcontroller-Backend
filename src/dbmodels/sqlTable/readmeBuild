@@ -1,0 +1,36 @@
+export data from the mysql tables
+copy the data into sql.txt
+convert it to the required format with string replacement and adding variables to each table
+  vi editor - variable const sql to const sql_1 , 2 , 3
+  let c=0 | g/const sql/ let c+=1 | s//\='const sql_' . c
+
+should become something like
+
+          const sql_240 =  `CREATE TABLE x12_partners (
+             id  int(11) NOT NULL DEFAULT 0,
+             name  varchar(255) DEFAULT NULL,
+             id_number  varchar(255) DEFAULT NULL,
+             x12_sender_id  varchar(255) DEFAULT NULL,
+             x12_receiver_id  varchar(255) DEFAULT NULL,
+             processing_format  enum('standard','medi-cal','cms','proxymed','oa_eligibility','availity_eligibility') DEFAULT NULL,
+             x12_isa01  varchar(2) NOT NULL DEFAULT '00' COMMENT 'User logon Required Indicator',
+             x12_isa02  varchar(10) NOT NULL DEFAULT '          ' COMMENT 'User Logon',
+             x12_isa03  varchar(2) NOT NULL DEFAULT '00' COMMENT 'User password required Indicator',
+             x12_isa04  varchar(10) NOT NULL DEFAULT '          ' COMMENT 'User Password',
+             x12_isa05  char(2) NOT NULL DEFAULT 'ZZ',
+             x12_isa07  char(2) NOT NULL DEFAULT 'ZZ',
+             x12_isa14  char(1) NOT NULL DEFAULT '0',
+             x12_isa15  char(1) NOT NULL DEFAULT 'P',
+             x12_gs02  varchar(15) NOT NULL DEFAULT '',
+             x12_per06  varchar(80) NOT NULL DEFAULT '',
+             x12_dtp03  char(1) NOT NULL DEFAULT 'A',
+            PRIMARY KEY ( id )
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;`;
+
+
+
+then copy all the data into sql.js
+run the sql.js
+which generates the new files under jsonSchema folder
+
+Note : these can be optimized - this is the first cut draft

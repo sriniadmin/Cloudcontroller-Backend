@@ -1,0 +1,222 @@
+<div id="patientsettingmodal1" class="modal">
+    <div class="modal-content ">
+        <div class="modal-header">
+            <h4>Settings
+                <div class="modal-close" style="float:right">
+                    <i class="material-icons">clear</i>
+                </div>
+        </div>
+        <div class="card">
+            <div class="card-content wizard-content">
+
+                <h6 class="card-subtitle">
+
+                </h6>
+                <form id="form" name="form" action="/patientsettings" method="post" class="tab-wizard wizard-circle">
+                    <!-- Step 1 -->
+                    <h6>HealthScore Alert Settings</h6>
+                    <section>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="min_hr">Min HeartRate : </label>
+                                    <input type="text" id="min_hr" name="min_hr" />
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="max_hr">Max HeartRate:
+                                    </label>
+                                    <input type="text" id="max_hr" name="max_hr" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="min_rr">Min RespirationRate :
+                                    </label>
+                                    <input type="text" id="min_rr" name="min_rr" />
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="max_rr">Max RespirationRate:
+                                    </label>
+                                    <input type="text" id="max_rr" name="max_rr" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="min_temp">Min Temperature : </label>
+                                    <input type="text" id="min_temp" name="min_temp" />
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="max_temp">Max Temperature:
+                                    </label>
+                                    <input type="text" id="max_temp" name="max_temp" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="min_spo2">Min SPo2 : </label>
+                                    <input type="text" id="min_spo2" name="min_spo2" />
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="max_spo2">Max SPo2:
+                                    </label>
+                                    <input type="text" id="max_spo2" name="max_spo2" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="min_ews">EWS Interval (mins):
+                                    </label>
+                                    <input type="text" id="min_ews" name="min_ews" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+                    <!-- Step 2 -->
+                    <h6>Personal</h6>
+                    <section>
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="input-field">
+                                    <label for="shortDescription1">Address
+                                        :</label>
+                                    <textarea name="address1" id="address1" class="materialize-textarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="city1">City
+                                        :</label>
+                                    <input type="text" id="patientcity" name="patientcity" />
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="state1">State
+                                        :</label>
+                                    <input type="text" id="patientState" name="patientState" />
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+
+                                    <select id="patientcountry" name="patientcountry">
+                                        <option value="" disabled selected>
+                                            Country
+                                        </option>
+                                        <option value="India">
+                                            India
+                                        </option>
+                                        <option value="USA">
+                                            USA</option>
+                                        <option value="France">
+                                            France
+                                        </option>
+                                        <option value="Italy">
+                                            Italy
+                                        </option>
+                                    </select>
+                                    <label>Country
+                                        :</label>
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="zip1">ZIP/PIN
+                                        :</label>
+                                    <input type="text" id="patientzip1" name="patientzip1" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="emecontactname1">Emergency
+                                        Contact
+                                        Name
+                                        :</label>
+                                    <input type="text" id="emergencyName1" name="emergencyName1" />
+
+                                </div>
+                            </div>
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="emergencyphoneNumber1">Emergency
+                                        Phone Number
+                                        :</label>
+                                    <input type="tel" id="emergencyphoneNumber1" name="emergencyphoneNumber1" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Step 3 -->
+
+                    <h6>Patch</h6>
+                    <section>
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+                                    <label for="empname1">Patch
+                                        ID :</label>
+                                    <input type="text" id="empName1" name="empName1" />
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 l6">
+                                <div class="input-field">
+
+                                    <select name="empcountry" id="empcountry">
+                                        <option value="" disabled selected>
+                                            Patch
+                                            Type
+                                        </option>
+                                        <option value="India">
+                                            ECG</option>
+                                        <option value="USA">
+                                            Temperature
+                                        </option>
+                                        <option value="France">
+                                            SPo2
+                                        </option>
+
+                                    </select>
+                                    <label>Patch Type
+                                        :</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+
+    </div>
+</div>

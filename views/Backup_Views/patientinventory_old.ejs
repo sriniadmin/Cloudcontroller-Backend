@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/assets/images/favicon.png"
+        />
+        <% include partials/title.ejs %>
+        <!-- Style CSS -->
+        <link href="/dist/css/style.css" rel="stylesheet" />
+        <!-- This page CSS -->
+        <link href="/dist/css/pages/dashboard1.css" rel="stylesheet" />
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div class="main-wrapper" id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Preloader - style you can find in spinners.css -->
+            <!-- ============================================================== -->
+
+            <% include partials/preloader.ejs %> <% include partials/header.ejs
+            %> <% include partials/sidebar.ejs %>
+
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Title and breadcrumb -->
+                <!-- ============================================================== -->
+                <% include partials/breadcrumb.ejs %>
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <form action="/createpatient" method="post">
+                <div class="container-fluid">
+                    <div class="row">
+                        <h5>Basic Information</h5>
+                        <div class="col m4 s12">
+                            <label>Patient ID</label>
+                            <input id="patientid"
+                                placeholder="Enter the patient ID"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patient Name</label>
+                            <input id="patientname" placeholder="Patient Name" type="text" />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Phone Number</label>
+                            <input placeholder="Phone Number" type="text" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <label>Address</label>
+                            <input placeholder="Address" type="text" />
+                        </div>
+                    </div>
+                    <hr style="background-color: white;" />
+                    <div class="row">
+                        <h5>Medical Information</h5>
+                        <div class="col m4 s12">
+                            <label>Consulting Doctor's</label>
+                            <input
+                                placeholder="Consulting Doctor's"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Diagnosis</label>
+                            <input placeholder="Diagnosis" type="text" />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Known Health Issues</label>
+                            <input
+                                placeholder="Known Health Issues"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col m6 s12">
+                            <label>Lab Tests</label>
+                            <input placeholder="Lab Tests" type="text" />
+                        </div>
+                        <div class="col m6 s12">
+                            <label>Medication</label>
+                            <input placeholder="Medication" type="text" />
+                        </div>
+                    </div>
+                    <hr style="background-color: white;" />
+                    <div class="row">
+                        <h5>Patch Information</h5>
+                        <div class="col m4 s12">
+                            <label>Patch ID</label>
+                            <input
+                                placeholder="Enter the patch ID"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patch Functionality</label>
+                            <input
+                                placeholder="Patch Functionality"
+                                type="text"
+                            />
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Hardware Info</label>
+                            <input placeholder="Hardware Info" type="text" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <h4>Link Patch</h4>
+                        <div class="col m6 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <option value="1">Mayo Clinic</option>
+                                <option value="2">UCSF Medical Center</option>
+                                <option value="3"
+                                    >Johns Hopkins Hospital</option
+                                >
+                            </select>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row">
+                        <h3>Enable Sensors</h3>
+                        <div class="col s12">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Blood Pressure</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Sugar Levels</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>ECG</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Temperature Sensor</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>SpO2</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Geo Monitoring</span> </label
+                            ><br />
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span
+                                    >Monitoring Interval(No. of times a
+                                    day)</span
+                                > </label
+                            ><br />
+                        </div>
+                    </div>
+                    <br /><br />
+                    <div class="row">
+                        <h5>Pricing Information</h5>
+                        <div class="col m4 s12">
+                            <label>Monthly Threshold</label>
+                            <input
+                                placeholder="Enter the Monthly Threshold"
+                                type="text"
+                            />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <center>
+                                <a id="addpatient-post-btn"
+                                    class="waves-effect waves-light btn btn-round green"
+                                    >Add</a
+                                >
+                            </center>
+                        </div>
+                    </div>
+                </div>
+                </form>
+
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <% include partials/footer.ejs %>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="chat-windows"></div>
+            <!-- ============================================================== -->
+            <!-- Right Sidebar -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- All Required js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+        <script src="/dist/js/materialize.min.js"></script>
+        <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Apps -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/app.js"></script>
+        <script src="/dist/js/app.init.dark.js"></script>
+        <script src="/dist/js/app-style-switcher.js"></script>
+        <!-- ============================================================== -->
+        <!-- Custom js -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/custom.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Backend js -->
+        <!-- ============================================================== -->
+        <script src="/javascripts/patientonboard.js"></script>
+    </body>
+</html>

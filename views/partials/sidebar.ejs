@@ -1,0 +1,150 @@
+<!-- ============================================================== -->
+<!-- Sidebar scss in sidebar.scss -->
+<!-- ============================================================== -->
+<aside class="left-sidebar">
+    <ul id="slide-out" class="sidenav">
+        <li class="small-cap">
+            <span class="hide-menu">Welcome 
+                <%= userRoleData["email"].split("@")[0] %>!</span>
+        </li>
+        <li class="no-padding">
+            <ul class="collapsible collapsible-accordion">
+                <li>
+                    <a class="collapsible-header"
+                        ><i class="material-icons">dashboard</i
+                        ><span class="hide-menu"> Dashboard</span></a
+                    >
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="/dashboard"
+                                    ><i class="material-icons">adjust</i
+                                    ><span class="hide-menu">Dashboard</span></a
+                                >
+                            </li>
+                            <li>
+                                <a href="/dashboard"
+                                    ><i class="material-icons">adjust</i
+                                    ><span class="hide-menu"
+                                        >Patient Dashboard</span
+                                    ></a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li>
+                    <a class="collapsible-header"
+                        ><i class="material-icons">group</i
+                        ><span class="hide-menu"> Patients</span></a
+                    >
+                    <div class="collapsible-body">
+                        <ul>
+                            <li>
+                                <a href="/patientlist"
+                                    ><i class="material-icons">adjust</i
+                                    ><span class="hide-menu"
+                                        >Patient List</span
+                                    ></a
+                                >
+                            </li>
+                            <li>
+                                <a href="index.html"
+                                    ><i class="material-icons">calendar_today</i
+                                    ><span class="hide-menu"
+                                        >Appointment</span
+                                    ></a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="/patchinventory" class="collapsible-header"
+                        ><i class="material-icons">archive</i
+                        ><span class="hide-menu"> Patch Inventory </span></a
+                    >
+                </li>
+                <%
+                roleGrant=role_ac.can(userRoleData["role"]).readAny("adminPage")
+                %> <% if(roleGrant.granted){ %>
+                <li>
+                    <a
+                        href="/hospitalbilling?patient=Abigail Mendez&hospital=Cleveland Clinic&timerange=1week&id=5f1935269065e5a4927de1af"
+                        class="collapsible-header"
+                        ><i class="material-icons">account_balance_wallet</i
+                        ><span class="hide-menu"> Hospital Billing </span></a
+                    >
+                </li>
+                <% } %> <%
+                roleGrant=role_ac.can(userRoleData["role"]).readAny("adminPage")
+                %> <% if(roleGrant.granted){ %>
+                <li>
+                    <a href="/administration" class="collapsible-header"
+                        ><i class="material-icons">account_circle</i
+                        ><span class="hide-menu"> Administration </span></a
+                    >
+                </li>
+                <% } %>
+                <li>
+                    <a href="/map" class="collapsible-header"
+                        ><i class="material-icons">map</i
+                        ><span class="hide-menu"> Map</span></a
+                    >
+                </li>
+                <%
+                roleGrant=role_ac.can(userRoleData["role"]).readAny("adminPage")
+                %> <% if(roleGrant.granted){ %>
+                <li>
+                    <a href="javascript: void(0);" class="collapsible-header"
+                        ><i class="material-icons">equalizer</i
+                        ><span class="hide-menu"> Analytics </span></a
+                    >
+                </li>
+                <% } %> <%
+                roleGrant=role_ac.can(userRoleData["role"]).readAny("adminPage")
+                %> <% if(roleGrant.granted){ %>
+                <li>
+                    <a href="/nurseview" class="collapsible-header"
+                        ><i class="material-icons">library_books</i
+                        ><span class="hide-menu"> Reports </span></a
+                    >
+                </li>
+                <% } %> <%
+                roleGrant=role_ac.can(userRoleData["role"]).readAny("adminPage")
+                %> <% if(roleGrant.granted){ %>
+                <li>
+                    <a href="javascript: void(0);" class="collapsible-header"
+                        ><i class="material-icons">multiline_chart</i
+                        ><span class="hide-menu">Incidents</span></a
+                    >
+                </li>
+                <% } %>
+
+                <!-- <li>
+                    <a href="javascript: void(0);" class="collapsible-header"
+                        ><i class="material-icons">explore</i
+                        ><span class="hide-menu"> Timeline</span></a
+                    >
+                </li> -->
+                <!-- <li>
+                    <a href="javascript: void(0);" class="collapsible-header"
+                        ><i class="material-icons">content_paste</i
+                        ><span class="hide-menu"> Documentation </span></a
+                    >
+                </li> -->
+                <li>
+                    <a href="javascript: void(0);" class="collapsible-header"
+                        ><i class="material-icons">people_outline</i
+                        ><span class="hide-menu"> Support </span></a
+                    >
+                </li>
+            </ul>
+        </li>
+    </ul>
+</aside>
+<!-- ============================================================== -->
+<!-- Sidebar scss in sidebar.scss -->
+<!-- ============================================================== -->

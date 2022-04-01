@@ -1,0 +1,34 @@
+// require("dotenv").config({
+//     path:
+//         "/home/sudks/Projects/EMR/Development/software/code/UI/emr-webapp-master/emr-webapp-master/.env",
+// })
+
+
+
+
+// app.use(session({
+//     secret: process.env.COOKIE_SECRET,
+//     saveUninitialized: true,
+//     resave: false
+// }))
+// app.use(function (req, res, next) {
+//     res.locals.user = req.session.user
+//     next()
+// })
+
+
+
+
+function verifySession(res, sess) {
+    console.log("Session is ", sess)
+    if (typeof sess === "undefined" || !sess.user) {
+        res.render("index.ejs", {
+            title: "Login",
+            breadcrumb: "Login",
+            data: [1, 2, 3, 4, 5],
+        })
+        res.send("Contact Admin (s) - Thank YOU !!")
+        res.end("Done")
+    }
+    return true
+}

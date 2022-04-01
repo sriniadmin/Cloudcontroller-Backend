@@ -1,0 +1,28 @@
+{
+  "name": "liveapi",
+  "version": "0.0.1",
+  "description": "Patient Patch Data Live Stream",
+  "main": "liveapi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "live247",
+  "license": "ISC",
+  "dependencies": {
+    "http": "0.0.1-security",
+    "redis": "^3.1.2",
+    "url": "^0.11.0",
+    "kafkajs": "^1.15.0",
+    "log4js": "^6.3.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "path": "^0.12.7",
+    "sequelize": "^6.3.5",
+    "sequelize-auto": "^0.7.7",
+    "swagger": "^0.7.5",
+    "swagger-jsdoc": "5.0.1",
+    "swagger-ui-express": "^4.1.6",
+    "util": "^0.12.3",
+    "ws": "^7.4.5"
+  }
+}

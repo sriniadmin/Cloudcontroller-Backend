@@ -1,0 +1,117 @@
+{
+  "license": [
+    {
+      "Basic_License": [
+        {
+          "Dashboard": {
+            "status": "active",
+            "StartDate": "2021-06-23T00:00:00.000Z",
+            "EndDate": "2021-09-23T00:00:00.000Z"
+          },
+          "Alerts": {
+            "status": "active",
+            "StartDate": "2021-06-23T00:00:00.000Z",
+            "EndDate": "2021-09-23T00:00:00.000Z"
+          },
+          "Audit": {
+            "status": "active",
+            "StartDate": "2021-06-23T00:00:00.000Z",
+            "EndDate": "2021-09-23T00:00:00.000Z"
+          },
+          "Billing": {
+            "status": "active",
+            "StartDate": "2021-06-23T00:00:00.000Z",
+            "EndDate": "2021-09-23T00:00:00.000Z"
+          },
+          "Patient Journey": {
+            "status": "active",
+            "StartDate": "2021-06-23T00:00:00.000Z",
+            "EndDate": "2021-09-23T00:00:00.000Z"
+          }
+        }
+      ],
+      "Devices": [
+        {
+          "sensors": "spo2",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "ecg",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "temperature",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "ds",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "glucometer",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "bp",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "sensors": "gateway",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        }
+      ],
+      "Advanced_Features": [
+        {
+          "advanced_features": "Visualizer",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "advanced_features": "Medicine Reminder",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "advanced_features": "ICU",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "advanced_features": "EMR Connector",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "advanced_features": "Audit",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        },
+        {
+          "advanced_features": "Chat",
+          "status": "active",
+          "StartDate": "2021-06-23T00:00:00.000Z",
+          "EndDate": "2021-09-23T00:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}

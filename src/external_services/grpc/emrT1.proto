@@ -1,0 +1,206 @@
+syntax = "proto2";
+
+option go_package = "./emr_consumer_proto";
+
+message Null {};
+
+enum patientDiscoveryMethod {
+    METHOD_CREATE = 1;
+    METHOD_DELETE = 2;
+}
+
+enum baselineOperation {
+    BSLN_OP_CURRENT = 1;
+    BSLN_OP_AGGREGATE = 2;
+}
+
+
+enum fetchDuration {
+    FETCH_DURATION_8HR = 1;
+    FETCH_DURATION_12HR = 2;
+    FETCH_DURATION_24HR = 3;
+    FETCH_DURATION_48HR = 4;
+    FETCH_DURATION_76HR = 5;
+    FETCH_DURATION_1WK = 6;
+    FETCH_DURATION_2WK = 7;
+    FETCH_DURATION_3WK = 8;
+    FETCH_DURATION_4WK = 9;
+}
+
+message baselinesHr {
+    optional int32 hrMax = 1;
+    optional int32 hrMin = 2;
+    optional int32 hrAvg = 3;
+}
+
+message baselinesRr {
+    optional int32 rrMax = 1;
+    optional int32 rrMin = 2;
+    optional int32 rrAvg = 3;
+}
+
+message baselinesPr {
+    optional int32 prMax = 1;
+    optional int32 prMin = 2;
+    optional int32 prAvg = 3;
+}
+message baselinesSpo2 {
+    optional int32 spo2Max = 1;
+    optional int32 spo2Min = 2;
+    optional int32 spo2Avg = 3;
+}
+
+message baselinesPi {
+    optional float piMax = 1;
+    optional float piMin = 2;
+    optional float piAvg = 3;
+}
+message baselinesTemperature {
+    optional float temperatureMax = 1;
+    optional float temperatureMin = 2;
+    optional float temperatureAvg = 3;
+}
+message baselinesBP {
+    optional int32 bps = 1;
+    optional int32 bpd = 2;
+    optional uint64 time = 3;
+
+}
+
+message baselinesPatient {
+    required string tenantUUID = 1;
+    required string patientUUID = 2;
+    required baselineOperation baselineOp = 3;
+    optional baselinesHr hr = 4;
+    optional baselinesRr rr = 5;
+    optional baselinesPr pr = 6;
+    optional baselinesSpo2 spo2 = 7;
+    optional baselinesPi pi = 8;
+    optional baselinesTemperature temperature = 9;
+    optional uint64 currTime = 10;
+    optional int32  batteryEcg = 11;
+    optional int32  batterySpo2 = 12;
+    optional int32  batteryTemperature = 13;
+    optional int32  batteryGateway = 14;
+    optional baselinesBP  bp = 15;    
+    optional int32  sugar = 16;
+    optional float  weight = 17;
+    optional int32  batteryBp = 18;
+
+}
+
+message trendDataPoint {
+    optional int32 valInt = 1;
+    optional float valFloat = 2;
+    optional uint64 timeStamp = 3;
+}
+
+message trendsPatient {
+    optional bool rsp = 1;
+    optional string tenantUUID = 2;
+    optional string patientUUID = 3;
+    optional string time = 4;
+    optional int32 livehr = 5;
+    optional int32 maxhr = 6;
+    optional int32 liverr = 7;
+    optional int32 livespo2 = 8;
+    optional int32 minspo2 = 9;
+    optional int32 livepr = 10;
+    optional float livepi = 11;
+    optional float livetemperature = 12;
+    optional float maxtemperature = 13;
+    repeated trendDataPoint trendhr = 14;
+    repeated trendDataPoint trendrr = 15;
+    repeated trendDataPoint trendpr = 16;
+    repeated trendDataPoint trendspo2 = 17;
+    repeated trendDataPoint trendpi = 18;
+    repeated trendDataPoint trendtemperature = 19;
+    optional int32 ews = 20;
+    optional uint64 lastUpdatedLiveTime = 21;
+    optional uint64 lastUpdatedTrendTime = 22;
+    repeated int32 trendews = 23;
+    optional int32  batteryEcg = 24;
+    optional int32  batterySpo2 = 25;
+    optional int32  batteryTemperature = 26;
+    optional int32  batteryGateway = 27;
+    repeated trendDataPoint  trendbatteryEcg = 28;
+    repeated trendDataPoint  trendbatterySpo2 = 29;
+    repeated trendDataPoint  trendbatteryTemperature = 30;
+    repeated trendDataPoint  trendbatteryBp = 31;
+    repeated trendDataPoint  trendbatteryGateway = 32;
+    repeated trendDataPoint  trendbp = 33;
+    repeated trendDataPoint  trendweight = 34;
+    optional int32              livebp = 35;
+    optional float              liveweight = 36;
+    optional uint64             lastUpdatedLiveEcgTime = 37;
+    optional uint64             lastUpdatedLiveSpo2Time = 38;
+    optional uint64             lastUpdatedLiveTemperatureTime = 39;
+    optional uint64             lastUpdatedLiveWeightTime = 40;
+    optional uint64             lastUpdatedLiveBPTime = 41;
+
+}
+
+message allPatientTrends {
+    repeated trendsPatient trndsPtnt = 1;
+    optional int32 numPatients = 2;
+    optional int32 currentIdx = 3;
+}
+
+
+message foldUpMetrics {
+    required int64 recordDate =1;
+    required int32 hr    =  2;
+    required int32 rr    =  3;
+    required int32 spo2  =  4;
+    required int32 pr    =  5;
+    required float pi    =  6;
+    required float temperature    =  7;
+}
+
+message foldUpMetricsFull {
+    repeated foldUpMetrics fldUpMetricsAll  = 1;
+}
+
+message trendsPatientReq {
+    required string tenantUUID = 1;
+    required string patientUUID = 2;    
+    optional fetchDuration duration = 3;
+}
+
+
+message pagination {
+    required int32 pgNumEntries = 1;
+    required int32 pgIdx = 2;
+    optional fetchDuration duration = 3;
+    required string tenantUUID = 4;
+    repeated string patientUUIDList = 5;
+}
+
+message patientThresholdVitals {
+    optional int32 bps = 1;
+    optional int32 bpd = 2;
+    optional int32 sugar = 3;
+    optional int32 spo2Threshold = 4;
+    optional int32 temperatureThreshold = 5;
+    optional int32 prThreshold = 6;
+    optional int32 piThreshold = 7;
+    optional float weight = 8;
+
+}
+message patientRegister {
+    required string patientUUID = 1;
+    optional patientDiscoveryMethod method = 2;
+    optional patientThresholdVitals vitals = 3;
+
+}
+message patientRegisterRsp {
+    required bool rsp = 1;
+}
+
+service EmrT1Rpc {
+    rpc RegisterPatient(patientRegister) returns (patientRegisterRsp);
+    rpc DeRegisterPatient(patientRegister) returns (patientRegisterRsp);
+    rpc BaselineSend(baselinesPatient) returns (patientRegisterRsp);
+    rpc GetTrendsPatient(trendsPatientReq) returns (trendsPatient);
+    rpc GetSortedTrendsPatient(pagination) returns (allPatientTrends);
+}

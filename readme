@@ -1,0 +1,434 @@
+ pm2 start app.js
+
+
+ influx
+ show databases;
+ use example;
+ insert weather,location=bangalore temperature=96;
+ insert weather,location=bangalore temperature=97;
+
+ show measurements;
+ select * from weather;
+
+
+sequelize - working
+root@sudks-G3-3579:/home/sudks/Projects/EMR/Development/software/code/UI/emr-webapp-master/emr-webapp-master# sequelize-auto -o "./src/dbmodels/sequelizeEMRModels" -d openemr -h localhost -u root -x root -e mysql
+
+For some of the tables - primaryKey: true needs to be set -- then everything will work as expected
+For now commented them
+
+
+curl -X POST -H "Content-Type: application/json"     -d '{"password": "linuxize", "email": "linuxize@example.com", "role":"user"}'     http://127.0.0.1:7117/signupnew -H "x-access-token:  "
+
+CREATE TABLE `uuid` (
+  `uuid` varchar(400) NOT NULL COMMENT 'with the uuidType',
+  `tenant_uuid` varchar(255) NOT NULL,
+  PRIMARY KEY (uuid,tenant_uuid)
+);
+
+
+ALTER TABLE `patch_patient_map`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `patch_history_map`;
+
+ALTER TABLE `Appointment`
+ADD `tenant_uuid` varchar(255) COLLATE 'utf8_general_ci' NOT NULL;
+
+ALTER TABLE `ews_table`
+CHANGE `timestamp` `timestamp` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP AFTER `pid`,
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `score_split`;
+
+ALTER TABLE `facility`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `oid`;
+
+ALTER TABLE `location`
+CHANGE `tenant_uuid` `tenant_uuid` varchar(255) NOT NULL AFTER `location_uuid`;
+
+ALTER TABLE `notes`
+CHANGE `revision` `revision` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE CURRENT_TIMESTAMP AFTER `date`,
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `revision`;
+
+ALTER TABLE `patch`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `patch_serial`;
+
+ALTER TABLE `patch_patient_map`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `patch_history_map`;
+
+ALTER TABLE `patient_data`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `guardianemail`,
+CHANGE `tenant_uuid` `med_record` varchar(150) NULL AFTER `tenant_id`;
+
+ALTER TABLE `users`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `patient_menu_role`;
+
+ALTER TABLE `practictioner_patient_map`
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `users_uuid`;
+
+ALTER TABLE `users_secure`
+CHANGE `last_update` `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE CURRENT_TIMESTAMP AFTER `salt`,
+CHANGE `tenant` `tenant` varchar(255) NULL AFTER `role`;
+
+ALTER TABLE `users_secure`
+CHANGE `id` `id` bigint(20) NOT NULL AUTO_INCREMENT FIRST,
+CHANGE `last_update` `last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE CURRENT_TIMESTAMP AFTER `salt`;
+
+
+ALTER TABLE `patient_data`
+CHANGE `pid` `pid` varchar(255) NOT NULL DEFAULT '0' AFTER `pubpid`;
+
+ALTER TABLE `users`
+ADD `tenant_id` bigint(20) NOT NULL;
+
+CREATE TABLE `patch` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `patch_type` varchar(200) NOT NULL,
+  `patch_name` varchar(200) NOT NULL,
+  `patch_uuid` varchar(250) NOT NULL,
+  `patch_status` int NOT NULL,
+  `patch_group_id` int NOT NULL,
+  `patch_mac` int NOT NULL,
+  `patch_bluetooth` smallint NOT NULL DEFAULT '1',
+  `patch_sensor_id` varchar(250) NOT NULL,
+  `patch_serial` varchar(250) NOT NULL
+);
+
+
+CREATE TABLE `patch_patient_map` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `patient_uuid` varchar(255) NOT NULL,
+  `patch_map` json NOT NULL,
+  `patch_history_map` json NOT NULL
+);
+
+ALTER TABLE `patch_patient_map`
+ADD `tenant_id` bigint(20) NOT NULL;
+
+ALTER TABLE `patch`
+ADD `tenant_id` bigint(20) NOT NULL;
+
+ALTER TABLE `patient_data`
+ADD `tenant_id` bigint(20) NULL;
+
+
+ALTER TABLE `facility`
+ADD `tenant_id` bigint(20) NOT NULL;
+
+
+ALTER TABLE `users`
+ADD `role` varchar(255) NOT NULL,
+ADD `user_uuid` varchar(255) NOT NULL AFTER `role`;
+
+CREATE TABLE `practictioner_patient_map` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `patient_uuid` varchar(255) NOT NULL,
+  `users_uuid` varchar(255) NOT NULL,
+  `tenant_id` bigint(20) NOT NULL,
+  `archive` smallint NOT NULL
+);
+
+ALTER TABLE `practictioner_patient_map`
+ADD `primary` smallint(6) NOT NULL;
+
+INSERT INTO `patch_patient_map` (`patient_uuid`, `patch_map`, `patch_history_map`, `tenant_id`)
+VALUES ('123', '{\r\n\"ecg\":123,\r\n\"spo2\",456\r\n}', '{\r\n\"time\":\"7:00:20 04/04/2021\"\r\n\"patchmap\" :{\r\n\"ecg\":123,\r\n\"spo2\",456\r\n}\r\n}', '3');
+
+
+CREATE TABLE `ews_table` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `pid` varchar(255) NOT NULL,
+  `timestamp` timestamp NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `calculated_time` varchar(255) NOT NULL,
+  `score` varchar(20) NOT NULL,
+  `score_split` json NOT NULL,
+  `tenant_id` bigint(20) NOT NULL,
+  `archive` tinyint NOT NULL DEFAULT '0'
+);
+
+
+CREATE TABLE `role` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(100) NOT NULL,
+  `role_uuid` VARCHAR(250) NOT NULL,
+  `description` TINYTEXT NULL,
+  `active` TINYINT(2) NOT NULL DEFAULT 0,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NULL DEFAULT NULL,
+  `content` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+
+  ALTER TABLE `notes`
+  CHANGE `foreign_id` `note_uuid` varchar(250) NOT NULL DEFAULT '0' AFTER `id`,
+  CHANGE `note` `note` longtext COLLATE 'utf8_general_ci' NULL AFTER `note_uuid`,
+  CHANGE `owner` `prac_uuid` varchar(255) NULL AFTER `note`,
+  CHANGE `date` `date` datetime NULL COMMENT 'create date time' AFTER `prac_uuid`,
+  CHANGE `revision` `revision` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE CURRENT_TIMESTAMP AFTER `date`,
+  ADD `tenant_id` bigint(20) NOT NULL,
+  ADD `pid` varchar(255) NOT NULL AFTER `tenant_id`;
+
+
+  ALTER TABLE `prescriptions`
+  CHANGE `patient_id` `patient_id` varchar(250) NULL AFTER `id`,
+  CHANGE `note` `note_uuid` varchar(255) COLLATE 'utf8_general_ci' NULL AFTER `medication`,
+  CHANGE `user` `prac_uuid` varchar(250) COLLATE 'utf8_general_ci' NULL AFTER `datetime`,
+  ADD `tenant_uuid` bigint(20) NOT NULL;
+
+
+  CREATE TABLE `location` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `location_uuid` varchar(255) NOT NULL,
+  `tenant_uuid` bigint(20) NOT NULL,
+  `archive` smallint NOT NULL,
+  `active` smallint NOT NULL,
+  `date` datetime NOT NULL,
+  `building` varchar(100) NOT NULL,
+  `floor` varchar(100) NOT NULL,
+  `ward` varchar(100) NOT NULL,
+  `facility_uuid` varchar(250) NOT NULL
+);
+
+
+CREATE TABLE `bed` (
+  `id` bigint NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `tenant_uuid` varchar(255) NOT NULL,
+  `bed_uuid` varchar(255) NOT NULL,
+  `bed_num` varchar(100) NOT NULL,
+  `archive` smallint NOT NULL,
+  `active` tinyint NOT NULL,
+  `location_uuid` varchar(255) NOT NULL
+);
+
+
+ALTER TABLE `patch`
+CHANGE `patch_group_id` `patch_group_id` varchar(250) NULL AFTER `patch_status`,
+ADD `pid` varchar(255) COLLATE 'utf8_general_ci' NOT NULL;
+
+https://dba.stackexchange.com/questions/137606/slot-time-challenge-doctor-appointment-database-schema/171361
+  CREATE TABLE Appointment (
+    prac_uuid    VARCHAR(255)     NOT NULL,
+    `date`      DATE            NOT NULL,
+    startTime   TIME(0)         NOT NULL,
+    endTime     TIME(0)         NOT NULL,
+
+    CONSTRAINT PRIMARY KEY (prac_uuid, `date`, startTime),
+
+    CONSTRAINT mustStartOnTenMinuteBoundary CHECK (
+        EXTRACT(MINUTE FROM startTime) % 10 = 0
+        AND EXTRACT(SECOND FROM startTime) = 0
+    ),
+    CONSTRAINT mustEndOnTenMinuteBoundary CHECK (
+        EXTRACT(MINUTE FROM endTime) % 10 = 0
+        AND EXTRACT(SECOND FROM endTime) = 0
+    ),
+    CONSTRAINT cannotStartBefore0900 CHECK (
+        EXTRACT(HOUR FROM startTime) >= 9
+    ),
+    CONSTRAINT cannotEndAfter1700 CHECK (
+        EXTRACT(HOUR FROM (startTime - INTERVAL 1 SECOND)) < 17
+    ),
+    CONSTRAINT mustEndAfterStart CHECK (
+        endTime > startTime
+    )
+);
+
+
+ALTER TABLE `users`
+CHANGE `username` `username` varchar(255) COLLATE 'utf8_general_ci' NOT NULL AFTER `id`,
+CHANGE `password` `password` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `username`,
+CHANGE `lname` `lname` varchar(255) COLLATE 'utf8_general_ci' NOT NULL AFTER `mname`,
+CHANGE `facility_id` `facility_id` int(11) NULL DEFAULT '0' AFTER `facility`,
+CHANGE `see_auth` `see_auth` int(11) NULL DEFAULT '1' AFTER `facility_id`,
+CHANGE `email_direct` `email_direct` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `email`,
+CHANGE `cal_ui` `cal_ui` tinyint(4) NULL DEFAULT '1' AFTER `notes`,
+CHANGE `taxonomy` `taxonomy` varchar(30) COLLATE 'utf8_general_ci' NULL DEFAULT '207Q00000X' AFTER `cal_ui`,
+CHANGE `calendar` `calendar` tinyint(1) NULL DEFAULT '0' COMMENT '1 = appears in calendar' AFTER `taxonomy`,
+CHANGE `abook_type` `abook_type` varchar(31) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `calendar`,
+CHANGE `default_warehouse` `default_warehouse` varchar(31) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `pwd_history2`,
+CHANGE `irnpool` `irnpool` varchar(31) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `default_warehouse`,
+CHANGE `main_menu_role` `main_menu_role` varchar(50) COLLATE 'utf8_general_ci' NULL DEFAULT 'standard' AFTER `physician_type`,
+CHANGE `patient_menu_role` `patient_menu_role` varchar(50) COLLATE 'utf8_general_ci' NULL DEFAULT 'standard' AFTER `main_menu_role`,
+CHANGE `tenant_id` `tenant_id` varchar(255) NOT NULL AFTER `patient_menu_role`;
+
+
+ALTER TABLE `patch_patient_map`
+CHANGE `patch_map` `patch_uuid` longtext COLLATE 'utf8mb4_bin' NOT NULL AFTER `pid`,
+DROP `patch_history_map`,
+ADD `duration` bigint NULL;
+
+
+
+ALTER TABLE `patient_data`
+CHANGE `title` `title` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `id`,
+CHANGE `language` `language` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `title`,
+CHANGE `financial` `financial` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `language`,
+CHANGE `fname` `fname` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `financial`,
+CHANGE `mname` `mname` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `lname`,
+CHANGE `street` `street` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `DOB`,
+CHANGE `postal_code` `postal_code` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `street`,
+CHANGE `city` `city` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `postal_code`,
+CHANGE `state` `state` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `city`,
+CHANGE `country_code` `country_code` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `state`,
+CHANGE `drivers_license` `drivers_license` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `country_code`,
+CHANGE `ss` `ss` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `drivers_license`,
+CHANGE `phone_home` `phone_home` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `occupation`,
+CHANGE `phone_biz` `phone_biz` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `phone_home`,
+CHANGE `phone_contact` `phone_contact` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `phone_biz`,
+CHANGE `phone_cell` `phone_cell` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `phone_contact`,
+CHANGE `pharmacy_id` `pharmacy_id` int(11) NULL DEFAULT '0' AFTER `phone_cell`,
+CHANGE `status` `status` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `pharmacy_id`,
+CHANGE `contact_relationship` `contact_relationship` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `status`,
+CHANGE `referrer` `referrer` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `sex`,
+CHANGE `referrerID` `referrerID` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `referrer`,
+CHANGE `email` `email` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `ref_providerID`,
+CHANGE `email_direct` `email_direct` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `email`,
+CHANGE `ethnoracial` `ethnoracial` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `email_direct`,
+CHANGE `race` `race` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `ethnoracial`,
+CHANGE `ethnicity` `ethnicity` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `race`,
+CHANGE `religion` `religion` varchar(40) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `ethnicity`,
+CHANGE `interpretter` `interpretter` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `religion`,
+CHANGE `migrantseasonal` `migrantseasonal` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `interpretter`,
+CHANGE `family_size` `family_size` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `migrantseasonal`,
+CHANGE `monthly_income` `monthly_income` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `family_size`,
+CHANGE `homeless` `homeless` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `billing_note`,
+CHANGE `pubpid` `pubpid` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `financial_review`,
+CHANGE `pid` `pid` varchar(255) COLLATE 'utf8_general_ci' NOT NULL DEFAULT '0' AFTER `pubpid`,
+CHANGE `genericname1` `genericname1` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `pid`,
+CHANGE `genericval1` `genericval1` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `genericname1`,
+CHANGE `genericname2` `genericname2` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `genericval1`,
+CHANGE `genericval2` `genericval2` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `genericname2`,
+CHANGE `hipaa_mail` `hipaa_mail` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `genericval2`,
+CHANGE `hipaa_voice` `hipaa_voice` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `hipaa_mail`,
+CHANGE `hipaa_notice` `hipaa_notice` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `hipaa_voice`,
+CHANGE `hipaa_message` `hipaa_message` varchar(20) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `hipaa_notice`,
+CHANGE `hipaa_allowsms` `hipaa_allowsms` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT 'NO' AFTER `hipaa_message`,
+CHANGE `hipaa_allowemail` `hipaa_allowemail` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT 'NO' AFTER `hipaa_allowsms`,
+CHANGE `squad` `squad` varchar(32) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `hipaa_allowemail`,
+CHANGE `fitness` `fitness` int(11) NULL DEFAULT '0' AFTER `squad`,
+CHANGE `referral_source` `referral_source` varchar(30) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `fitness`,
+CHANGE `usertext1` `usertext1` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `referral_source`,
+CHANGE `usertext2` `usertext2` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext1`,
+CHANGE `usertext3` `usertext3` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext2`,
+CHANGE `usertext4` `usertext4` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext3`,
+CHANGE `usertext5` `usertext5` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext4`,
+CHANGE `usertext6` `usertext6` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext5`,
+CHANGE `usertext7` `usertext7` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext6`,
+CHANGE `usertext8` `usertext8` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext7`,
+CHANGE `userlist1` `userlist1` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `usertext8`,
+CHANGE `userlist2` `userlist2` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist1`,
+CHANGE `userlist3` `userlist3` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist2`,
+CHANGE `userlist4` `userlist4` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist3`,
+CHANGE `userlist5` `userlist5` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist4`,
+CHANGE `userlist6` `userlist6` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist5`,
+CHANGE `userlist7` `userlist7` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `userlist6`,
+CHANGE `pricelevel` `pricelevel` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT 'standard' AFTER `userlist7`,
+CHANGE `completed_ad` `completed_ad` varchar(3) COLLATE 'utf8_general_ci' NULL DEFAULT 'NO' AFTER `contrastart`,
+CHANGE `vfc` `vfc` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `ad_reviewed`,
+CHANGE `mothersname` `mothersname` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `vfc`,
+CHANGE `allow_imm_reg_use` `allow_imm_reg_use` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `guardiansname`,
+CHANGE `allow_imm_info_share` `allow_imm_info_share` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `allow_imm_reg_use`,
+CHANGE `allow_health_info_ex` `allow_health_info_ex` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `allow_imm_info_share`,
+CHANGE `allow_patient_portal` `allow_patient_portal` varchar(31) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `allow_health_info_ex`,
+CHANGE `deceased_reason` `deceased_reason` varchar(255) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `deceased_date`,
+CHANGE `cmsportal_login` `cmsportal_login` varchar(60) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `soap_import_status`,
+CHANGE `county` `county` varchar(40) COLLATE 'utf8_general_ci' NULL DEFAULT '' AFTER `care_team`,
+CHANGE `location_uuid` `location_uuid` varchar(255) COLLATE 'utf8_general_ci' NULL AFTER `tenant_id`,
+CHANGE `bed_uuid` `bed_uuid` varchar(255) COLLATE 'utf8_general_ci' NULL AFTER `location_uuid`;
+
+ALTER TABLE `Appointment`
+ADD `pid` varchar(255) NOT NULL;
+
+CREATE FUNCTION slotIsAvailable(
+    doctorID            INT,
+    slotStartDateTime   DATETIME,
+    slotEndDateTime     DATETIME
+) RETURNS BOOLEAN DETERMINISTIC
+BEGIN
+    RETURN CASE WHEN EXISTS (
+        -- This table will contain records iff the slot clashes with an existing appointment
+        SELECT TRUE
+        FROM Appointment AS a
+        WHERE
+                CONVERT(slotStartDateTime, TIME) < a.endTime   -- These two conditions will both hold iff the slot overlaps
+            AND CONVERT(slotEndDateTime,   TIME) > a.startTime -- with the existing appointment that it's being compared to
+            AND a.doctorID = doctorID
+            AND a.date = CONVERT(slotStartDateTime, DATE)
+    ) THEN FALSE ELSE TRUE
+    END;
+END;
+
+CREATE TRIGGER ensureNewAppointmentsDoNotClash
+    BEFORE INSERT ON Appointment
+    FOR EACH ROW
+BEGIN
+    IF NOT slotIsAvailable(
+        NEW.doctorID,
+        CAST( CONCAT(NEW.date, ' ', NEW.startTime)  AS DATETIME ),
+        CAST( CONCAT(NEW.date, ' ', NEW.endTime)    AS DATETIME )
+    ) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Appointment clashes with an existing appointment!';
+    END IF;
+END; //
+
+
+-- The ID of the doctor to book the appointment with.
+SET @doctorID = 1;
+
+-- The moment from which to start searching for availble time slots
+SET @searchStart = CURRENT_TIMESTAMP;
+
+-- The duration of the appointment to book, in minutes.
+SET @duration = 20;
+
+WITH
+    SlotStart AS (
+        -- This table will list all the 10-minute-aligned timestamps that occur after `@searchStart`
+        SELECT
+            CONVERT(@searchStart, DATE)
+            + INTERVAL (EXTRACT(HOUR FROM @searchStart)) HOUR
+            + INTERVAL ( EXTRACT(MINUTE FROM @searchStart) DIV 10 + number + 1 ) * 10 MINUTE
+        AS startDateTime
+        FROM Numbers
+    ),
+    Slot AS (
+        SELECT
+            startDateTime,
+            startDateTime + INTERVAL @duration MINUTE   AS endDateTime
+        FROM SlotStart
+    ),
+    AvailableSlot AS (
+        SELECT
+            @doctorID   AS doctorID,
+            startDateTime,
+            endDateTime
+        FROM Slot AS s
+        WHERE
+                slotIsAvailable(@doctorID, s.startDateTime, s.endDateTime)
+            AND EXTRACT(HOUR FROM s.startDateTime) >= 9
+            AND EXTRACT(HOUR FROM (s.endDateTime - INTERVAL 1 MINUTE)) <= 16
+    )
+SELECT *
+    FROM AvailableSlot
+    WHERE
+            CONVERT(startDateTime, DATE) = CONVERT(@searchStart, DATE)
+        AND CONVERT(endDateTime,   DATE) = CONVERT(@searchStart, DATE)
+    ORDER BY startDateTime ASC;
+
+gradle.properties
+android.useAndroidX=true
+android.enableJetifier=true
+
+ALTER TABLE `location`
+ADD `bed_count` varchar(100) COLLATE 'utf8_general_ci' NOT NULL AFTER `ward`,
+ADD `address` varchar(1000) COLLATE 'utf8_general_ci' NOT NULL AFTER `bed_count`,
+ADD `ward_tag` mediumtext COLLATE 'utf8_general_ci' NOT NULL,
+ADD `building_tag` mediumtext COLLATE 'utf8_general_ci' NOT NULL AFTER `ward_tag`,
+ADD `floor_tag` mediumtext COLLATE 'utf8_general_ci' NOT NULL AFTER `building_tag`,
+ADD `ward_description` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `floor_tag`,
+ADD `floor_description` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `ward_description`,
+ADD `building_description` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `floor_description`;
+
+
+docker run --restart=always -it --add-host kafka:0.0.0.0 -d -p 9000:9000 -e KAFKA_BROKERCONNECT=your_local_IP:9092 -e JVM_OPTS="-Xms32M -Xmx64M" -e SERVER_SERVLET_CONTEXTPATH="/" obsidiandynamics/kafdrop
+
+
+vi editor - variable const sql to const sql_1 , 2 , 3
+let c=0 | g/const sql/ let c+=1 | s//\='const sql_' . c

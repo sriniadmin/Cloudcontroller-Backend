@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png" />
+    <% include partials/title.ejs %>
+    <!-- Style CSS -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    <link href="/dist/css/style.css" rel="stylesheet" />
+    <!-- This page CSS -->
+    <link href="/dist/css/pages/float-chart.css" rel="stylesheet">
+    <link href="/assets/extra-libs/horizontal-timeline/css/horizontal-timeline.css" rel="stylesheet">
+
+    <link href="/assets/libs/nouislider/distribute/nouislider.min.css" rel="stylesheet">
+    <link href="/assets/extra-libs/nouislider/palette-noui.css" rel="stylesheet">
+    <link href="/assets/extra-libs/nouislider/noui-slider.min.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <link href="/assets/libs/jquery-steps/jquery.steps.css" rel="stylesheet">
+    <link href="/assets/libs/jquery-steps/steps.css" rel="stylesheet">
+    <link href="/assets/extra-libs/prism/prism.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+
+        <% include partials/preloader.ejs %> <% include partials/header.ejs
+            %> <% include partials/sidebar.ejs %>
+
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Title and breadcrumb -->
+            <!-- ============================================================== -->
+            <% include partials/breadcrumb.ejs %>
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+
+
+            <!-- Button HTML (to Trigger Modal) -->
+            <input type="button" class="btn btn-lg btn-primary show-modal" value="Show Demo Modal">
+
+            <!-- Modal HTML -->
+            <div id="myModal" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Do you want to save changes you made to document before closing?</p>
+                            <p class="text-warning"><small>If you don't save, your changes will be lost.</small></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <% include partials/footer.ejs %>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+
+        <div class="chat-windows "></div>
+        <!-- ============================================================== -->
+        <!-- Right Sidebar -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+
+
+
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Backend js -->
+    <!-- ============================================================== -->
+    <!--script src="/javascripts/patientonboard.js"></script-->
+
+    <script>
+        $(document).ready(function () {
+            $(".show-modal").click(function () {
+                $("#myModal").modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

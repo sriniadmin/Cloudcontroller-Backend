@@ -1,0 +1,16 @@
+@import "/dist/css/a.css";
+@import "/dist/css/b.css";
+@import "/dist/css/c.css";
+@import "/dist/css/d.css";
+@import "/dist/css/e.css";
+
+/* the f, g files are the main background and dashboard stuffs */
+@import "/dist/css/f.css";
+/*@import "/dist/css/hlight.css";*/
+/*@import "/dist/css/hdark.css";*/
+@import "/dist/css/gbasic.css";
+
+
+
+
+

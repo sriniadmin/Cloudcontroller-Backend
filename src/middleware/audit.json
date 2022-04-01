@@ -1,0 +1,35 @@
+{
+	"route": {
+		"/api/alerts": {
+			"audit": "Alert",
+			"verb": ["PUT", "POST", "DELETE"],
+			"body": [],
+			"params": [],
+			"query": []
+		},
+		"/api/patients/(.*)/patch_map": {
+			"audit": "Patient Sensors",	
+			"verb": ["PUT", "POST", "DELETE"],
+			"body": [],
+			"params": [],
+			"query": []
+		},
+		"/api/patients": {
+			"audit": "Patient Records",
+			"verb": ["PUT", "POST", "DELETE"],
+			"body": [],
+			"params": [],
+			"query": []
+		},
+		"/api/medication": {
+			"audit": "Medication",
+			"verb": ["PUT", "POST", "DELETE"],
+			"body": [],
+			"params": [],
+			"query": []
+		} 
+    },
+    "user": {
+        "id": ["userEmail", "userRole", "tenant"]
+    }
+}

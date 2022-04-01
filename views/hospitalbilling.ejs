@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<% include partials/cssdarkhead1.ejs %>
+
+    <body>
+        <div class="main-wrapper" id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Preloader - style you can find in spinners.css -->
+            <!-- ============================================================== -->
+
+            <% include partials/preloader.ejs %> <% include partials/header.ejs
+            %> <% include partials/sidebar.ejs %>
+
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Title and breadcrumb -->
+                <!-- ============================================================== -->
+                <% include partials/breadcrumb.ejs %>
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col m4 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default" id="hospitalList">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <% for(var i=0; i < hospitalDetails.length; i++)
+                                { %>
+                                <option value="<%= hospitalDetails[i].name %>">
+                                    <%= hospitalDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patients</label>
+                            <select class="browser-default" id="patientList">
+                                <option value="" disabled selected>
+                                    Choose Patients
+                                </option>
+                                <% for(var i=0; i < patientDetails.length; i++)
+                                { %>
+                                <option
+                                    value="<%= patientDetails[i].name %>"
+                                    patientId="<%= patientDetails[i]._id %>"
+                                >
+                                    <%= patientDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Time Range</label>
+                            <select class="browser-default" id="timeRange">
+                                <option value="" disabled selected
+                                    >Choose Time Range</option
+                                >
+                                <option value="1day">1 Day</option>
+                                <option value="1week">1 Week</option>
+                                <option value="1month">1 Month</option>
+                                <option value="3months">3 Months</option>
+                                <option value="6months">6 Months</option>
+                                <option value="1year">1 Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col l12">
+                            <div class="card">
+                                <div class="card-content analytics-info">
+                                    <h5 class="card-title">
+                                        Patient Details
+                                    </h5>
+                                    <div
+                                        id="billing-info"
+                                        style="height: 50px;"
+                                    >
+                                        <div class="row">
+                                            <div class="col m4 s12">
+                                                Name - <%= currentPatient.name
+                                                %>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                User ID - <%= currentPatient._id
+                                                %>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Patch - <%= currentPatient.patch
+                                                %>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <h5 class="col m4 s12">
+                                                Current Month Cost - <%=
+                                                currentPatient.cost %>
+                                            </h5>
+                                            <h5 class="col m4 s12">
+                                                Projected Cost for the Month -
+                                                <%= currentPatient.projectedCost
+                                                %>
+                                            </h5>
+                                            <h5 class="col m4 s12">
+                                                Max. Cost Cap - <%=
+                                                currentPatient.thresholdCost %>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col l12">
+                            <div class="card">
+                                <div class="card-content analytics-info">
+                                    <h5 class="card-title">
+                                        Billing - last 7 days
+                                    </h5>
+                                    <div id="active-bar-chart">
+                                        <div
+                                            id="billing-bar-chart-week"
+                                            style="height: 400px;"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col l12">
+                            <div class="card">
+                                <div class="card-content analytics-info">
+                                    <h5 class="card-title">
+                                        Billing - last 30 days
+                                    </h5>
+                                    <div id="active-bar-chart">
+                                        <div
+                                            id="billing-bar-chart-month"
+                                            style="height: 400px;"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <% include partials/footer.ejs %>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="chat-windows"></div>
+            <!-- ============================================================== -->
+            <!-- Right Sidebar -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- All Required js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+        <script src="/dist/js/materialize.min.js"></script>
+        <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Apps -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/app.js"></script>
+        <script src="/dist/js/app.init.dark.js"></script>
+        <script src="/dist/js/app-style-switcher.js"></script>
+        <!-- ============================================================== -->
+        <!-- Custom js -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/custom.min.js"></script>
+
+        <script src="/assets/libs/echarts/dist/echarts-en.min.js"></script>
+        <script src="/dist/js/pages/echarts/bar/bar.js"></script>
+    <!-- ============================================================== -->
+    <!-- Prod Js-->
+    <!-- ============================================================== -->
+        <script>
+            setTimeout(() => {
+                const queryString = window.location.search
+                const urlParams = new URLSearchParams(queryString)
+                var hospital = urlParams.get("hospital")
+                var patient = urlParams.get("patient")
+                var timerange = urlParams.get("timerange")
+                console.log(hospital)
+                console.log(patient)
+                console.log(timerange)
+                if (hospital) {
+                    document.getElementById("hospitalList").value = hospital
+                }
+                if (patient) {
+                    document.getElementById("patientList").value = patient
+                }
+                if (timerange) {
+                    document.getElementById("timeRange").value = timerange
+                }
+            }, 500)
+
+            document
+                .getElementById("patientList")
+                .addEventListener("change", function () {
+                    console.log("You selected: ", this.value)
+                    window.location.href =
+                        "/hospitalbilling?patient=" +
+                        this.value +
+                        "&hospital=Cleveland Clinic&timerange=1week&id=" +
+                        this.selectedOptions[0].getAttribute("patientId")
+                })
+        </script>
+        <script src="/dist/js/dark.js"></script>
+    </body>
+</html>

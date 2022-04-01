@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<% include partials/cssdarkhead1.ejs %>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+        <% include partials/preloader.ejs %>
+            <% include partials/header.ejs%>
+                <% include partials/sidebar.ejs %>
+
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+                    <div class="page-wrapper">
+                        <!-- ============================================================== -->
+                        <!-- Title and breadcrumb -->
+                        <!-- ============================================================== -->
+                        <% include partials/breadcrumb.ejs %>
+                            <!-- ============================================================== -->
+                            <!-- Container fluid scss in scafholding.scss -->
+                            <!-- ============================================================== -->
+                            <div class="container-fluid">
+                                <!-- ============================================================== -->
+                                <!-- Sales Summery -->
+                                <!-- ============================================================== -->
+                                <!-- Row of Combo selector of Hospital and Patients -->
+                                <div class="row">
+                                    <div class="col m6 s12">
+                                        <label>Location</label>
+                                        <select class="browser-default">
+                            <option value="" disabled selected>Choose Location</option>
+                            <option value="1">Bangalore</option>
+                            <option value="2">New York</option>
+                            <option value="3">Singapore</option>
+                        </select>
+                                    </div>
+                                    <div class="col m6 s12">
+                                        <label>Hospital</label>
+                                        <select class="browser-default">
+                            <option value="" disabled selected>Choose Hospital</option>
+                            <option value="1">Apollo</option>
+                            <option value="2">Columbia Asia</option>
+                            <option value="3">Aster CMI</option>
+                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col l3 m6 s12">
+                                        <div class="card danger-gradient card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex no-block align-items-center">
+                                                    <div>
+                                                        <h2 class="white-text m-b-5">
+                                                            250
+                                                        </h2>
+                                                        <h6 class="white-text op-5 light-blue-text">
+                                                            Reports
+                                                        </h6>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <span class="white-text display-6"><i
+                                                class="material-icons">assignment</i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col l3 m6 s12">
+                                        <div class="card info-gradient card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex no-block align-items-center">
+                                                    <div>
+                                                        <h2 class="white-text m-b-5">
+                                                            520
+                                                        </h2>
+                                                        <h6 class="white-text op-5">
+                                                            New Patients
+                                                        </h6>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <span class="white-text display-6"><i
+                                                class="material-icons">assignment_ind</i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col l3 m6 s12">
+                                        <div class="card success-gradient card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex no-block align-items-center">
+                                                    <div>
+                                                        <h2 class="white-text m-b-5">
+                                                            900
+                                                        </h2>
+                                                        <h6 class="white-text op-5 text-darken-2">
+                                                            Active Devices
+                                                        </h6>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <span class="white-text display-6"><i
+                                                class="material-icons">surround_sound</i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col l3 m6 s12">
+                                        <div class="card warning-gradient card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex no-block align-items-center">
+                                                    <div>
+                                                        <h2 class="white-text m-b-5">12</h2>
+                                                        <h6 class="white-text op-5">
+                                                            Faulty Devices
+                                                        </h6>
+                                                    </div>
+                                                    <div class="ml-auto">
+                                                        <span class="white-text display-6"><i
+                                                class="material-icons">error_outline</i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <!-- column -->
+                                    <div class="col s12 l6">
+                                        <div class="card">
+                                            <div class="card-content analytics-info">
+                                                <h5 class="card-title">Heart Rate</h5>
+                                                <div id="heartrate_pie_dashboard" style="height:400px;"></div>
+                                                <!-- onclick="location.href='/patientdetails';" style="cursor: pointer" -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- column -->
+                                    <div class="col s12 l6">
+                                        <div class="card">
+                                            <div class="card-content analytics-info">
+                                                <h5 class="card-title">Device Location</h5>
+                                                <div id="device_location_pie_dashboard" style="height:400px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ============================================================== -->
+                                <!-- Sales Summery -->
+                                <!-- ============================================================== -->
+                                <div class="row">
+                                    <div class="col s12 l8">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h5 class="card-title">
+                                                            Key Health Events
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                                <!-- Sales Summery -->
+                                                <div class="p-t-20">
+                                                    <div class="row">
+                                                        <div class="col s12">
+                                                            <div id="sales" style="height: 332px;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col s12 l4">
+                                        <div class="card card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="m-r-20">
+                                                        <h1 class="">
+                                                            <i class="ti-light-bulb"></i>
+                                                        </h1>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="card-title">
+                                                            Analytics
+                                                        </h3>
+                                                        <h6 class="card-subtitle">
+                                                            March 2020
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col s6">
+                                                        <h3 class="font-light m-t-10">
+                                                            <sup><small><i class="ti-arrow-up"></i></small></sup>35487
+                                                        </h3>
+                                                    </div>
+                                                    <div class="col s6 right-align">
+                                                        <div class="p-t-10 p-b-10">
+                                                            <div class="spark-count" style="height:65px"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="m-r-20">
+                                                        <h1 class="">
+                                                            <i class="ti-pie-chart"></i>
+                                                        </h1>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="card-title">
+                                                            Health Report
+                                                        </h3>
+                                                        <h6 class="card-subtitle">
+                                                            Last 24hours Average Report
+                                                        </h6>
+                                                    </div>
+                                                </div>
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col s6">
+                                                        <h3 class="font-light m-t-10">
+                                                            60% healthy
+                                                        </h3>
+                                                    </div>
+                                                    <div class="col s6 p-t-10 p-b-20 right-align">
+                                                        <div class="p-t-10 p-b-10 m-r-20">
+                                                            <div class="spark-count2" style="height:65px">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ============================================================== -->
+                            <!-- Container fluid scss in scafholding.scss -->
+                            <!-- ============================================================== -->
+                            <% include partials/footer.ejs %>
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+
+                    <div class="chat-windows "></div>
+                    <!-- ============================================================== -->
+                    <!-- Right Sidebar -->
+                    <!-- ============================================================== -->
+    </div>
+    <!-- Data Injection 
+        <script>
+        var myVar = JSON.parse("<%= JSON.stringify(data) %>");
+        console.log(myVar);
+        window.mdata = myVar;
+    </script> -->
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugin js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/echarts/dist/echarts-en.min.js"></script>
+    <script src="/javascripts/dashboard.js"></script>
+    <script src="/assets/libs/chartist/dist/chartist.min.js"></script>
+    <script src="/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+    <script src="/assets/extra-libs/sparkline/sparkline.js"></script>
+    <!-- <script src="/dist/js/pages/dashboards/dashboard1.js"></script> -->
+
+        <!-- ============================================================== -->
+        <!-- Prod Js-->
+        <!-- ============================================================== -->
+        <script src="/dist/js/dark.js"></script>
+</body>
+
+</html>

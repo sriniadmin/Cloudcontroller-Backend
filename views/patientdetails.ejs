@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html>
+
+<% include partials/cssdarkhead1.ejs %>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+        <div id="server_side_data">
+            <p id="patchresult" style="display:none">
+                <%= patchresult %>
+            </p>
+            <p id="ecgpatchresult" style="display:none">
+                <%= ecgpatchresult %>
+            </p>
+            <p id="hrpatchresult" style="display:none">
+                <%= hrpatchresult %>
+            </p>
+            <p id="rrpatchresult" style="display:none">
+                <%= rrpatchresult %>
+            </p>
+
+            <p id="temppatchresult" style="display:none">
+                <%= temppatchresult %>
+            </p>
+            <p id="_tempbattcurr" style="display:none">
+                <%= tempbattcurr %>
+            </p>
+            <p id="_spo2battcurr" style="display:none">
+                <%= spo2battcurr %>
+            </p>
+            <p id="spo2patchresult" style="display:none">
+                <%= spo2patchresult %>
+            </p>
+
+            <p id="_ecgbattcurr" style="display:none">
+                <%= ecgbattcurr %>
+            </p>
+            <p id="_hrmin" style="display:none">
+                <%= hrmin %>
+            </p>
+            <p id="_hrmax" style="display:none">
+                <%= hrmax %>
+            </p>
+            <p id="_rrmin" style="display:none">
+                <%= rrmin %>
+            </p>
+            <p id="_rrmax" style="display:none">
+                <%= rrmax %>
+            </p>
+            <p id="_rrcurr" style="display:none">
+                <%= rrcurr %>
+
+                <p id="_tempmin" style="display:none">
+                    <%= tempmin %>
+                </p>
+                <p id="_tempmax" style="display:none">
+                    <%= tempmax %>
+                </p>
+                <p id="_tempcurr" style="display:none">
+                    <%= tempcurr %>
+
+                    <p id="_spo2min" style="display:none">
+                        <%= spo2min %>
+                    </p>
+                    <p id="_spo2max" style="display:none">
+                        <%= spo2max %>
+                    </p>
+                    <p id="_spo2curr" style="display:none">
+                        <%= spo2curr %>
+
+                    </p>
+                    <p id="_hrcurr" style="display:none">
+                        <%= hrcurr %>
+                    </p>
+
+                    <p id="_query_patientid" style="display:none" tag="_query_patientid">
+                        <%= query_patientid%>
+                    </p>
+                    <p id="_patient_details" style="display:none" tag="_patient_details">
+                        <%= patient_details%>
+                    </p>
+        </div>
+        <% include partials/preloader.ejs %>
+        <% include partials/header.ejs %>
+        <% include partials/sidebar.ejs %>
+
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Title and breadcrumb -- NOT NEEDED in Details Page -->
+            <!-- ============================================================== -->
+            <!-- <% include partials/breadcrumb.ejs %> -->
+            <div class="page-titles">
+
+                <div class="container " style="width:100%; max-width:100%">
+                    <div class="row ">
+                        <div class="col s12 m6 l3 ">
+                            <h5><a><img id="profilepic" alt="user" width="50" height="50"
+                                        class="circle responsive-img"></a><a href="#!">
+                                    <%- (!!locals.breadcrumb)?breadcrumb:"" %>
+                                </a>
+                                <a id="editclick" href="#patientsummarymodal1" class=" modal-trigger ">
+                                    <i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">info</i></a>
+                            </h5>
+
+                        </div>
+                        <div class=" col s12 m6 l3">
+                            <a id="editclick" href="#patientmodal1" class=" modal-trigger ">
+                                <i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">edit</i></a>
+                            <a id="settingclick" href="#patientsettingmodal1" class=" modal-trigger ">
+                                <i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">settings</i></a>
+                            <a id="viewclick" href="#patientinfo" class=" modal-trigger"> <i class="material-icons"
+                                    style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">add_comment</i></a>
+                        </div>
+                        <div class=" col s12 m6 l3">
+
+                        </div>
+                        <div class=" col s12 m6 l3">
+
+                            <select class="browser-default" id="patientList">
+                                <option value="" disabled selected>
+                                    Choose Patients
+                                </option>
+                                <% for(var i=0; i < patientDetailsList.length; i++) { %>
+                                <option value="<%= patientDetailsList[i].name %>"
+                                    patientId="<%= patientDetailsList[i]._id %>">
+                                    <%= patientDetailsList[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="row ">
+                        <div class="col s12 m6 l3">
+                            <%- (!!locals.breadcrumb_status)?breadcrumb_status:'' %>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="row">
+
+                        <div class="col l6 m12">
+                            <% include emr_views/emr_base.ejs %>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12">
+                            <!-- <div id="patientmodal1" class="modal modal-fixed-footer"> -->
+                            <% include emr_views/patient_basic_input.ejs %>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <!-- <div id="patientsettingmodal1" class="modal modal-fixed-footer"> -->
+                            <% include emr_views/patient_baseline_settings.ejs %>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <!-- <div id="patientsettingmodal1" class="modal modal-fixed-footer"> -->
+                            <% include emr_views/patient_quick_summary.ejs %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col s12">
+                        <div class="card">
+                            <div class="card-content">
+
+                                <table>
+                                    <tr>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            Heart Rate</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            Respiration Rate</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            Temperature</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            SPO2</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            EWS</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            Recovery Index</th>
+                                        <th style="font-size: 20px; text-align: center;">
+                                            Pain</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h1 style="font-size: 4vw; text-align: center;" id="hrcurr1">70
+                                            </h1>
+                                        </td>
+                                        <td>
+                                            <h1 style="font-size: 4vw; text-align: center;" id="rrcurr1">20
+                                            </h1>
+                                        </td>
+                                        <td>
+                                            <h1 style="font-size: 4vw; text-align: center;" id="tempcurr1">97.5
+                                            </h1>
+                                        </td>
+                                        <td>
+                                            <h1 style="font-size: 4vw; text-align: center;" id="spo2curr1">99
+                                            </h1>
+                                        </td>
+                                        <td>
+                                            <div class="center-align">
+                                                <input data-plugin="knob" data-width="85" data-height="85"
+                                                    data-linecap=round data-fgColor="#f53b3b" value="4.2"
+                                                    data-skin="tron" data-angleOffset="-125" data-max="5"
+                                                    data-angleArc=250 data-readOnly=true data-thickness=".1" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="center-align">
+                                                <input data-plugin="knob" data-width="85" data-height="85"
+                                                    data-linecap=round data-fgColor="#0fec03" value="65"
+                                                    data-skin="tron" data-angleOffset="180" data-readOnly=true
+                                                    data-thickness=".1" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <h6 style="font-size: 1vw; text-align: center;" id="painnum1">7</h6>
+                                            <h1 style="font-size: 4vw; text-align: center;" id="pain1">
+                                                &#128531;
+                                            </h1>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <ul id="tabs-swipe" class="tabs">
+                        <li class="tab col s3"><a class="active" href="#swipe-1">Live Monitor</a></li>
+                        <li class="tab col s3"><a href="#swipe-2">Anomolies</a></li>
+                        <li class="tab col s3"><a href="#swipe-3">Recover Velocity</a></li>
+                        <li class="tab col s3"><a href="#swipe-3">Alerts</a></li>
+                    </ul>
+                    <div id="swipe-1" class="col s12">
+                        <!-- Realtime Live Monitor of Sensors -->
+                        <div class="col s12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">ECG <img src="assets/images/emr/ecg.png" height="30px"
+                                            width="30px" />
+                                        <img id="ecgbattimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="ecgbattcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            NA
+                                        </div>
+
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-ecg" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Heart Rate <img src="assets/images/emr/heartrate.png"
+                                            height="30px" width="30px" />
+                                        <div
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="hrmin"
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="hrmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 70px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="hrcurr"
+                                            style="padding-left:100px; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-hr" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Respiration Rate <img src="assets/images/emr/respiration.png"
+                                            height="30px" width="30px" />
+
+                                        <div
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="rrmin"
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="rrmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 70px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="rrcurr"
+                                            style="padding-left:100px; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-rr" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Temperature <img src="assets/images/emr/temperature.png"
+                                            height="30px" width="30px" />
+                                        <img id="tempbattimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="tempbattcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            NA
+                                        </div>
+                                        <div
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="tempmin"
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:50px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="tempmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:100px;width: 100px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="tempcurr"
+                                            style="padding-left:100px;width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-temperature" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">SpO2
+                                        <img id="spo2battimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="spo2battcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            95%
+                                        </div>
+                                        <div
+                                            style="padding-left:20px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+
+                                            Min:</div>
+                                        <div id="spo2min"
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:50px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="spo2max"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:100px;width: 100px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="spo2curr"
+                                            style="padding-left:100px;width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-spo2" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card" style="display: none;">
+                                <div class="card-content">
+                                    <h5 class="card-title">Patch Battery</h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patch-battery" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="swipe-2" class="col s12">
+                        <!-- Calendar for Anomolies to be added -->
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <div id='calendar'></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sensors data based on Anomolies -->
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">ECG <img src="assets/images/emr/ecg.png" height="30px"
+                                            width="30px" />
+                                        <img id="ecgbattimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="ecgbattcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            NA
+                                        </div>
+
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-ecg" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Heart Rate <img src="assets/images/emr/heartrate.png"
+                                            height="30px" width="30px" />
+                                        <div
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="hrmin"
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="hrmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 70px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="hrcurr"
+                                            style="padding-left:100px; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-hr" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Respiration Rate <img src="assets/images/emr/respiration.png"
+                                            height="30px" width="30px" />
+
+                                        <div
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="rrmin"
+                                            style="padding-left:50px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="rrmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Unknown</div>
+                                        <div
+                                            style="padding-left:100px; width: 70px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="rrcurr"
+                                            style="padding-left:100px; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Unknown
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-rr" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Temperature <img src="assets/images/emr/temperature.png"
+                                            height="30px" width="30px" />
+                                        <img id="tempbattimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="tempbattcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            NA
+                                        </div>
+                                        <div
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            Min:</div>
+                                        <div id="tempmin"
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:50px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="tempmax"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:100px;width: 100px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="tempcurr"
+                                            style="padding-left:100px;width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-temperature" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">SpO2
+                                        <img id="spo2battimg" src="assets/images/battery/full.svg" height="30px"
+                                            width="30px" />
+                                        <div id="spo2battcurr"
+                                            style="width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                            95%
+                                        </div>
+                                        <div
+                                            style="padding-left:20px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+
+                                            Min:</div>
+                                        <div id="spo2min"
+                                            style="padding-left:0px ; width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:50px; width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                            Max:</div>
+                                        <div id="spo2max"
+                                            style="padding-left:50px;width: 50px; height: 10px; border: 0px;display:inline-block;">
+                                        </div>
+                                        <div
+                                            style="padding-left:100px;width: 100px; height: 10px;  border: 0px;display:inline-block;">
+                                            Current:
+                                        </div>
+                                        <div id="spo2curr"
+                                            style="padding-left:100px;width: 50px; height: 10px;  border: 0px;display:inline-block;">
+                                        </div>
+
+                                    </h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patient-spo2" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card" style="display: none;">
+                                <div class="card-content">
+                                    <h5 class="card-title">Patch Battery</h5>
+                                    <div class="demo-container" style="height:200px;">
+                                        <div id="patch-battery" style="height:175px;" class="flot-chart-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="swipe-3" class="col s12">
+                        <!-- Alerts to be added here -->
+                    </div>
+                </div>
+
+                <div class="row">
+
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <% include partials/footer.ejs %>
+        </div>
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+
+        <div class="chat-windows "></div>
+        <!-- ============================================================== -->
+        <!-- Right Sidebar -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugin js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/flot/excanvas.min.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.pie.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.time.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.stack.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.crosshair.js"></script>
+    <script src="/assets/libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+    <script src="/javascripts/patientdetails.js"></script>
+    <script src="/assets/extra-libs/knob/jquery.knob.js"></script>
+    <script src="/assets/extra-libs/sparkline/sparkline.js"></script>
+    <script src="/assets/extra-libs/horizontal-timeline/js/horizontal-timeline.js"></script>
+    <script>
+        $(function() {
+            $('[data-plugin="knob"]').knob();
+        });
+    </script>
+    <script src="/assets/libs/wnumb/wNumb.js"></script>
+    <script src="/assets/libs/nouislider/distribute/nouislider.min.js"></script>
+
+    <script>
+        // Success
+        $(function() {
+            var successColorSlider = document.getElementById('battery-color-slider');
+            var maxVal = Math.floor(Math.random() * 100)
+            noUiSlider.create(successColorSlider, {
+                start: [0, maxVal],
+                behaviour: 'drag',
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 100
+                },
+                limit: maxVal,
+            });
+            var batteryPercent = document.getElementById('battery-color-slider-value-max');
+            successColorSlider.noUiSlider.on('update', function(values, handle) {
+                if (handle) {
+                    batteryPercent.innerHTML = Math.round(values[handle]);
+                    document.getElementById('batteryTimeLeft').innerText = Math.round(values[handle] /
+                        10) + ' days ' + Math.round(Math.random() * 20) + ' hours'
+                }
+            });
+        });
+        document.getElementById('profilepic').src = "/assets/images/users/" + Math.floor(Math.random() * 8.5) + ".jpg"
+        document
+            .getElementById("patientList")
+            .addEventListener("change", function() {
+                console.log("You selected: ", this.value)
+                window.location.href =
+                    "/patientdetails?id=" +
+                    this.selectedOptions[0].getAttribute("patientId")
+            })
+    </script>
+    <script src="/javascripts/refreshPage.js"></script>
+    <script type="text/javascript">
+        tempval = document.getElementById("_hrmin").innerText;
+        document.getElementById("hrmin").innerHTML = tempval;
+        tempval = document.getElementById("_hrmax").innerText;
+        document.getElementById("hrmax").innerHTML = tempval;
+        tempval = document.getElementById("_hrcurr").innerText;
+        document.getElementById("hrcurr").innerHTML = tempval;
+        document.getElementById("hrcurr1").innerHTML = tempval;
+        tempval = document.getElementById("_rrmin").innerText;
+        document.getElementById("rrmin").innerHTML = tempval;
+        tempval = document.getElementById("_rrmax").innerText;
+        document.getElementById("rrmax").innerHTML = tempval;
+        tempval = document.getElementById("_rrcurr").innerText;
+        document.getElementById("rrcurr").innerHTML = tempval;
+        document.getElementById("rrcurr1").innerHTML = tempval;
+        tempval = document.getElementById("_tempbattcurr").innerText;
+        document.getElementById("tempbattcurr").innerHTML = tempval;
+        if (tempval > 80) {
+            document.getElementById("tempbattimg").src = "assets/images/battery/full.svg"
+        } else if (tempval > 31) {
+            document.getElementById("tempbattimg").src = "assets/images/battery/70percent.svg"
+        } else if (tempval > 11) {
+            document.getElementById("tempbattimg").src = "assets/images/battery/30percent.svg"
+        } else if (tempval > -1) {
+            document.getElementById("tempbattimg").src = "assets/images/battery/low.svg"
+        } else if (tempval == -1) {
+            document.getElementById("tempbattimg").src = "assets/images/battery/unknown.png"
+        }
+        tempval = document.getElementById("_tempmin").innerText;
+        document.getElementById("tempmin").innerHTML = ((tempval * 9 / 5) + 32).toFixed(1);
+        tempval = document.getElementById("_tempmax").innerText;
+        document.getElementById("tempmax").innerHTML = ((tempval * 9 / 5) + 32).toFixed(1);
+        tempval = document.getElementById("_tempcurr").innerText;
+        document.getElementById("tempcurr").innerHTML = ((tempval * 9 / 5) + 32).toFixed(1);
+        document.getElementById("tempcurr1").innerHTML = ((tempval * 9 / 5) + 32).toFixed(1);
+        //document.getElementById("tempcurr").innerHTML = 98.1;
+        //document.getElementById("tempcurr1").innerHTML = 98.1;
+        tempval = document.getElementById("_spo2battcurr").innerText;
+        document.getElementById("spo2battcurr").innerHTML = tempval;
+        if (tempval > 80) {
+            document.getElementById("spo2battimg").src = "assets/images/battery/full.svg"
+        } else if (tempval > 31) {
+            document.getElementById("spo2battimg").src = "assets/images/battery/70percent.svg"
+        } else if (tempval > 11) {
+            document.getElementById("spo2battimg").src = "assets/images/battery/30percent.svg"
+        } else if (tempval > -1) {
+            document.getElementById("spo2battimg").src = "assets/images/battery/low.svg"
+        } else if (tempval == -1) {
+            document.getElementById("spo2battimg").src = "assets/images/battery/unknown.png"
+        }
+        tempval = document.getElementById("_spo2min").innerText;
+        //document.getElementById("spo2min").innerHTML = tempval;
+        document.getElementById("spo2min").innerHTML = 98;
+        tempval = document.getElementById("_spo2max").innerText;
+        //document.getElementById("spo2max").innerHTML = tempval;
+        document.getElementById("spo2max").innerHTML = 100;
+        tempval = document.getElementById("_spo2curr").innerText;
+        //document.getElementById("spo2curr").innerHTML = tempval;
+        //document.getElementById("spo2curr1").innerHTML = tempval;
+        document.getElementById("spo2curr").innerHTML = 99;
+        document.getElementById("spo2curr1").innerHTML = 99;
+        tempval = document.getElementById("_ecgbattcurr").innerText;
+        document.getElementById("ecgbattcurr").innerHTML = tempval;
+        if (tempval > 80) {
+            document.getElementById("ecgbattimg").src = "assets/images/battery/full.svg"
+        } else if (tempval > 31) {
+            document.getElementById("ecgbattimg").src = "assets/images/battery/70percent.svg"
+        } else if (tempval > 11) {
+            document.getElementById("ecgbattimg").src = "assets/images/battery/30percent.svg"
+        } else if (tempval > -1) {
+            document.getElementById("ecgbattimg").src = "assets/images/battery/low.svg"
+        } else if (tempval == -1) {
+            document.getElementById("ecgbattimg").src = "assets/images/battery/unknown.png"
+        }
+        tempval = document.getElementById("_query_patientid").innerText;
+        document.getElementById("_query_patientid").innerHTML = tempval;
+    </script>
+    <script src="/assets/libs/jquery-steps/build/jquery.steps.min.js"></script>
+    <script src="/assets/libs/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script>
+        $(".tab-wizard").steps({
+            headerTag: "h6",
+            bodyTag: "section",
+            transitionEffect: "fade",
+            titleTemplate: '<span class="step">#index#</span> #title#',
+            labels: {
+                finish: "Submit"
+            },
+            onFinished: function(event, currentIndex) {
+                $("#form").submit();
+                alert("Form Submitted!",
+                    "Done"
+                );
+            }
+        });
+    </script>
+    <script>
+        // To update all the Edit information dialog
+        document.getElementById("firstName").value = "<%= patient_details['firstName'] %>"
+    </script>
+    <script src="/assets/extra-libs/prism/prism.js"></script>
+    <script src="/dist/js/dark.js"></script>
+    <script>
+        $(document).ready(function() {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems, {
+                dismissible: false
+            });
+        });
+    </script>
+
+    <script>
+        // To show only Vitals when vitals is clicked in the modal
+        function showVitals() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeIn("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showMedicalIssues() {
+            $('.right-part.medical-issues').fadeIn("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showPreventiveCare() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeIn("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showHospitalization() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeIn("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showPastIllness() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeIn("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showFamilyHistory() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeIn("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showLifeStyle() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeIn("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showPrescriptions() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeIn("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showProcedures() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeIn("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showImmunization() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeIn("fast");
+            $('.right-part.medical-labs').fadeOut("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // To show only Vitals when vitals is clicked in the modal
+        function showLabs() {
+            $('.right-part.medical-issues').fadeOut("fast");
+            $('.right-part.medical-lifestyle').fadeOut("fast");
+            $('.right-part.medical-family-history').fadeOut("fast");
+            $('.right-part.medical-past-illness').fadeOut("fast");
+            $('.right-part.medical-hospitalization').fadeOut("fast");
+            $('.right-part.medical-procedures').fadeOut("fast");
+            $('.right-part.medical-preventive-care').fadeOut("fast");
+            $('.right-part.medical-prescription').fadeOut("fast");
+            $('.right-part.medical-immunization').fadeOut("fast");
+            $('.right-part.medical-labs').fadeIn("fast");
+            $('.right-part.mail-details').fadeOut("fast");
+            $('.right-part.mail-compose').fadeOut("fast");
+            $('.right-part.medical-vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_issues').fadeOut("fast");
+            $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+            $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+            $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+            $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+            $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+            $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+            $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+            $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+            $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+            $('.right-part.right_compose_medical_labs').fadeOut("fast");
+        }
+        // jQuery
+        $(function() {
+
+            "use strict";
+            var mail = $('.email-table .max-texts a');
+            
+            // Highlight row when checkbox is checked
+            $('.email-table').find('tr > td:first-child').find('input[type=checkbox]').on('change',
+                function() {
+                    if ($(this).is(':checked')) {
+                        $(this).parents('tr').addClass('selected');
+                    } else {
+                        $(this).parents('tr').removeClass('selected');
+                    }
+                });
+            $(".sl-all").on('click', function() {
+                $('.email-table input:checkbox').not(this).prop('checked', this.checked);
+                if ($('.email-table input:checkbox').is(':checked')) {
+                    $('.email-table input:checkbox').parents('tr').addClass('selected');
+                } else {
+                    $('.email-table input:checkbox').parents('tr').removeClass('selected');
+                }
+            });
+            $("#compose_medical_issues").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeIn("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_vitals").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeIn("fast");
+                
+                
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+                console.log("The vitals_compose_flag value is "+vitals_compose_flag)
+                if (  vitals_compose_flag ) { //=== true) {
+                
+                var dataContainer = document.getElementById(
+                "right_compose_medical_vitals"
+                )
+                dataContainer.innerHTML = default_right_compose_medical_vitals
+                }
+                else {
+                    console.log(" vitals_compose_flag is false , "+ vitals_compose_flag)
+                }
+            });
+            $("#compose_medical_lifestyle").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeIn("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_family_history").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeIn("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_past_illness").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeIn("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_hospitalization").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeIn("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_procedures").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeIn("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_preventive_care").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeIn("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_prescription").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeIn("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_immunization").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeIn("fast");
+                $('.right-part.right_compose_medical_labs').fadeOut("fast");
+            });
+            $("#compose_medical_labs").on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.medical-lifestyle').fadeOut("fast");
+                $('.right-part.medical-family-history').fadeOut("fast");
+                $('.right-part.medical-past-illness').fadeOut("fast");
+                $('.right-part.medical-hospitalization').fadeOut("fast");
+                $('.right-part.medical-procedures').fadeOut("fast");
+                $('.right-part.medical-preventive-care').fadeOut("fast");
+                $('.right-part.medical-prescription').fadeOut("fast");
+                $('.right-part.medical-immunization').fadeOut("fast");
+                $('.right-part.medical-labs').fadeOut("fast");
+                $('.right-part.medical-vitals').fadeOut("fast");
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.right_compose_medical_issues').fadeOut("fast");
+                $('.right-part.right_compose_medical_vitals').fadeOut("fast");
+                $('.right-part.right_compose_medical_lifestyle').fadeOut("fast");
+                $('.right-part.right_compose_medical_family_history').fadeOut("fast");
+                $('.right-part.right_compose_medical_past_illness').fadeOut("fast");
+                $('.right-part.right_compose_medical_hospitalization').fadeOut("fast");
+                $('.right-part.right_compose_medical_procedures').fadeOut("fast");
+                $('.right-part.right_compose_medical_preventive_care').fadeOut("fast");
+                $('.right-part.right_compose_medical_prescriptions').fadeOut("fast");
+                $('.right-part.right_compose_medical_immunization').fadeOut("fast");
+                $('.right-part.right_compose_medical_labs').fadeIn("fast");
+            });
+            $("#cancel_compose_medical_issues").on("click", function() {
+                showMedicalIssues();
+            });
+            $("#cancel_compose_medical_vitals").on("click", function() {
+                showVitals();
+            });
+            $("#cancel_compose_medical_lifestyle").on("click", function() {
+                showLifeStyle();
+            });
+            $("#cancel_compose_medical_family_history").on("click", function() {
+                showFamilyHistory();
+            });
+            $("#cancel_compose_medical_past_illness").on("click", function() {
+                showPastIllness();
+            });
+            $("#cancel_compose_medical_hospitalization").on("click", function() {
+                showHospitalization();
+            });
+            $("#cancel_compose_medical_procedures").on("click", function() {
+                showProcedures();
+            });
+            $("#cancel_compose_medical_preventive_care").on("click", function() {
+                showPreventiveCare();
+            });
+            $("#cancel_compose_medical_prescriptions").on("click", function() {
+                showPrescriptions();
+            });
+            $("#cancel_compose_medical_immunization").on("click", function() {
+                showImmunization();
+            });
+            $("#cancel_compose_medical_labs").on("click", function() {
+                showLabs();
+            });
+            $(mail).on("click", function() {
+                $('.right-part.medical-issues').fadeOut("fast");
+                $('.right-part.mail-details').fadeIn("fast");
+            });
+            $("#back_to_inbox").on("click", function() {
+                $('.right-part.mail-details').fadeOut("fast");
+                $('.right-part.medical-issues').fadeIn("fast");
+            });
+        });
+    </script>
+    <script src="/assets/libs/summernote/dist/summernote-lite.js"></script>
+    <!-- Define Global variables for the page -->
+    <script>
+        var vitals_compose_flag = false
+        var default_right_compose_medical_vitals = ''
+        </script>
+    <script>
+        $('#summernote').summernote({
+            placeholder: 'Diag',
+            tabsize: 2,
+            height: 100
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridDay',
+                initialDate: '2020-12-07',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                },
+                selectable: true,
+                events: [{
+                        title: 'SPo2 High - Count:100',
+                        start: '2020-12-01'
+                    },
+                    {
+                        title: 'High Heart Rate',
+                        start: '2020-12-07',
+                        end: '2020-12-10'
+                    },
+                    {
+                        groupId: '999',
+                        title: 'High Respiration Rate',
+                        start: '2020-12-09T16:00:00'
+                    },
+                    {
+                        groupId: '999',
+                        title: 'High Respiration Rate',
+                        start: '2020-12-16T16:00:00'
+                    },
+                    {
+                        title: 'High Heart Rate',
+                        start: '2020-12-11',
+                        end: '2020-12-13'
+                    },
+                    {
+                        title: 'EWS High Score',
+                        start: '2020-12-12T10:30:00',
+                        end: '2020-12-12T12:30:00'
+                    },
+                    {
+                        title: 'Respiration Rate High',
+                        start: '2020-12-12T12:00:00'
+                    },
+                    {
+                        title: 'High Heart Rate',
+                        start: '2020-12-12T14:30:00'
+                    },
+                    {
+                        title: 'ECG Abnormal',
+                        start: '2020-12-13T07:00:00'
+                    },
+                ],
+                dateClick: function(info) {
+                    //alert('Clicked on: ' + info.dateStr);
+                    //alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+                    //alert('Current view: ' + info.view.type);
+                    // change the day's background color just for fun
+                    info.dayEl.style.backgroundColor = 'red';
+                    //console.log(info.view.name);
+                    if (info.view.type === "dayGridMonth") {
+                        calendar.changeView('timeGridDay', info.dateStr);
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+   
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.5.0/main.min.js'></script>
+    <!--  -->
+    <!-- EMR Scripts  -->
+    <!--  -->
+    <script src='/javascripts/patient_details_vitals.js'></script>
+</body>
+
+</html>

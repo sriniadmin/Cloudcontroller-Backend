@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+    <% include partials/cssdarkhead1.ejs %>
+
+    <body>
+        <div class="main-wrapper" id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Preloader - style you can find in spinners.css -->
+            <!-- ============================================================== -->
+
+            <% include partials/preloader.ejs %> <% include partials/header.ejs
+            %> <% include partials/sidebar.ejs %>
+
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Title and breadcrumb -->
+                <!-- ============================================================== -->
+                <% include partials/breadcrumb.ejs %>
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col m6 s12">
+                            <label>Location</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Location</option
+                                >
+                                <option value="1">Bangalore</option>
+                                <option value="2">New York</option>
+                                <option value="3">Singapore</option>
+                            </select>
+                        </div>
+                        <div class="col m6 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <option value="1">Apollo</option>
+                                <option value="2">Columbia Asia</option>
+                                <option value="3">Aster CMI</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Jamie Vardy</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-1-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-1-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-1-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-1-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Sergio Aguero</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-2-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-2-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-2-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-2-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">
+                                        Cristiano Ronaldo
+                                    </h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-3-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-3-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-3-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-3-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Don Park</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-4-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-4-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-4-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-4-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">
+                                        Brielle Williamson
+                                    </h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-5-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-5-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-5-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-5-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Herrod Chandler</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-6-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-6-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-6-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-6-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Chu Wu Chi</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-7-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-7-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-7-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-7-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">Ram Kashyap</h5>
+                                    <div
+                                        class="demo-container"
+                                        style="height: 550px;"
+                                        onclick="location.href='/patientdetails?id=5f1935265810b551232fe171';"
+                                        style="cursor: pointer;"
+                                    >
+                                        <b style="color: #4ec3ff;">ECG</b>
+                                        <div
+                                            id="patient-8-ecg"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Systolic</b>
+                                        <div
+                                            id="patient-8-bp-sys"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">Diastolic</b>
+                                        <div
+                                            id="patient-8-bp-dia"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                        <b style="color: #4ec3ff;">SpO2</b>
+                                        <div
+                                            id="patient-8-spo2"
+                                            style="
+                                                height: 100px;
+                                                margin-bottom: 1em;
+                                            "
+                                            class="flot-chart-content"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <% include partials/footer.ejs %>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="chat-windows"></div>
+            <!-- ============================================================== -->
+            <!-- Right Sidebar -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- All Required js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+        <script src="/dist/js/materialize.min.js"></script>
+        <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Apps -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/app.js"></script>
+        <script src="/dist/js/app.init.dark.js"></script>
+        <script src="/dist/js/app-style-switcher.js"></script>
+        <!-- ============================================================== -->
+        <!-- Custom js -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/custom.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- This page plugin js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/flot/excanvas.min.js"></script>
+        <script src="/assets/libs/flot/jquery.flot.js"></script>
+        <script src="/assets/libs/flot/jquery.flot.pie.js"></script>
+        <script src="/assets/libs/flot/jquery.flot.time.js"></script>
+        <script src="/assets/libs/flot/jquery.flot.stack.js"></script>
+        <script src="/assets/libs/flot/jquery.flot.crosshair.js"></script>
+        <script src="/assets/libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+        <script src="/javascripts/nurseview.js"></script>
+                <!-- ============================================================== -->
+        <!-- Prod Js-->
+        <!-- ============================================================== -->
+        <script src="/dist/js/dark.js"></script>
+    </body>
+</html>

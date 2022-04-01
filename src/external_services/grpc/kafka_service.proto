@@ -1,0 +1,16 @@
+
+syntax = "proto2";
+
+option go_package = "./emr_consumer_proto";
+
+message Null {};
+
+message patientRegister {
+    required string patientUUID = 1;
+}
+message patientRegisterRsp {
+    required bool rsp = 1;
+}
+service EmrT1Rpc {
+    rpc RegisterPatient(patientRegister) returns (patientRegisterRsp);
+}

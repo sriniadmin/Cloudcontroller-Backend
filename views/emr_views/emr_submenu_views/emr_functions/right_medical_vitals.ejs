@@ -1,0 +1,192 @@
+<!-- Medical Email type headers and contents -->
+
+<div id="right-part_medical-vitals" class=" right-part medical-vitals bg-white overflow-auto">
+    <div class="p-3 border-bottom">
+        <div class="d-flex align-items-center">
+            <div>
+                <h4>Vitals <a id="compose_medical_vitals" href="javascript:void(0)"><i class="material-icons"
+                            style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a></h4>
+                <span>Issues List</span>
+            </div>
+            <div class="ml-auto">
+                <input placeholder="Search" id="" type="text" class="form-control">
+            </div>
+        </div>
+    </div>
+    <!-- Action part -->
+    <!-- Button group part -->
+    <div class="bg-light p-3 d-flex align-items-center do-block">
+        <div class="btn-group mt-1 mb-1">
+            <div class="checkbox checkbox-info">
+                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                <label for="cstall">
+                    <span>Check
+                        all</span>
+                </label>
+            </div>
+        </div>
+        <div class="ml-auto">
+            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                <button type="button" class="btn btn-outline-secondary font-18"><i class="material-icons"></i></button>
+                <button type="button" class="btn btn-outline-secondary font-18"><i class="material-icons"></i></button>
+                <button type="button" class="btn btn-outline-secondary font-18"><i class="material-icons"></i></button>
+            </div>
+        </div>
+    </div>
+    <!-- Action part -->
+    <!-- Mail list-->
+    <div class="table-responsive">
+        <table class="table email-table no-wrap table-hover v-middle">
+            <tbody>
+                <!-- row -->
+                <tr class="unread">
+                    <!-- label -->
+                    <td class="chb">
+                        <div class="checkbox checkbox-info">
+                            <input type="checkbox" class="material-inputs" id="cst1">
+                            <label for="cst1" class="mb-0">
+                                <span>&nbsp;</span>
+                            </label>
+                        </div>
+                    </td>
+                    <!-- star -->
+                    <td class="starred px-1 py-3">
+                        <i class="far fa-star"></i>
+                    </td>
+                    <!-- User -->
+                    <td class="user-image px-1 py-3">
+                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle" width="30">
+                    </td>
+                    <td class="user-name px-1 py-3">
+                        <h6 class="mb-0 text-truncate no-wrap">
+                            Hanna
+                            Gover</h6>
+                    </td>
+                    <!-- Message -->
+                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                        <a class="link" href="javascript: void(0)"><span
+                                class="badge py-1 badge-danger mr-2">Work</span>
+                            <span class="blue-grey-text text-darken-4">Lorem
+                                ipsum
+                                perspiciatis-</span>
+                            unde
+                            omnis
+                            iste natus
+                            error sit
+                            voluptatem</a>
+                    </td>
+                    <!-- Attachment -->
+                    <td class="clip px-1  py-3">
+                        <i class="fa fa-paperclip"></i>
+                    </td>
+                    <!-- Time -->
+                    <td class="time text-right">
+                        12:30 PM </td>
+                </tr>
+                <!-- row -->
+            </tbody>
+        </table>
+    </div>
+    <div class="p-3 mt-4">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Medical Vitals Information -->
+
+<div id="right_compose_medical_vitals" class="right-part right_compose_medical_vitals bg-white overflow-auto"
+    style="display: none; ">
+    <div class="p-3 border-bottom">
+        <div class="d-flex align-items-center">
+            <div>
+                <h4>Vitals</h4>
+
+            </div>
+            <div class="ml-auto">
+                <button id="cancel_compose_medical_vitals" class="btn btn-dark">Back</button>
+            </div>
+        </div>
+    </div>
+    <!-- Action part -->
+    <!-- Button group part -->
+    <div class="card-body" style="margin-left: 20px;">
+        <form id="vitals_form" method="POST" >
+            <div class="row">
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="observedDate" name="observedDate" class="form-control
+                                                                        datepicker" placeholder="Date">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="Weight" name="Weight" class="form-control" placeholder="Weight (Kgs)">
+                    </div>
+                </div>
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="Height" name="Height" class="form-control" placeholder="Height (Inch)">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="BPsys" name="BPsys" class="form-control"
+                            placeholder="BP Systolic (mm Hg)">
+                    </div>
+                </div>
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="BPdia" name="BPdia" class="form-control"
+                            placeholder="BP Diastolic (mm Hg)">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="bmi" name="bmi" class="form-control" placeholder="BMI">
+                    </div>
+                </div>
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="Pain" name="Pain" class="form-control" placeholder="Pain (1-10)">
+                    </div>
+                </div>
+            </div>
+             <div class="row">
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="bmi" name="bmi" class="form-control" placeholder="Head Circumference (cms)">
+                    </div>
+                </div>
+                <div class="col s12 l6">
+                    <div class="form-group">
+                        <input type="text" id="Pain" name="Pain" class="form-control" placeholder="LMP">
+                    </div>
+                </div>
+            </div>
+            <button id="vitals_add"  class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                Add</button>
+            <button id="vitals_discard" type="submit" class="btn btn-dark mt-3">Discard</button>
+        </form>
+        <!-- Action part -->
+    </div>
+</div>

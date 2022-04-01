@@ -1,0 +1,1969 @@
+<div id="patientinfo" class="modal">
+    <div class="modal-content ">
+        <div class="modal-header">
+            <h4>Greta Mills
+
+                <div class="modal-close" style="float:right">
+                    <i class="material-icons">clear</i>
+                </div>
+
+                <div class="modal-close" style="float:right">
+                    <i class="material-icons">print</i>
+                </div>
+                <!-- <div class="input-field" style="float:right">
+                                                    <label for="firstName1">Search </label>
+                                                    <input type="text" id="search" name="search" />
+                                                </div> -->
+                <div class="modal-close" style="float:right">
+                    <i class="material-icons">toc</i>
+                </div>
+                <!-- <div class="input-field" style="float:right">
+                                                    <label for="firstName1">Views </label>
+                                                    <input type="text" id="views" name="views" />
+                                                </div> -->
+        </div>
+        <div class="card">
+            <!-- ============================================================== -->
+            <!-- Email App Part -->
+            <!-- ============================================================== -->
+            <div class="email-app">
+                <!-- ============================================================== -->
+                <!-- Left Part -->
+                <!-- ============================================================== -->
+                <% include emr_submenu_views/left_bar.ejs %>
+
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Issues -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-issues bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical issues <a id="compose_medical_issues" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a></h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Vitals -->
+                <!-- ============================================================== -->
+                <% include emr_submenu_views/emr_functions/right_medical_vitals.ejs %>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Life Style -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-lifestyle bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Lifesytle <a id="compose_medical_lifestyle" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a></h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Family History -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-family-history bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Family History <a id="compose_medical_family_history" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a></h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Past Illness -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-past-illness bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical Past Illness<a id="compose_medical_past_illness"
+                                        href="javascript:void(0)"><i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a>
+                                </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Hospitalization -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-hospitalization bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical
+                                    Hospitalization<a id="compose_medical_hospitalization" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a>
+                                </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Procedures -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-procedures bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical Surgery
+                                    Procedures<a id="compose_medical_procedures" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a> </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Preventive Care -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-preventive-care bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Preventive Care<a id="compose_medical_preventive_care" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a></h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Prescriptions -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-prescription bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical Prescription<a id="compose_medical_prescription"
+                                        href="javascript:void(0)"><i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a>
+                                </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Immunization -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-immunization bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Medical Immunization<a id="compose_medical_immunization"
+                                        href="javascript:void(0)"><i class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a>
+                                </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                                                                        aria-label="Button group with nested dropdown">
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18 "></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                        <div class="btn-group" role="group">
+                                                                                                                                                                            <button id="btnGroupDrop1" type="button"
+                                                                                                                                                                                class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                                                                                data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                                                                                aria-expanded="false"> <i
+                                                                                                                                                                                    class="material-icons font-18"></i>
+                                                                                                                                                                            </button>
+                                                                                                                                                                            <div class="dropdown-menu"
+                                                                                                                                                                                aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                                                                    class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> <a class="dropdown-item"
+                                                                                                                                                                                    href="javascript:void(0)">Dropdown
+                                                                                                                                                                                    link</a> </div>
+                                                                                                                                                                        </div>
+                                                                                                                                                                    </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Right Part  Labs -->
+                <!-- ============================================================== -->
+                <div class="right-part medical-labs bg-white overflow-auto">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Lab Information<a id="compose_medical_labs" href="javascript:void(0)"><i
+                                            class="material-icons" style="height:48px !important;
+    width:48px !important;font-size: 24px;line-height: 48px;">note_add</i></a>
+                                </h4>
+                                <span>Issues List</span>
+                            </div>
+                            <div class="ml-auto">
+                                <input placeholder="Search" id="" type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="bg-light p-3 d-flex align-items-center do-block">
+                        <div class="btn-group mt-1 mb-1">
+                            <div class="checkbox checkbox-info">
+                                <input type="checkbox" class="sl-all material-inputs" id="cstall">
+                                <label for="cstall">
+                                    <span>Check
+                                        all</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="ml-auto">
+                            <div class="btn-group mr-2" role="group" aria-label="Button group with nested dropdown">
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                                <button type="button" class="btn btn-outline-secondary font-18"><i
+                                        class="material-icons"></i></button>
+                            </div>
+                            <!-- <div class="btn-group mr-2" role="group"
+                                                                                                                    aria-label="Button group with nested dropdown">
+                                                                                                                    <div class="btn-group" role="group">
+                                                                                                                        <button id="btnGroupDrop1" type="button"
+                                                                                                                            class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                            aria-expanded="false"> <i
+                                                                                                                                class="material-icons font-18 "></i>
+                                                                                                                        </button>
+                                                                                                                        <div class="dropdown-menu"
+                                                                                                                            aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                class="dropdown-item"
+                                                                                                                                href="javascript:void(0)">Dropdown
+                                                                                                                                link</a> <a class="dropdown-item"
+                                                                                                                                href="javascript:void(0)">Dropdown
+                                                                                                                                link</a> </div>
+                                                                                                                    </div>
+                                                                                                                    <div class="btn-group" role="group">
+                                                                                                                        <button id="btnGroupDrop1" type="button"
+                                                                                                                            class="btn btn-outline-secondary dropdown-toggle"
+                                                                                                                            data-toggle="dropdown" aria-haspopup="true"
+                                                                                                                            aria-expanded="false"> <i
+                                                                                                                                class="material-icons font-18"></i>
+                                                                                                                        </button>
+                                                                                                                        <div class="dropdown-menu"
+                                                                                                                            aria-labelledby="btnGroupDrop1"> <a
+                                                                                                                                class="dropdown-item"
+                                                                                                                                href="javascript:void(0)">Dropdown
+                                                                                                                                link</a> <a class="dropdown-item"
+                                                                                                                                href="javascript:void(0)">Dropdown
+                                                                                                                                link</a> </div>
+                                                                                                                    </div>
+                                                                                                                </div> -->
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Mail list-->
+                    <div class="table-responsive">
+                        <table class="table email-table no-wrap table-hover v-middle">
+                            <tbody>
+                                <!-- row -->
+                                <tr class="unread">
+                                    <!-- label -->
+                                    <td class="chb">
+                                        <div class="checkbox checkbox-info">
+                                            <input type="checkbox" class="material-inputs" id="cst1">
+                                            <label for="cst1" class="mb-0">
+                                                <span>&nbsp;</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <!-- star -->
+                                    <td class="starred px-1 py-3">
+                                        <i class="far fa-star"></i>
+                                    </td>
+                                    <!-- User -->
+                                    <td class="user-image px-1 py-3">
+                                        <img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                            width="30">
+                                    </td>
+                                    <td class="user-name px-1 py-3">
+                                        <h6 class="mb-0 text-truncate no-wrap">
+                                            Hanna
+                                            Gover</h6>
+                                    </td>
+                                    <!-- Message -->
+                                    <td class="max-texts text-truncate px-1 py-3 no-wrap">
+                                        <a class="link" href="javascript: void(0)"><span
+                                                class="badge py-1 badge-danger mr-2">Work</span>
+                                            <span class="blue-grey-text text-darken-4">Lorem
+                                                ipsum
+                                                perspiciatis-</span>
+                                            unde
+                                            omnis
+                                            iste natus
+                                            error sit
+                                            voluptatem</a>
+                                    </td>
+                                    <!-- Attachment -->
+                                    <td class="clip px-1  py-3">
+                                        <i class="fa fa-paperclip"></i>
+                                    </td>
+                                    <!-- Time -->
+                                    <td class="time text-right">
+                                        12:30 PM </td>
+                                </tr>
+                                <!-- row -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 mt-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">2</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a>
+                                </li>
+                                <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Issues-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_issues bg-white overflow-auto" style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Issue</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_issues" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Vitals-->
+                <!-- ============================================================== -->
+               
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Life Style-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_lifestyle bg-white overflow-auto" style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Lifestyle</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_lifestyle" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Family History-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_family_history bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical family history</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_family_history" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Past Illness-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_past_illness bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical past illness</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_past_illness" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Hospitalization-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_hospitalization bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Hospitalization</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_hospitalization" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Procedures -->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_procedures bg-white overflow-auto" style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical procedures</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_procedures" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Preventive Care-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_preventive_care bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Preventive care</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_preventive_care" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Prescriptions -->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_prescriptions bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Prescriptions</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_prescriptions" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Immunization-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_immunization bg-white overflow-auto"
+                    style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Immunization</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_immunization" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Medical Labs-->
+                <!-- ============================================================== -->
+                <div class="right-part right_compose_medical_labs bg-white overflow-auto" style="display: none;">
+                    <div class="p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <h4>Compose</h4>
+                                <span>create new
+                                    medical Lab Information</span>
+                            </div>
+                            <div class="ml-auto">
+                                <button id="cancel_compose_medical_labs" class="btn btn-dark">Back</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action part -->
+                    <!-- Button group part -->
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="email" id="example-email" name="example-email" class="form-control"
+                                    placeholder="To">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="example-subject" name="example-subject" class="form-control"
+                                    placeholder="Subject">
+                            </div>
+                            <div id="summernote"></div>
+                            <h4>Attachment</h4>
+                            <div class="dropzone" id="dzid">
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-3"><i class="far fa-envelope"></i>
+                                Send</button>
+                            <button type="submit" class="btn btn-dark mt-3">Discard</button>
+                        </form>
+                        <!-- Action part -->
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- Right Part  Mail detail -->
+                <!-- ============================================================== -->
+                <div class="right-part mail-details bg-white overflow-auto" style="display: none;">
+                    <div class="card-body bg-light">
+                        <button type="button" id="back_to_inbox" class="btn btn-outline-secondary font-18 mr-2"><i
+                                class="mdi mdi-arrow-left"></i></button>
+
+                    </div>
+                    <div class="card-body border-bottom">
+                        <h4 class="mb-0">Your Message
+                            title goes here</h4>
+                    </div>
+                    <div class="card-body border-bottom">
+                        <div class="d-flex no-block align-items-center mb-5">
+                            <div class="mr-2"><img src="../assets/images/users/1.jpg" alt="user" class="rounded-circle"
+                                    width="45">
+                            </div>
+                            <div class="">
+                                <h5 class="mb-0 font-16 font-medium">
+                                    Hanna Gover
+                                    <small> ( <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                            data-cfemail="5c343b332a392e1c3b313d3530723f3331">[email&#160;protected]</a>
+                                        )</small>
+                                </h5><span>to <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                        data-cfemail="065573686f6a6c69756e6f373f46616b676f6a2865696b">[email&#160;protected]</a></span>
+                            </div>
+                        </div>
+                        <h4 class="mb-3">Hey Hi,</h4>
+                        <p>Test Message Composed here... </p>
+                    </div>
+                    <div class="card-body">
+                        <h4><i class="fa fa-paperclip mr-2 mb-2"></i>
+                            Attachments
+                            <span>(3)</span>
+                        </h4>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <a href="javascript:void(0)">
+                                    <img class="img-thumbnail img-fluid" alt="attachment"
+                                        src="../assets/images/big/img1.jpg">
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="javascript:void(0)">
+                                    <img class="img-thumbnail img-fluid" alt="attachment"
+                                        src="../assets/images/big/img2.jpg">
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="javascript:void(0)">
+                                    <img class="img-thumbnail img-fluid" alt="attachment"
+                                        src="../assets/images/big/img3.jpg">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="border mt-3 p-3">
+                            <p class="pb-3">click here
+                                to <a href="javascript:void(0)">Reply</a>
+                                or <a href="javascript:void(0)">Forward</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ============================================================== -->
+            <!-- End PAge Content -->
+            <!-- ============================================================== -->
+        </div>
+    </div>
+</div>

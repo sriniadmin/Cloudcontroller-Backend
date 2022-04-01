@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png" />
+    <% include partials/title.ejs %>
+        <!-- Style CSS -->
+        <link href="/dist/css/style.css" rel="stylesheet" />
+        <!-- This page CSS -->
+        <link href="/dist/css/pages/float-chart.css" rel="stylesheet">
+        <link href="/assets/extra-libs/horizontal-timeline/css/horizontal-timeline.css" rel="stylesheet">
+
+        <link href="/assets/libs/nouislider/distribute/nouislider.min.css" rel="stylesheet">
+        <link href="/assets/extra-libs/nouislider/palette-noui.css" rel="stylesheet">
+        <link href="/assets/extra-libs/nouislider/noui-slider.min.css" rel="stylesheet">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+        <p id="patchresult" style="display:none">
+            <%= patchresult %>
+        </p>
+        <p id="ecgpatchresult" style="display:none">
+            <%= ecgpatchresult %>
+        </p>
+        <p id="hrpatchresult" style="display:none">
+            <%= hrpatchresult %>
+        </p>
+        <p id="rrpatchresult" style="display:none">
+            <%= rrpatchresult %>
+        </p>
+        <p id="_rrcurr" style="display:none">
+            <%= rrcurr %>
+        </p>
+        <p id="_hrcurr" style="display:none">
+            <%= hrcurr %>
+        </p>
+        <p id="_battcurr" style="display:none">
+            <%= battcurr %>
+        </p>
+        <p id="_query_patientid" style="display:none" tag="_query_patientid">
+            <%= query_patientid%>
+        </p>
+
+        <% include partials/preloader.ejs %>
+            <% include partials/header.ejs %>
+                <% include partials/sidebar.ejs %>
+
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+                    <div class="page-wrapper">
+                        <!-- ============================================================== -->
+                        <!-- Title and breadcrumb -->
+                        <!-- ============================================================== -->
+                        <% include partials/breadcrumb.ejs %>
+                            <!-- ============================================================== -->
+                            <!-- Container fluid scss in scafholding.scss -->
+                            <!-- ============================================================== -->
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col m6 s12">
+                                        <label>Location</label>
+                                        <select class="browser-default">
+                                            <option value="" disabled selected>Choose Location</option>
+                                            <option value="1">Bangalore</option>
+                                            <option value="2">California</option>
+                                            <option value="2">New York</option>
+                                            <option value="2">Seattle</option>
+                                            <option value="3">Singapore</option>
+                                        </select>
+                                    </div>
+                                    <div class="col m6 s12">
+                                        <label>Patients</label>
+                                        <select class="browser-default" id="patientList">
+                                            <option value="" disabled selected>
+                                                Choose Patients
+                                            </option>
+                                            <% for(var i=0; i < patientDetailsList.length; i++)
+                                            { %>
+                                            <option
+                                                value="<%= patientDetailsList[i].name %>"
+                                                patientId="<%= patientDetailsList[i]._id %>"
+                                            >
+                                                <%= patientDetailsList[i].name %>
+                                            </option>
+                                            <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col m6">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col m4 l3 center-align">
+                                                        <a href="app-contact-detail.html"><img id="profilepic" alt="user" class="circle responsive-img"></a>
+                                                    </div>
+                                                    <div class="col m8 l9">
+                                                        <h3 class="m-b-0">
+                                                            <%= patientDetails.name %>
+                                                        </h3> Age -
+                                                        <%= patientDetails.age %> | Gender -
+                                                            <%= patientDetails.gender %>
+                                                                <address>
+                                                                <%= patientDetails.address %>
+                                                            <br />
+                                                            Weight - <%= patientDetails.weight %> Kgs | Height - <%= patientDetails.height %> cms
+                                                            <br />
+                                                            </address>
+                                                                <h4>Cost-
+                                                                    <%= patientDetails.cost %> <input type="button" class="waves-effect waves-light btn btn-round blue white-text m-t-20" value="View" onclick="location.href='/hospitalbilling?patient=<%= patientDetails.name %>&hospital=<%= patientDetails.hospital %>&timerange=1week&id=<%= patientDetails._id %>';"
+                                                                            style="cursor: pointer"></h4>
+                                                                <b>Last Updated Time - <%= patientDetails.lastupdate %></b>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col l3 m6">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">Early warning score</h5>
+                                                <div class="center-align">
+                                                    <input data-plugin="knob" data-width="85" data-height="85" data-linecap=round data-fgColor="#f53b3b" value="70" data-skin="tron" data-angleOffset="180" data-readOnly=true data-thickness=".1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card card-hover">
+                                                <div class="card-content">
+                                                    <div class="d-flex align-items-center">
+                                                        <div>
+                                                            <h3 class="card-title">
+                                                                Health Report
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="p-15 text-right">
+                                                        <!--div class="row d-flex align-items-center "-->
+                                                        <div class="spark-count2 align-center" style="height:90px">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col l3 m6">
+                                        <div class="card card-hover">
+                                            <div class="card-content">
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h3 class="card-title">
+                                                            Health Scores
+                                                        </h3>
+                                                        <br>
+                                                        <h5 style="text-align:left;float:left;">
+                                                            Heart Rate :
+                                                            <div id="hrcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown
+                                                            </div>
+                                                            <br>
+                                                            <br>
+                                                            <br>
+                                                        </h5>
+                                                        <h5 style="text-align:left;float:left;">
+                                                            Respiration Rate :
+                                                            <div id="rrcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown
+                                                            </div>
+                                                            <br>
+                                                            <br>
+                                                            <br>
+                                                        </h5>
+                                                        <h5 style="text-align:left;float:left;">
+                                                            Temparature :
+                                                            <div id="rrcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown
+                                                            </div>
+                                                        </h5>
+                                                        <h5 style="text-align:left;float:left;">
+                                                            ECG Patch Battery :
+                                                            <div id="battcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown
+                                                            </div>
+                                                        </h5>
+                                                        <br>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col s6">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">ECG</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patient-ecg" style="height:175px;" class="flot-chart-content"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">Heart Rate</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patient-hr" style="height:175px;" class="flot-chart-content"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">Respiration Rate</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patient-rr" style="height:175px;" class="flot-chart-content"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">Temperature</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patient-temperature" style="height:175px;" class="flot-chart-content">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">SpO2</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patient-spo2" style="height:175px;" class="flot-chart-content"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <h5 class="card-title">Patch Battery</h5>
+                                                <div class="demo-container" style="height:200px;">
+                                                    <div id="patch-battery" style="height:175px;" class="flot-chart-content"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col s6">
+                                        <div class="row">
+                                            <div class="col s12">
+
+                                                <div class="card">
+                                                    <div class="card-content">
+                                                        <h5 class="card-title">Anomolies Timeline</h5>
+                                                        <section class="cd-horizontal-timeline">
+                                                            <div class="timeline">
+                                                                <div class="events-wrapper">
+                                                                    <div class="events">
+                                                                        <ol>
+                                                                            <li><a href="#0" data-date="27/02/2020" class="selected">27 Feb</a></li>
+                                                                            <li><a href="#0" data-date="28/02/2020">28 Feb</a> </li>
+                                                                            <li><a href="#0" data-date="02/03/2020">02 Mar</a> </li>
+                                                                            <li><a href="#0" data-date="10/03/2020">10 Mar</a> </li>
+                                                                            <li><a href="#0" data-date="07/04/2020">07 Apr</a> </li>
+                                                                        </ol>
+                                                                        <span class="filling-line" aria-hidden="true"></span>
+                                                                    </div>
+                                                                    <!-- .events -->
+                                                                </div>
+                                                                <!-- .events-wrapper -->
+                                                                <ul class="cd-timeline-navigation">
+                                                                    <li><a href="#0" class="prev inactive">Prev</a></li>
+                                                                    <li><a href="#0" class="next">Next</a></li>
+                                                                </ul>
+                                                                <!-- .cd-timeline-navigation -->
+                                                            </div>
+                                                            <!-- .timeline -->
+                                                            <div class="events-content">
+                                                                <ol>
+                                                                    <li class="selected" data-date="27/02/2020">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div>
+                                                                                <h3>High BP</h3>
+                                                                                <h6>February 27th, 2020</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="p-t-20">
+                                                                            High BP level - 150/90
+                                                                        </p>
+                                                                        <p class="p-t-20">
+                                                                            <h4>Recommendation</h4><br> Make sure you have taken the Atenolol tablet. Relax and Meditate for 15mins.
+                                                                        </p>
+                                                                        <p>
+                                                                            <a class="waves-effect waves-light btn btn-round indigo white-text m-t-20">Read More</a>
+                                                                        </p>
+                                                                    </li>
+                                                                    <li data-date="28/02/2020">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div>
+                                                                                <h3>Low Sugar Levels</h3>
+                                                                                <h6>February 28th, 2020</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="p-t-20">
+                                                                            Fasting Sugar level 60
+                                                                        </p>
+                                                                        <p class="p-t-20">
+                                                                            <h4>Recommendation</h4><br> Please have breakfast.
+                                                                        </p>
+                                                                        <p class="p-b-20">
+                                                                            <a class="waves-effect waves-light btn btn-round indigo white-text m-t-20">Read More</a>
+                                                                        </p>
+                                                                    </li>
+                                                                    <li data-date="02/03/2020">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div>
+                                                                                <h3>Low SpO2 Levels</h3>
+                                                                                <h6>February 28th, 2020</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="p-t-20">
+                                                                            SpO2 level - 92
+                                                                        </p>
+                                                                        <p class="p-t-20">
+                                                                            <h4>Recommendation</h4><br> Breathe-in and Breathe-out. Please walk around for 5minutes. Drink some water.
+                                                                        </p>
+                                                                        <p class="p-b-20">
+                                                                            <a class="waves-effect waves-light btn btn-round indigo white-text m-t-20">Read More</a>
+                                                                        </p>
+                                                                    </li>
+                                                                    <li data-date="10/03/2020">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div>
+                                                                                <h3>High Sugar Levels</h3>
+                                                                                <h6>February 28th, 2020</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="p-t-20">
+                                                                            Fasting Sugar level 110
+                                                                        </p>
+                                                                        <p class="p-t-20">
+                                                                            <h4>Recommendation</h4><br> Please have breakfast and take the tablet on time.
+                                                                        </p>
+                                                                        <p class="p-b-20">
+                                                                            <a class="waves-effect waves-light btn btn-round indigo white-text m-t-20">Read More</a>
+                                                                        </p>
+                                                                    </li>
+                                                                    <li data-date="07/04/2020">
+                                                                        <div class="d-flex align-items-center">
+                                                                            <div>
+                                                                                <h3>Low Sugar Levels</h3>
+                                                                                <h6>February 28th, 2020</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                        <p class="p-t-20">
+                                                                            Fasting Sugar level 70
+                                                                        </p>
+                                                                        <p class="p-t-20">
+                                                                            <h4>Recommendation</h4><br> Please have breakfast.
+                                                                        </p>
+                                                                        <p class="p-b-20">
+                                                                            <a class="waves-effect waves-light btn btn-round indigo white-text m-t-20">Read More</a>
+                                                                        </p>
+                                                                    </li>
+                                                                </ol>
+                                                            </div>
+                                                            <!-- .events-content -->
+                                                        </section>
+                                                    </div>
+                                                </div>
+                                                <div class="card">
+                                                    <div class="card-content">
+                                                        <h5 class="card-title">Patch Details | P-MY-5436234324</h5>
+                                                        <br/>
+                                                        <h5>Battery: <span id="battery-color-slider-value-max"></span>% </h5>
+                                                        <h6>Estimated Time to recharge- <span id="batteryTimeLeft"></span></h6>
+                                                        <div class="demo-container" style="height:200px;">
+                                                            <div id="battery-color-slider">
+                                                            </div>
+                                                            <br/>
+                                                            <h5>Monitoring Rate</h5>
+                                                            <label>
+                                                            <input type="text" value="8" readonly/>
+                                                                <span><b>(No. of times a day)</b></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- more -->
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================================================== -->
+                            <!-- Container fluid scss in scafholding.scss -->
+                            <!-- ============================================================== -->
+                            <% include partials/footer.ejs %>
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+
+                    <div class="chat-windows "></div>
+                    <!-- ============================================================== -->
+                    <!-- Right Sidebar -->
+                    <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugin js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/flot/excanvas.min.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.pie.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.time.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.stack.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.crosshair.js"></script>
+    <script src="/assets/libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+    <script src="/javascripts/patientdetails.js"></script>
+    <script src="/assets/extra-libs/knob/jquery.knob.js"></script>
+    <script src="/assets/extra-libs/sparkline/sparkline.js"></script>
+    <script src="/assets/extra-libs/horizontal-timeline/js/horizontal-timeline.js"></script>
+    <script>
+        $(function() {
+            $('[data-plugin="knob"]').knob();
+        });
+    </script>
+    <script src="/assets/libs/wnumb/wNumb.js"></script>
+    <script src="/assets/libs/nouislider/distribute/nouislider.min.js"></script>
+    <script>
+        // Success
+        $(function() {
+            var successColorSlider = document.getElementById('battery-color-slider');
+            var maxVal = Math.floor(Math.random() * 100)
+
+            noUiSlider.create(successColorSlider, {
+                start: [0, maxVal],
+                behaviour: 'drag',
+                connect: true,
+                range: {
+                    'min': 0,
+                    'max': 100
+                },
+                limit: maxVal,
+            });
+
+            var batteryPercent = document.getElementById('battery-color-slider-value-max');
+
+            successColorSlider.noUiSlider.on('update', function(values, handle) {
+                if (handle) {
+                    batteryPercent.innerHTML = Math.round(values[handle]);
+                    document.getElementById('batteryTimeLeft').innerText = Math.round(values[handle] / 10) + ' days ' + Math.round(Math.random() * 20) + ' hours'
+                }
+            });
+
+
+        });
+
+        document.getElementById('profilepic').src = "/assets/images/users/" + Math.floor(Math.random() * 8.5) + ".jpg"
+
+        document
+            .getElementById("patientList")
+            .addEventListener("change", function() {
+                console.log("You selected: ", this.value)
+                window.location.href =
+                    "/patientdetails?id=" +
+                    this.selectedOptions[0].getAttribute("patientId")
+            })
+    </script>
+    <script src="/javascripts/refreshPage.js"></script>
+    <script type="text/javascript">
+        // tempval = document.getElementById("_hrmin").innerText;
+        // document.getElementById("hrmin").innerHTML = tempval;
+        // tempval = document.getElementById("_hrmax").innerText;
+        // document.getElementById("hrmax").innerHTML = tempval;
+        tempval = document.getElementById("_hrcurr").innerText;
+        document.getElementById("hrcurr").innerHTML = tempval;
+        // tempval = document.getElementById("_rrmin").innerText;
+        // document.getElementById("rrmin").innerHTML = tempval;
+        // tempval = document.getElementById("_rrmax").innerText;
+        // document.getElementById("rrmax").innerHTML = tempval;
+        tempval = document.getElementById("_rrcurr").innerText;
+        document.getElementById("rrcurr").innerHTML = tempval;
+        tempval = document.getElementById("_battcurr").innerText;
+        document.getElementById("battcurr").innerHTML = tempval;
+        tempval = document.getElementById("_query_patientid").innerText;
+        document.getElementById("_query_patientid").innerHTML = tempval;
+    </script>
+</body>
+
+</html>

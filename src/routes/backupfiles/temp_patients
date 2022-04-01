@@ -1,0 +1,118 @@
+
+// router.post("/createpatient", function (req, res, next) {
+//     // var patientDetailsMock = require("../mock/patientdetails.mock")
+//     // console.log("patientDetailsMock = ", patientDetailsMock);
+//     verifySession(res, req.session)
+
+//     patientController.create(req, res)
+//     res.render("patientlist.ejs", {
+//         dark: false,
+//         title: "Patient List",
+//         breadcrumb: "Patient List",
+//         patientDetailsList: patientDetailsMock,
+//     })
+//     // .then(function (response) {
+//     //     console.log("Response of paient -- ", response)
+//     //     res.render("patientinventory.ejs", {
+//     //         dark: true,
+//     //         title: "Nurse View",
+//     //         breadcrumb: "Nurse View",
+//     //     })
+//     // })
+// })
+
+router.post("/createpatient1", function (req, res, next) {
+    // var patientDetailsMock = require("../mock/patientdetails.mock")
+    // console.log("patientDetailsMock = ", patientDetailsMock);
+    verifySession(res, req.session)
+
+
+    firstName = req.body["firstName"]
+    lastName = req.body["lastName1"]
+    phonenum = req.body['phoneNumber1']
+    emailAddress1 = req.body['emailAddress1']
+    phoneNumber1 = req.body['phoneNumber1']
+    dob = req.body['dob']
+    patientsex = req.body['patientsex']
+    patientuidtype = req.body['patientuidtype']
+    patientuid1 = req.body['patientuid1']
+    address1 = req.body['address1']
+    patientcity = req.body['patientcity']
+    patientState = req.body["patientState"]
+    patientcountry = req.body["patientcountry"]
+    patientzip1 = req.body['patientzip1']
+
+
+
+    const axios = require("axios")
+
+    axios
+        .post("https://localhost:443/apis/api/auth", {
+            grant_type: "password",
+            username: "admin",
+            password: "pass",
+            scope: "default",
+        })
+        .then(function (response) {
+            console.log(response.data["access_token"])
+            acc_token = "Bearer " + response.data["access_token"]
+            var data = JSON.stringify({
+                title: "Mr",
+                fname: firstName,
+                mname: "",
+                lname: lastName,
+                street: "456 Tree Lane",
+                postal_code: "08642",
+                city: "FooTown",
+                state: "FL",
+                country_code: "US",
+                phone_contact: "123-456-7890",
+                DOB: "1992-02-02",
+                sex: "Male",
+                race: "",
+                ethnicity: "",
+                dob: "1992-02-02",
+            })
+            console.log("Json out is", data)
+            var config = {
+                method: "post",
+                url: "https://localhost:443/apis/api/patient",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: acc_token,
+                },
+                data: data,
+            }
+
+            axios(config)
+                .then(function (response) {
+                    console.log("Response of paient -- ", response)
+                    res.render("patientinventory.ejs", {
+                        dark: true,
+                        title: "Nurse View",
+                        breadcrumb: "Nurse View",
+                    })
+                })
+                .catch(function (error) {
+                    console.log(error)
+                    res.render("error.ejs", {
+                        dark: true,
+                        error: error,
+                        message: "Error due to " + error,
+                        title: "Nurse View",
+                        breadcrumb: "Nurse View",
+                    })
+                })
+        })
+        .catch(function (error) {
+            console.log(error)
+            res.render("error.ejs", {
+                dark: true,
+                error: error,
+                message: "Error due to " + error,
+                title: "Nurse View",
+                breadcrumb: "Nurse View",
+            })
+        })
+    console.log("Test done")
+})

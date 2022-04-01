@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$comment": "JSON Schema for test_users_secure table",
+    "$id": "test_users_secure",
+    "title": "test_users_secure",
+    "type": "object",
+    "required": [
+        "users_secure_ref",
+        "users_ref"
+    ],
+    "properties": {
+        "users_secure_ref": {
+            "$ref": "users_secure"
+        },
+        "users_ref": {
+            "$ref": "users"
+        }
+
+    }
+
+}

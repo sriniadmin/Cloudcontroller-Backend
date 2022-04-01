@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png" />
+    <% include partials/title.ejs %>
+        <!-- Style CSS -->
+        <link href="/dist/css/style.css" rel="stylesheet" />
+        <!-- This page CSS -->
+        <link href="/dist/css/pages/dashboard1.css" rel="stylesheet" />
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <p id="patchresult" style="display:none">
+            <%= patchresult %>
+        </p>
+        <p id="ecgpatchresult" style="display:none">
+            <%= ecgpatchresult %>
+        </p>
+        <p id="hrpatchresult" style="display:none">
+            <%= hrpatchresult %>
+        </p>
+        <p id="rrpatchresult" style="display:none">
+            <%= rrpatchresult %>
+        </p>
+        <p id="_battcurr" style="display:none">
+            <%= battcurr %>
+        </p>
+        <p id="_hrcurr" style="display:none">
+            <%= hrcurr %>
+        </p>
+        <p id="_hrmin" style="display:none">
+            <%= hrmin %>
+        </p>
+        <p id="_hrmax" style="display:none">
+            <%= hrmax %>
+        </p>
+        <p id="_rrmin" style="display:none">
+            <%= rrmin %>
+        </p>
+        <p id="_rrmax" style="display:none">
+            <%= rrmax %>
+        </p>
+        <p id="_rrcurr" style="display:none">
+            <%= rrcurr %>
+        </p>
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+
+        <% include partials/preloader.ejs %>
+            <% include partials/header.ejs %>
+                <% include partials/sidebar.ejs %>
+
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+                    <div class="page-wrapper">
+                        <!-- ============================================================== -->
+                        <!-- Title and breadcrumb -->
+                        <!-- ============================================================== -->
+                        <% include partials/breadcrumb.ejs %>
+                            <!-- ============================================================== -->
+                            <!-- Container fluid scss in scafholding.scss -->
+                            <!-- ============================================================== -->
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <h3>Patch Search</h3>
+                                    <div class="col m4 s12">
+                                        <label>Patch ID</label>
+                                        <input placeholder="Enter the patch ID" type="text" value="P-MY-5436234324" />
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <label>Patch Functionality</label>
+                                        <input placeholder="Patch Functionality" type="text" value="Monitoring BP, Sugar levels" />
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <label>Hardware Info</label>
+                                        <input placeholder="Hardware Info" type="text" value="Qualcomm Hardware Chip v2.43.343" />
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <h4>Link Patch</h4>
+                                    <div class="col m4 s12">
+                                        <label>Hospital</label>
+                                        <select class="browser-default">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <option value="1" selected="selected">Mayo Clinic</option>
+                                <option value="2">UCSF Medical Center</option>
+                                <option value="3"
+                                    >Johns Hopkins Hospital</option
+                                >
+                            </select>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <label>Patients</label>
+                                        <select class="browser-default">
+                                <option value="2" disabled selected
+                                    >Choose Patients</option
+                                >
+                                <option value="1">Jamie Vardy</option>
+                                <option value="2" selected="selected">Christiano Ronaldo</option>
+                                <option value="3">Ram Kashyap</option>
+                                <option value="4">Sergio Aguero</option>
+                                <option value="5">Chu Wu Chi</option>
+                            </select>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div class="row">
+                                    <h3>Enabled Sensors</h3>
+                                    <div class="col m4 s12">
+                                        <label>
+                                    <input type="checkbox" class="filled-in" checked="checked" />
+                                    <span>Blood Pressure</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="checkbox" class="filled-in"/>
+                                    <span>Sugar Levels</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="checkbox" class="filled-in" checked="checked" />
+                                    <span>ECG</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="checkbox" class="filled-in" checked="checked" />
+                                    <span>Temperature Sensor</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="checkbox" class="filled-in" />
+                                    <span>SpO2</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="checkbox" class="filled-in" checked="checked" />
+                                    <span>Geo Monitoring</span>
+                                </label><br/>
+                                        <label>
+                                    <input type="text" value="8"/>
+                                    <span>Monitoring Interval(No. of times a day)</span>
+                                </label><br/>
+                                    </div>
+
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <h5 class="card-title">Battery Status
+
+                                            <div style="padding-left:40px;width: 200px; height: 10px;  border: 0px;display:inline-block;">Current %:</div>
+                                            <div id="battcurr" style="padding-left:0px;width: 200px; height: 10px;  border: 0px;display:inline-block;">Unknown</div>
+                                        </h5>
+                                        <div class="demo-container" style="height:200px;">
+                                            <div id="patch-battery" style="height:175px;" class="flot-chart-content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <h5 class="card-title">ECG Status</h5>
+                                        <div class="demo-container" style="height:200px;">
+                                            <div id="patch-ecg" style="height:175px;" class="flot-chart-content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <h5 class="card-title">Heart Rate
+                                            <div style="padding-left:50px ; width: 100px; height: 10px;  border: 0px;display:inline-block;">Min:</div>
+                                            <div id="hrmin" style="padding-left:0px ; width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown</div>
+                                            <div style="padding-left:0px; width: 100px; height: 10px; border: 0px;display:inline-block;">Max:</div>
+                                            <div id="hrmax" style="padding-left:0px;width: 100px; height: 10px; border: 0px;display:inline-block;">Unknown</div>
+                                            <div style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Current:</div>
+                                            <div id="hrcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown</div>
+                                        </h5>
+                                        <div class="demo-container" style="height:200px;">
+                                            <div id="patch-hr" style="height:175px;" class="flot-chart-content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content">
+                                        <h5 class="card-title"> Respiration Rate
+                                            <div style="padding-left:50px ; width: 100px; height: 10px;  border: 0px;display:inline-block;">Min:</div>
+                                            <div id="rrmin" style="padding-left:0px ; width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown</div>
+                                            <div style="padding-left:0px; width: 100px; height: 10px; border: 0px;display:inline-block;">Max:</div>
+                                            <div id="rrmax" style="padding-left:0px;width: 100px; height: 10px; border: 0px;display:inline-block;">Unkonwn</div>
+                                            <div style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Current:</div>
+                                            <div id="rrcurr" style="width: 100px; height: 10px;  border: 0px;display:inline-block;">Unknown</div>
+
+                                        </h5>
+                                        <div class="demo-container" style="height:200px;">
+                                            <div id="patch-rr" style="height:175px;" class="flot-chart-content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    </div>
+
+                    <!-- ============================================================== -->
+                    <!-- Container fluid scss in scafholding.scss -->
+                    <!-- ============================================================== -->
+                    <% include partials/footer.ejs %>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Page wrapper scss in scafholding.scss -->
+    <!-- ============================================================== -->
+
+    <div class="chat-windows"></div>
+    <!-- ============================================================== -->
+    <!-- Right Sidebar -->
+    <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+    <!-- ============================================================== -->
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <script src="/assets/libs/flot/excanvas.min.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.pie.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.time.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.stack.js"></script>
+    <script src="/assets/libs/flot/jquery.flot.crosshair.js"></script>
+    <script src="/assets/libs/jquery.flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+    <script src="/javascripts/patchinventorydetails.js"></script>
+    <script src="/assets/extra-libs/knob/jquery.knob.js"></script>
+    <script src="/assets/extra-libs/sparkline/sparkline.js"></script>
+    <script src="/assets/extra-libs/horizontal-timeline/js/horizontal-timeline.js"></script>
+    <script src="/javascripts/refreshPage.js"></script>
+    <script type="text/javascript">
+        tempval = document.getElementById("_hrmin").innerText;
+        document.getElementById("hrmin").innerHTML = tempval;
+        tempval = document.getElementById("_hrmax").innerText;
+        document.getElementById("hrmax").innerHTML = tempval;
+        tempval = document.getElementById("_hrcurr").innerText;
+        document.getElementById("hrcurr").innerHTML = tempval;
+        tempval = document.getElementById("_rrmin").innerText;
+        document.getElementById("rrmin").innerHTML = tempval;
+        tempval = document.getElementById("_rrmax").innerText;
+        document.getElementById("rrmax").innerHTML = tempval;
+        tempval = document.getElementById("_rrcurr").innerText;
+        document.getElementById("rrcurr").innerHTML = tempval;
+        tempval = document.getElementById("_battcurr").innerText;
+        document.getElementById("battcurr").innerHTML = tempval;
+    </script>
+
+</body>
+
+</html>

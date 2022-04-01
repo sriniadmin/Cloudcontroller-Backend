@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+ <% include partials/cssdarkhead1.ejs %>
+
+    <body>
+        <div class="main-wrapper" id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Preloader - style you can find in spinners.css -->
+            <!-- ============================================================== -->
+
+            <% include partials/preloader.ejs %> <% include partials/header.ejs
+            %> <% include partials/sidebar.ejs %>
+
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Title and breadcrumb -->
+                <!-- ============================================================== -->
+                <% include partials/breadcrumb.ejs %>
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <h3>Patch Map</h3>
+                        <div class="col m4 s12">
+                            <label>Hospital</label>
+                            <select class="browser-default" id="hospitalList">
+                                <option value="" disabled selected
+                                    >Choose Hospital</option
+                                >
+                                <% for(var i=0; i < hospitalDetails.length; i++)
+                                { %>
+                                <option value="<%= hospitalDetails[i].name %>">
+                                    <%= hospitalDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Patients</label>
+                            <select class="browser-default" id="patientList">
+                                <option value="" disabled selected>
+                                    Choose Patients
+                                </option>
+                                <% for(var i=0; i < patientDetails.length; i++)
+                                { %>
+                                <option
+                                    value="<%= patientDetails[i].name %>"
+                                    patiendId="<%= patientDetails[i]._id %>"
+                                >
+                                    <%= patientDetails[i].name %>
+                                </option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Device Status</label>
+                            <select class="browser-default">
+                                <option value="1" selected>Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col s12">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Critical Patients</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    class="filled-in"
+                                    checked="checked"
+                                />
+                                <span>Less than 10% Battery</span>
+                            </label>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h5 class="card-title">
+                                        USA - active devices
+                                    </h5>
+                                    <div
+                                        id="usaMapDistribution"
+                                        style="height: 450px;"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================================== -->
+                <!-- Container fluid scss in scafholding.scss -->
+                <!-- ============================================================== -->
+                <% include partials/footer.ejs %>
+            </div>
+            <!-- ============================================================== -->
+            <!-- Page wrapper scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="chat-windows"></div>
+            <!-- ============================================================== -->
+            <!-- Right Sidebar -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- All Required js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+        <script src="/dist/js/materialize.min.js"></script>
+        <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- Apps -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/app.js"></script>
+        <script src="/dist/js/app.init.dark.js"></script>
+        <script src="/dist/js/app-style-switcher.js"></script>
+        <!-- ============================================================== -->
+        <!-- Custom js -->
+        <!-- ============================================================== -->
+        <script src="/dist/js/custom.min.js"></script>
+
+        <!-- ============================================================== -->
+        <!-- This page plugin js -->
+        <!-- ============================================================== -->
+        <script src="/assets/libs/jvectormap/jquery-jvectormap.min.js"></script>
+        <script src="/assets/extra-libs/jvector/jquery-jvectormap-world-mill-en.js"></script>
+        <script src="/assets/extra-libs/jvector/jquery-jvectormap-in-mill.js"></script>
+        <script src="/assets/extra-libs/jvector/jquery-jvectormap-us-aea-en.js"></script>
+        <script src="/assets/extra-libs/jvector/jquery-jvectormap-uk-mill-en.js"></script>
+        <script src="/assets/extra-libs/jvector/jquery-jvectormap-au-mill.js"></script>
+        <script src="/assets/extra-libs/jvector/jvectormap.custom.js"></script>
+               <!-- ============================================================== -->
+        <!-- Prod Js-->
+        <!-- ============================================================== -->
+        <script src="/dist/js/dark.js"></script>
+    </body>
+</html>

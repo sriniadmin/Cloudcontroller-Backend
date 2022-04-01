@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+
+<% include partials/cssdarkhead1.ejs %>
+
+<body>
+    <div class="main-wrapper" id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Preloader - style you can find in spinners.css -->
+        <!-- ============================================================== -->
+        <% include partials/preloader.ejs %>
+        <% include partials/header.ejs%>
+        <% include partials/sidebar.ejs %>
+
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Title and breadcrumb -->
+            <!-- ============================================================== -->
+            <% include partials/breadcrumb.ejs %>
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+
+            <div class="container-fluid">
+
+                <div class="row">
+                    <div class="col s12">
+                        <!-- <div id="patientmodal1" class="modal modal-fixed-footer"> -->
+                        <div id="patientmodal1" class="modal">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <h4>Patient Details
+                                        <div class="modal-close" style="float:right">
+                                            <i class="material-icons">clear</i>
+                                        </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-content wizard-content">
+
+                                        <h6 class="card-subtitle">
+
+                                        </h6>
+                                        <form id="form" name="form" action="/createpatient" method="post"
+                                            class="tab-wizard wizard-circle">
+                                            <!-- Step 1 -->
+                                            <h6>Personal Info</h6>
+                                            <section>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="firstName1">First Name : </label>
+                                                            <input type="text" id="firstName" name="firstName" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="lastName1">Last Name :</label>
+                                                            <input type="text" id="lastName1" name="lastName1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="emailAddress1">Email Address :</label>
+                                                            <input type="email" id="emailAddress1"
+                                                                name="emailAddress1" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="phoneNumber1">Phone Number :</label>
+                                                            <input type="tel" id="phoneNumber1" name="phoneNumber1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <!-- <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="mothername1">Mother's Name :</label>
+                                                            <input type="text" id="mothername1" name="mothername1" />
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="date1">Date of Birth :</label>
+                                                            <input type="text" id="testdate" class="datepicker"
+                                                                name="testdate" />
+
+                                                            <!-- <input type="text" class="form-control datepicker"> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <!-- <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <select id="maritalStatus" name="maritalStatus">
+                                                                <option value="" disabled selected>Marital Status
+                                                                </option>
+                                                                <option value="Single">Single</option>
+                                                                <option value="Married">Married</option>
+                                                                <option value="Widowed">Widowed</option>
+                                                            </select>
+                                                            <label>Marital Status :</label>
+                                                        </div>
+                                                    </div> -->
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <select id="patientsex" name="patientsex">
+                                                                <option value="" disabled selected>Sex
+                                                                </option>
+                                                                <option value="Female">Female</option>
+                                                                <option value="Male">Male</option>
+                                                                <option value="NA">NA</option>
+                                                            </select>
+                                                            <label>Sex :</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+
+                                                            <select id="patientuidtype" name="patientuidtype">
+                                                                <option value="" disabled selected>UniqueID Type
+                                                                </option>
+                                                                <option value="SSN">SSN</option>
+                                                                <option value="Aadhar">Aadhar</option>
+                                                                <option value="DrivingLicense">Driving License</option>
+                                                                <option value="VoterID">VoterID</option>
+                                                            </select>
+                                                            <label>UniqueID Type :</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="uid1">Unique Govt ID :</label>
+                                                            <input type="text" id="patientuid1" name="patientuid1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <!-- Step 2 -->
+                                            <h6>Contact</h6>
+                                            <section>
+                                                <div class="row">
+                                                    <div class="col s12">
+                                                        <div class="input-field">
+                                                            <label for="shortDescription1">Address :</label>
+                                                            <textarea name="address1" id="address1"
+                                                                class="materialize-textarea"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="city1">City :</label>
+                                                            <input type="text" id="patientcity" name="patientcity" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="state1">State :</label>
+                                                            <input type="text" id="patientState" name="patientState" />
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+
+                                                            <select id="patientcountry" name="patientcountry">
+                                                                <option value="" disabled selected>Country
+                                                                </option>
+                                                                <option value="India">India</option>
+                                                                <option value="USA">USA</option>
+                                                                <option value="France">France</option>
+                                                                <option value="Italy">Italy</option>
+                                                            </select>
+                                                            <label>Country :</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="zip1">ZIP/PIN :</label>
+                                                            <input type="text" id="patientzip1" name="patientzip1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="emecontactname1">Emergency Contact Name
+                                                                :</label>
+                                                            <input type="text" id="emergencyName1"
+                                                                name="emergencyName1" />
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="emergencyphoneNumber1">Emergency Phone Number
+                                                                :</label>
+                                                            <input type="tel" id="emergencyphoneNumber1"
+                                                                name="emergencyphoneNumber1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <!-- Step 3 -->
+                                            <!-- <h6>Insurance</h6> -->
+                                            <!-- <section>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <select name="insStatus1" id="insStatus1">
+                                                                <option value="" disabled selected>Insurance Status
+                                                                </option>
+                                                                <option value="insavailable">Available</option>
+                                                                <option value="insNotavailable">Not Available</option>
+
+                                                            </select>
+                                                            <label>Insurance Status :</label>
+                                                        </div>
+                                                        <div class="input-field">
+                                                            <label for="uid1">Insurance Company :</label>
+                                                            <input type="text" id="InsCompanyName1"
+                                                                name="InsCompanyName1" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="polidyid1">Policy Number :</label>
+                                                            <input type="text" id="PolicyNumber1"
+                                                                name="PolicyNumber1" />
+
+                                                        </div>
+                                                        <div class="input-field">
+                                                            <label for="policygroupid1">Policy Group Number :</label>
+                                                            <input type="text" id="PolicyGroupNumber1"
+                                                                name="PolicyGroupNumber1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="copay1">Co-Pay Percentage :</label>
+                                                            <input type="text" id="Copay1" name="Copay1" />
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <select name="insStatus1" id="insStatus1">
+                                                                <option value="" disabled selected>Insurance - Relation
+                                                                </option>
+                                                                <option value="insself">Self</option>
+                                                                <option value="insspouse">Spouse</option>
+                                                                <option value="insfather">Father</option>
+                                                                <option value="insmother">Mother</option>
+                                                                <option value="inschild">Children</option>
+                                                                <option value="Other">Other</option>
+                                                            </select>
+                                                            <label for="insurancerelation1">Relationship :</label>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </section> -->
+                                            <!-- Step 4 -->
+                                            <!-- <h6>Gaurdian</h6> -->
+                                            <!-- <section>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="gaurdname1">Gaurdian Name :</label>
+                                                            <input type="text" id="gaurdName1" name="gaurdName1" />
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="gaurdphoneNumber1">Gaurdian Phone Number
+                                                                :</label>
+                                                            <input type="tel" id="gaurdphoneNumber1"
+                                                                name="gaurdphoneNumber1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12">
+                                                        <div class="input-field">
+                                                            <label for="gaurdshortDescription1">Address :</label>
+                                                            <textarea name="gaurdshortDescription"
+                                                                id="gaurdshortDescription1"
+                                                                class="materialize-textarea"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="gaurdcity1">City :</label>
+                                                            <input type="text" id="gaurdcity1" name="gaurdcity1" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="gaurdstate1">State :</label>
+                                                            <input type="text" id="gaurdState1" name="gaurdState1" />
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+
+                                                            <select name="gaurdcountry" id="gaurdcountry">
+                                                                <option value="" disabled selected>Country
+                                                                </option>
+                                                                <option value="India">India</option>
+                                                                <option value="USA">USA</option>
+                                                                <option value="France">France</option>
+                                                                <option value="Italy">Italy</option>
+                                                            </select>
+                                                            <label>Country :</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="garudpin1">ZIP/PIN :</label>
+                                                            <input type="text" id="gaurdpin1" name="gaurdpin1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </section> -->
+                                            <!-- Step 5 -->
+                                            <!-- <h6>Employer</h6> -->
+                                            <!-- <section>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="empname1">Employer Name :</label>
+                                                            <input type="text" id="empName1" name="empName1" />
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="empoccup1">Occupation :</label>
+                                                            <input type="tel" id="empoccup1" name="empoccup1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12">
+                                                        <div class="input-field">
+                                                            <label for="empshortDescription1">Address :</label>
+                                                            <textarea name="empshortDescription"
+                                                                id="empshortDescription1"
+                                                                class="materialize-textarea"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="empcity1">City :</label>
+                                                            <input type="text" id="empcity1" name="empcity1" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="empstate1">State :</label>
+                                                            <input type="text" id="empState1" name="empState1" />
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+
+                                                            <select name="empcountry" id="empcountry">
+                                                                <option value="" disabled selected>Country
+                                                                </option>
+                                                                <option value="India">India</option>
+                                                                <option value="USA">USA</option>
+                                                                <option value="France">France</option>
+                                                                <option value="Italy">Italy</option>
+                                                            </select>
+                                                            <label>Country :</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="emppin1">ZIP/PIN :</label>
+                                                            <input type="text" id="emppin1" name="emppin1" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </section> -->
+                                            <h6>Patch</h6>
+                                            <section>
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+                                                            <label for="empname1">Patch ID :</label>
+                                                            <input type="text" id="empName1" name="empName1" />
+
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                
+                                                <div class="row">
+                                                    <div class="col s12 l6">
+                                                        <div class="input-field">
+
+                                                            <select name="empcountry" id="empcountry">
+                                                                <option value="" disabled selected>Patch Type
+                                                                </option>
+                                                                <option value="India">ECG</option>
+                                                                <option value="USA">Temperature</option>
+                                                                <option value="France">SPo2</option>
+                                                                
+                                                            </select>
+                                                            <label>Patch Type :</label>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+
+                                            </section>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- This needs to be obtained from tenant and patient info from the Database-->
+                    <!-- <div class="col m5   s8">
+                        <label>Location</label>
+                        <select class="browser-default">
+                            <option value="" disabled selected>Choose Location</option>
+                            <option value="1">Bangalore</option>
+                            <option value="2">New York</option>
+                            <option value="3">Singapore</option>
+                        </select>
+                    </div>
+                    <div class="col m4 s6">
+                        <label>Hospital</label>
+                        <select class="browser-default">
+                            <option value="" disabled selected>Choose Hospital</option>
+                            <option value="1">Apollo</option>
+                            <option value="2">Columbia Asia</option>
+                            <option value="3">Aster CMI</option>
+                        </select>
+                    </div> -->
+
+                    <div class="modal-trigger col s2" style="cursor: pointer;" href="#patientmodal1">
+                        <h4 class="font-medium m-b-0 waves-effect waves-light btn btn-round blue white-text m-t-20">
+                            Add Patient</h4>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <!-- This Row displays all the patient list row vise ( Need to have some pagination logic with EMR DB)-->
+                    <div class="col s12">
+                        <div class="card">
+                            <div class="card-content">
+                                <h5 class="card-title">Patient Details</h5>
+                                <h6 class="card-subtitle">
+                                    Patient Database
+                                </h6>
+                                <table id="patient_details_table" class="responsive-table display" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Medication</th>
+                                            <th>Location</th>
+                                            <th>Age</th>
+                                            <th>Last Update</th>
+                                            <th>Status</th>
+                                            <th>Call</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for(var i=0; i <
+                                            patientDetailsList.length; i++) { %>
+
+                                        <tr onclick="location.href='/patientdetails?_query_patientid=<%= patientDetailsList[i].id %>&monitortime=1m'"
+                                            style="cursor: pointer;">
+                                            <td>
+                                                <h6>
+                                                    <%=
+                                                        patientDetailsList[i].fname
+                                                        %>
+                                                        <%=
+                                                        patientDetailsList[i].lname
+                                                        %>
+                                                </h6>
+                                            </td>
+                                            <td>
+                                                <%=
+                                                    patientDetailsList[i].email
+                                                    %>
+                                            </td>
+                                           <!-- PASTE HERE BACK -->
+                                            <td>
+                                                <i class="material-icons"
+                                                    onclick="alert('Alerting related personnel and 911')">call</i>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Medication</th>
+                                            <th>Location</th>
+                                            <th>Age</th>
+                                            <th>Last Update</th>
+                                            <th>Status</th>
+                                            <th>Call</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- Container fluid scss in scafholding.scss -->
+            <!-- ============================================================== -->
+            <% include partials/footer.ejs %>
+        </div>
+        <!-- ============================================================== -->
+        <!-- Page wrapper scss in scafholding.scss -->
+        <!-- ============================================================== -->
+
+        <div class="chat-windows"></div>
+        <!-- ============================================================== -->
+        <!-- Right Sidebar -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- All Required js -->
+
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/dist/js/materialize.min.js"></script>
+    <script src="/assets/libs/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- Apps -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/app.js"></script>
+    <script src="/dist/js/app.init.dark.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Custom js -->
+    <!-- ============================================================== -->
+    <script src="/dist/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    <!-- This page plugin js -->
+    <!-- ============================================================== -->
+    <script src="/assets/extra-libs/Datatables/datatables.min.js"></script>
+    <script src="/dist/js/pages/datatable/datatable-basic.init.js"></script>
+    <script src="/assets/libs/jquery-steps/build/jquery.steps.min.js"></script>
+    <script src="/assets/libs/jquery-validation/dist/jquery.validate.min.js"></script>
+    - ============================================================== -->
+    <!-- Prod Js-->
+    <!-- ============================================================== -->
+    <script src="/javascripts/refreshPage.js"></script>
+    <script>
+        // This script will submit the form and creates an alert
+        // This needs to be modified with a proper display - Submit and go to patient or Submit and stay in same page
+        $(".tab-wizard").steps({
+            headerTag: "h6",
+            bodyTag: "section",
+            transitionEffect: "fade",
+            titleTemplate: '<span class="step">#index#</span> #title#',
+            labels: {
+                finish: "Submit"
+            },
+            onFinished: function(event, currentIndex) {
+                $("#form").submit();
+                alert("Form Submitted!",
+                    "Done"
+                );
+            }
+        });
+    </script>
+
+    <script src="/assets/extra-libs/prism/prism.js"></script>
+    <script src="/dist/js/dark.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems, {
+                dismissible: false
+            });
+        });
+    </script>
+
+</body>
+
+</html>
