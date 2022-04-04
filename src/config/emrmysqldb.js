@@ -9,7 +9,7 @@ module.exports = new Sequelize(
     process.env.EMR_DB_USER,
     process.env.EMR_DB_PASS,
     {
-        host: 'localhost',
+        host: process.env.EMR_DB_HOST,
         dialect: process.env.EMR_DB_DIALECT,
         operatorsAliases: false,
         logging: false,
@@ -26,4 +26,3 @@ module.exports = new Sequelize(
         },
     }
 )
-

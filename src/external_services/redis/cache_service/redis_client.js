@@ -9,7 +9,7 @@ const redisClient = redis.createClient({
   // host: process.env.REDIS_SERVER,
   // port: process.env.REDIS_PORT,
   // password: process.env.REDIS_KEY
-  port: 6379,
+  port: 6379
 });
 
 

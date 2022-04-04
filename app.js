@@ -31,18 +31,9 @@ const port = process.env.WEB_APP_PORT
 // For now commented them some of the tables under init-models
 
 const sequelizeDB = require("./src/config/emrmysqldb") // Database
-// sequelizeDB.sync({ force: true }).then(function(){
-//     console.log('DB connection sucessful.');
-//   }, function(err){
-//     // catch error here
-//     console.log('ERROR-here',err);
-  
-//   });
-//   console.log('HERE');
 const postgresSequelizeDB = require("./src/config/emrpostgresdb") //postgres database
 let initModels =
     require("./src/dbmodels/sequelizeEMRModels/init-models").initModels
-
 let models = initModels(sequelizeDB)
 
 let postgresModels = initModels(postgresSequelizeDB)
@@ -87,15 +78,10 @@ const routes = {
 systemChecks.dbValidate()
 
 let app = express()
+const cors = require('cors')
 
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-};
-
-app.use(allowCrossDomain);
+app.options("*", cors({ origin: 'http://20.230.234.202:7141', optionsSuccessStatus: 200 }))
+app.use(cors({ origin: 'http://20.230.234.202:7141', optionsSuccessStatus: 200 }))
 
 // view engine setup - Can we removed once the Frontend React UI and Mobile App is available
 // app.set('views', path.join(__dirname, 'views'));
