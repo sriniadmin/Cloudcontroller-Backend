@@ -6,7 +6,7 @@ logger.debug("The Redis keys are ", process.env.REDIS_SERVER, process.env.REDIS_
 // create and connect redis client to local instance.
 // const redisClient = redis.createClient();
 const redisClient = redis.createClient({
-  // host: process.env.REDIS_SERVER,
+  host: process.env.REDIS_SERVER,
   // port: process.env.REDIS_PORT,
   // password: process.env.REDIS_KEY
   port: 6379
