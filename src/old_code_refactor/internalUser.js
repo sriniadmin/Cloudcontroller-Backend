@@ -858,6 +858,8 @@ async function loginUser(req, res, next) {
                         userEmail: email,
                         userUuid: user[0]["user_uuid"],
                         userName: user[0]["username"],
+                        role: user[0]["role"],
+                        tenant: user[0]["tenant_id"],
                         pid: userPid,
                     }
                     logger.debug("this is for alert testing")
