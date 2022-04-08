@@ -14,7 +14,15 @@ const LOCATIONS = models.location
 const patientLocation = models.patient_location_table
 
 async function db_get_location_list(tenant_id, username, params) {
-    location_list = ""
+    let location_list = []
+    
+    // try {
+    //     location_list = await LOCATIONS.findAll()
+    // } catch (err) {
+    //     console.log(err)
+    //     throw new Error("Login Failure as part of user cred -  tenant check")
+    // }
+    // return location_list
     let whereStatement = { tenant_uuid: tenant_id }
 
     let { limit, offset, filter, location_uuid } = params

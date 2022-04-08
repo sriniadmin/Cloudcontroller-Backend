@@ -1847,16 +1847,16 @@ async function updateRemoteLocation(req, res, next) {
 
 //Validated
 async function getLocation(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
+    let user_name = req.query.userName
+    // let given_pid = req.params.pid
+    let tenant_id = req.query.tenant_uuid
     let locations, facilities
     let totalCount = 0
 
     try {
-        locations = await db_get_location_list(tenant_id, username, req.query)
+        locations = await db_get_location_list(tenant_id, user_name, req.query)
         totalCount = await db_location_count(tenant_id)
-        facilities = await db_get_facility_list(tenant_id, username)
+        facilities = await db_get_facility_list(tenant_id, user_name)
         locations = dbOutput_JSON(locations)
         totalCount = dbOutput_JSON(totalCount)
         facilities = dbOutput_JSON(facilities)

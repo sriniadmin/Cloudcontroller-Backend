@@ -322,10 +322,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: true
     },
-    status: {
-      type: DataTypes.STRING(100),
-      allowNull: true
-    },
+    // status: {
+    //   type: DataTypes.STRING(100),
+    //   allowNull: true
+    // },
     facility_uuid: {
       type: DataTypes.STRING(250),
       allowNull: true
@@ -363,14 +363,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    initial_bed_list: {
-      type: DataTypes.JSON,
-      allowNull: true
-    },
-    used_bed_list: {
-      type: DataTypes.JSON,
-      allowNull: true
-    },
+    // initial_bed_list: {
+    //   type: DataTypes.JSON,
+    //   allowNull: true
+    // },
+    // used_bed_list: {
+    //   type: DataTypes.JSON,
+    //   allowNull: true
+    // },
   }, {
     sequelize,
     tableName: 'location',

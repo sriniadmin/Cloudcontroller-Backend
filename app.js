@@ -80,8 +80,8 @@ systemChecks.dbValidate()
 let app = express()
 const cors = require('cors')
 
-app.options("*", cors({ origin: 'http://20.230.234.202:7141', optionsSuccessStatus: 200 }))
-app.use(cors({ origin: 'http://20.230.234.202:7141', optionsSuccessStatus: 200 }))
+app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
+app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
 
 // view engine setup - Can we removed once the Frontend React UI and Mobile App is available
 // app.set('views', path.join(__dirname, 'views'));

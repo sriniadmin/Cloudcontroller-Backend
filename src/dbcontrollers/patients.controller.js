@@ -76,7 +76,7 @@ var Patient = function (patientobj) {
 }
 
 async function db_get_patient_list(tenant_id, username, query_param) {
-    patient_list = ""
+    patient_list = []
     let patient_data
     logger.debug("the body of the patient is", query_param)
 
@@ -286,6 +286,7 @@ async function db_get_patient_list(tenant_id, username, query_param) {
                 // nest: true
             })
         } catch (error) {
+            console.log(error)
             logger.debug(
                 "Patient list fetch error " +
                 tenant_id +

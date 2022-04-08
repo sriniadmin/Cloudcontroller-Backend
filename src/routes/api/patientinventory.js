@@ -51,6 +51,9 @@ const {
 
 router.get("/", patientInventory, apiFinalProcess)
 
+ //Chanage to post method to get data
+router.post("/", patientInventory, apiFinalProcess)
+
 /**
  * @openapi
  * /api/patientinventory/patient_injection:
