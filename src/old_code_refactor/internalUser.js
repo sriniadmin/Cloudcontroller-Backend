@@ -856,6 +856,7 @@ async function loginUser(req, res, next) {
                     req.apiRes = SYSTEM_AAA_CODE["6"]
                     req.apiRes["response"] = {
                         userEmail: email,
+                        accessToken: accessToken,
                         userUuid: user[0]["user_uuid"],
                         userName: user[0]["username"],
                         role: user[0]["role"],
