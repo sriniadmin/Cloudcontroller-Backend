@@ -50,6 +50,8 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 //Get Request
 
+router.post("/patchinventory", getPatchInventory,apiFinalProcess)
+
 router.get("/patchinventory", getPatchInventory,apiFinalProcess)
 /**
  * @openapi

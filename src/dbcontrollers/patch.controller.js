@@ -83,30 +83,30 @@ async function db_get_patch_list(tenant_id, query_param) {
     }
     logger.debug("The WhereStatement is ", whereStatement)
     await Patches.findAll({
-        include: [
-            {
-                model: models.patch_patient_map,
-                include:[
-                    {
-                        model:models.patient_data,
-                        attributes:['fname','lname','pid']
-                    }
-                ],
-                //required: innerRequired,
-                required: false,
-                where: whereStatement1,
-            },
-            {
-                model: models.patch,
-                //   required:false,
-                required: true,
-                as: "AssociatedPatch",
-            },
+        // include: [
+        //     {
+        //         model: models.patch_patient_map,
+        //         include:[
+        //             {
+        //                 model:models.patient_data,
+        //                 attributes:['fname','lname','pid']
+        //             }
+        //         ],
+        //         //required: innerRequired,
+        //         required: false,
+        //         where: whereStatement1,
+        //     },
+        //     {
+        //         model: models.patch,
+        //         //   required:false,
+        //         required: true,
+        //         as: "AssociatedPatch",
+        //     },
 
-        ],
+        // ],
         where: whereStatement,
-        limit: parseInt(limit),
-        offset: parseInt(offset),
+        limit: parseInt(10),
+        offset: parseInt(0),
         raw: false,
         // required:true,
         required: false,

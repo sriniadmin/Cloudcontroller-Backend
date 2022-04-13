@@ -912,10 +912,10 @@ async function logoutUser(req, res, next) {
 //Patch Function
 // Validated
 async function getPatchInventory(req, res, next) {
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
-    tenant_id = req.userTenantId
+    // email = req.userEmail
+    // username = email.split("@")[0]
+    // tenant_name = req.userTenant
+    tenant_id = req.body.tenant_id
     logger.debug("THE QUERY IS", req.query)
     logger.debug("THE PARAMS ARE", req.params)
     let patches
