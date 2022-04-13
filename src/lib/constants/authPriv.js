@@ -2,7 +2,7 @@ let IGNORE_AUTH_PATH = [
   "/api/sign/login",
   "/api/location/locationinventory", //delete latter, if i forget, please delete
   "/api/patientinventory", //delete latter, if i forget, please delete
-  "api/patch/patchinventory",
+  "/api/patch/patchinventory",
   "/api/login",
   "/signup",
   "/sign/signup",
