@@ -105,8 +105,8 @@ async function db_get_patch_list(tenant_id, query_param) {
 
         // ],
         where: whereStatement,
-        limit: parseInt(10),
-        offset: parseInt(0),
+        limit: parseInt(limit),
+        offset: parseInt(offset),
         raw: false,
         // required:true,
         required: false,

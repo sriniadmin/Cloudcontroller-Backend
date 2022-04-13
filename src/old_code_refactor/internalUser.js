@@ -922,7 +922,7 @@ async function getPatchInventory(req, res, next) {
     let filtered_patches = []
     let totalCount = 0
     try {
-        let patch_data = await db_get_patch_list(tenant_id, req.query)
+        let patch_data = await db_get_patch_list(tenant_id, req.body)
         patches = patch_data[0]
         totalCount = patch_data[1]
         patches = dbOutput_JSON(patches)
