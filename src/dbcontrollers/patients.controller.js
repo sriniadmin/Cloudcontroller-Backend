@@ -78,7 +78,7 @@ var Patient = function (patientobj) {
 async function db_get_patient_list(tenant_id, username, query_param) {
     patient_list = []
     let patient_data
-    tenant_id = query_param.body.tenantId
+    tenant_id = query_param.body.tenant_id
     logger.debug("the body of the patient is", query_param)
 
     let { limit, offset, filter, location_uuid } = query_param.body
@@ -394,6 +394,13 @@ async function db_patient_exist(
     return patient_id // This returns tenant_uuid only
 }
 
+async function db_get_patient_details(pid) {
+    const data = await Patients_Data.findOne({
+        pid: pid
+    });
+    return data
+}
+
 //This db_get_patient_list_new needs to be removed - just verify once and remove the code
 
 async function db_get_patient_list_new(tenant_id, username) {
@@ -624,4 +631,5 @@ module.exports = {
     db_patient_count,
     db_med_record_exist,
     db_patient_info,
+    db_get_patient_details
 }

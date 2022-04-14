@@ -69,6 +69,8 @@ const db_med_record_exist = patient_controller.db_med_record_exist
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 
+const { db_get_patient_details } = patient_controller
+
 const {
     db_get_ews_list,
     db_create_ews,
@@ -360,7 +362,7 @@ async function patientInventory(req, res, next) {
     // logger.debug("Patient Inventory Invoked")
     // let username = req.userName
     let username = 'doctor'
-    let tenant_id = req.body.tenant_id
+    let tenant_id = req.body.tenantId
     let filter_flag = false
     logger.debug("Query, Params ", req.query, req.params)
     req.query.location_uuid = getFilter(req.query.filter, "location_uuid")[
@@ -892,7 +894,7 @@ async function getPatientDetail(req, res, next) {
     // This API gets the username and tenant and other HTTP Headers info
     let username = req.userName
     let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
+    let tenant_id = req.body.tenantId
     let patient_exist, patients_list
     let duration = 3
     // let duration = req.query.duration
@@ -920,11 +922,7 @@ async function getPatientDetail(req, res, next) {
         logger.debug("Error in GRPC Call is ", error)
     }
     try {
-        patients_list = await db_get_patient_list(
-            tenant_id,
-            username,
-            query_param
-        )
+        patients_list = await db_get_patient_details(query_param.pid)
     } catch (e) {
         req.apiRes = PATIENT_CODE["1"]
         logger.debug("Exception : %s", e)
@@ -933,15 +931,14 @@ async function getPatientDetail(req, res, next) {
     patients_list = JSON.stringify(patients_list)
     patients_list = JSON.parse(patients_list)
 
-    let patients = patients_list[0]
+    let patients = patients_list
     //let patch_ref = patients["patch_patient_map"]
     //let location_ref = patients["location"]
-    patients_list[0]["baselineResult"] = baseLineDict["baselineResult"]
-    let listPatient = await genPatientRespData([patients_list[0]])
+    patients_list["baselineResult"] = baseLineDict["baselineResult"]
+    let listPatient = await genPatientRespData([patients_list])
     req.apiRes = PATIENT_CODE["2"]
     req.apiRes["response"] = {
-        patients: listPatient,
-        count: listPatient.length,
+        patient: listPatient[0]
     }
     return next()
 }
