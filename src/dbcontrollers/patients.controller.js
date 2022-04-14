@@ -78,6 +78,7 @@ var Patient = function (patientobj) {
 async function db_get_patient_list(tenant_id, username, query_param) {
     patient_list = []
     let patient_data
+    tenant_id = query_param.body.tenantId
     logger.debug("the body of the patient is", query_param)
 
     let { limit, offset, filter, location_uuid } = query_param.body
