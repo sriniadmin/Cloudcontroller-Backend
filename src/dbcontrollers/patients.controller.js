@@ -406,9 +406,9 @@ async function db_get_patient_inventory(params) {
     return data
 }
 
-async function db_get_patient_details(pid) {
+async function db_get_patient_details(params) {
     const data = await Patients_Data.findOne({
-        pid: pid
+        pid: params
     });
     return data
 }

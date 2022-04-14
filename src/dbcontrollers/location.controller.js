@@ -332,9 +332,10 @@ async function db_get_patient_location_list(tenant_id, username, params) {
 
     try {
         patient_location_list = await patientLocation.findAll({
-            where: whereStatement,
+            pid: pid
         })
     } catch (err) {
+        console.log(err)
         throw new Error("Failure in fetching the notes" + err)
     }
     return patient_location_list

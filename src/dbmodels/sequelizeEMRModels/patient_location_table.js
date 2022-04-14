@@ -66,22 +66,22 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
-            floor_tag: {
-                type: DataTypes.STRING(255),
-                allowNull: true,
-            },
-            ward_tag: {
-                type: DataTypes.STRING(255),
-                allowNull: true,
-            },
+                // floor_tag: {
+                //     type: DataTypes.STRING(255),
+                //     allowNull: true,
+                // },
+                // ward_tag: {
+                //     type: DataTypes.STRING(255),
+                //     allowNull: true,
+                // },
             bed_no: {
                 type: DataTypes.BIGINT(20),
                 allowNull: true,
             },
-            vital_report_details: {
-                type: DataTypes.JSON,
-                allowNull: true,
-            },
+            // vital_report_details: {
+            //     type: DataTypes.JSON,
+            //     allowNull: true,
+            // },
         },
         {
             sequelize,
