@@ -455,7 +455,7 @@ async function patientInventory(req, res, next) {
             // req.query.offset = 0
             logger.debug("the querty pidlist is", pidlist.length.toString())
             // logger.debug("the query for patients is", req.query)
-            patients = await db_get_patient_list(tenant_id, username, req.query)
+            patients = await db_get_patient_list(tenant_id, username, req)
             let newtotalCount = await db_patient_count(tenant_id)
             patients = dbOutput_JSON(patients)
             totalCount != newtotalCount
@@ -485,7 +485,7 @@ async function patientInventory(req, res, next) {
             // and then pass to the trend to get that values
             curr_limit = req.query.limit
             req.query.limit = 10000 // 10K max patients as of now in single tenant:-)
-            patients = await db_get_patient_list(tenant_id, username, req.query)
+            patients = await db_get_patient_list(tenant_id, username, req)
             req.query.limit = curr_limit
             let newtotalCount = await db_patient_count(tenant_id)
             patients = dbOutput_JSON(patients)

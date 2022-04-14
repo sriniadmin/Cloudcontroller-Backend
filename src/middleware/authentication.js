@@ -46,8 +46,8 @@ var validateSession = async function (req, res, next) {
         logger.debug("Ignoring path for authentication check URL - " + req.path)
         return next()
     }
-    if (req.cookies[process.env.TOKEN_KEY]) {
-        const accessToken = req.cookies[process.env.TOKEN_KEY]
+    if (req.headers.accesstoken) {
+        const accessToken = req.headers.accesstoken
         let JwtDecoded = null
         currTime = Date.now()
         try {

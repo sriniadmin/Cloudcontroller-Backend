@@ -80,7 +80,7 @@ async function db_get_patient_list(tenant_id, username, query_param) {
     let patient_data
     logger.debug("the body of the patient is", query_param)
 
-    let { limit, offset, filter, location_uuid } = query_param
+    let { limit, offset, filter, location_uuid } = query_param.body
     let whereStatement = { tenant_id: tenant_id }
     if (query_param.pid) whereStatement.pid = query_param.pid
     if (query_param.pidlist) whereStatement.pid = query_param.pidlist
