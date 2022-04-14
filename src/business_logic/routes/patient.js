@@ -69,7 +69,7 @@ const db_med_record_exist = patient_controller.db_med_record_exist
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 
-const { db_get_patient_details } = patient_controller
+const { db_get_patient_details, db_get_patient_inventory } = patient_controller
 
 const {
     db_get_ews_list,
@@ -358,288 +358,288 @@ async function registerPatientInventory(req, res, next) {
 }
 
 //VALIDATED
-async function patientInventory(req, res, next) {
-    // logger.debug("Patient Inventory Invoked")
-    // let username = req.userName
-    let username = 'doctor'
-    let tenant_id = req.body.tenantId
-    let filter_flag = false
-    logger.debug("Query, Params ", req.query, req.params)
-    req.query.location_uuid = getFilter(req.query.filter, "location_uuid")[
-        "location_uuid"
-    ]
-    req.query.fname = getFilter(req.query.filter, "fname")["fname"]
-    req.query.lname = getFilter(req.query.filter, "lname")["lname"]
-    req.query.prac = getFilter(req.query.filter, "prac_uuid")["prac_uuid"]
-    req.query.med_record = getFilter(req.query.filter, "med_red")["med_red"]
-    req.query.status = getFilter(req.query.filter, "status")["status"]
-    req.query.discharge_date = getFilter(req.query.filter, "discharge_date")[
-        "discharge_date"
-    ]
-    if (!req.query.duration) {
-        req.query.duration = 3
-    }
+// async function patientInventory(req, res, next) {?
+//     // logger.debug("Patient Inventory Invoked")
+//     // let username = req.userName
+//     let username = 'doctor'
+//     let tenant_id = req.body.tenantId
+//     let filter_flag = false
+//     // logger.debug("Query, Params ", req.query, req.params)
+//     // req.query.location_uuid = getFilter(req.query.filter, "location_uuid")[
+//     //     "location_uuid"
+//     // ]
+//     // req.query.fname = getFilter(req.query.filter, "fname")["fname"]
+//     // req.query.lname = getFilter(req.query.filter, "lname")["lname"]
+//     // req.query.prac = getFilter(req.query.filter, "prac_uuid")["prac_uuid"]
+//     // req.query.med_record = getFilter(req.query.filter, "med_red")["med_red"]
+//     // req.query.status = getFilter(req.query.filter, "status")["status"]
+//     // req.query.discharge_date = getFilter(req.query.filter, "discharge_date")[
+//     //     "discharge_date"
+//     // ]
+//     // if (!req.query.duration) {
+//     //     req.query.duration = 3
+//     // }
 
-    if (
-        req.query.location_uuid ||
-        req.query.fname ||
-        req.query.lname ||
-        req.query.prac ||
-        req.query.med_record ||
-        req.query.status ||
-        req.query.discharge_date
-    ) {
-        filter_flag = true
-    }
+//     // if (
+//     //     req.query.location_uuid ||
+//     //     req.query.fname ||
+//     //     req.query.lname ||
+//     //     req.query.prac ||
+//     //     req.query.med_record ||
+//     //     req.query.status ||
+//     //     req.query.discharge_date
+//     // ) {
+//     //     filter_flag = true
+//     // }
 
-    // logger.debug("The params are ", req.query)
-    let patients,
-        totalCount = 0,
-        listPatient = []
-    let status, patientList
-    let baselineResult
-    let tempbaselineResult = []
-    let currentIdx = -1
-    if (req.query.currentIdx && req.query.currentIdx != -1) {
-        req.query.offset=req.query.currentIdx
-    }
-    //
-    if (!filter_flag) {
-        try {
-            patientInventoryJSON = {
-                limit: parseInt(req.query.limit),
-                offset: parseInt(req.query.offset),
-                duration: parseInt(req.query.duration),
-                tenantUUID: tenant_id,
-            }
-            logger.debug("the GRPC Calling limit,offset,duration are", patientInventoryJSON)
+//     // logger.debug("The params are ", req.query)
+//     let patients,
+//         totalCount = 0,
+//         listPatient = []
+//     let status, patientList
+//     let baselineResult
+//     let tempbaselineResult = []
+//     let currentIdx = -1
+//     if (req.query.currentIdx && req.query.currentIdx != -1) {
+//         req.query.offset=req.query.currentIdx
+//     }
+//     //
+//     if (!filter_flag) {
+//         try {
+//             patientInventoryJSON = {
+//                 limit: parseInt(req.query.limit),
+//                 offset: parseInt(req.query.offset),
+//                 duration: parseInt(req.query.duration),
+//                 tenantUUID: tenant_id,
+//             }
+//             logger.debug("the GRPC Calling limit,offset,duration are", patientInventoryJSON)
             
-            baselineResult = await patientInventoryGRPC(patientInventoryJSON)
-            // logger.debug("The patientList GRPC is ", baselineResult)
-            tempbaselineResult = baselineResult["result"]["trndsPtnt"]
-            if (parseInt(baselineResult["status"]) != 0) {
-                // patientList will be loaded with error
-                logger.error("Patient List from GRPC is errored")
-                // req.apiRes = PATIENT_CODE["1"]
-                // req.apiRes["error"] = {
-                //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
-                // }
-                // return next()
-            }
-        } catch (err) {
-            logger.debug("Patient Inventory Fetch Error GRPC " + err)
-            // req.apiRes = PATIENT_CODE["1"]
-            // req.apiRes["error"] = {
-            //     errMessage: "Patient Inventory Fetch Error RPC",
-            // }
-            // return next()
-        }
-        let pidlist = []
-        try {
-            pidlist = baselineResult["result"]["trndsPtnt"]
-                .map((x) => x["patientUUID"])
-                .filter((item) => item !== undefined && item !== null)
-            totalCount = baselineResult["result"]["numPatients"]
-        } catch (error) {
-            logger.debug("Pid List failed.. Sorting based on Name")
-        }
-        // logger.debug("The Total Count, pidlist is ", totalCount, pidlist)
-        if (pidlist.length > 0) {
-            req.query["pidlist"] = pidlist
-        } else {
-            logger.error(
-                "The Baseline Provided info has no patients - Something went really wrong",
-                baselineResult["result"]
-            )
-        }
+//             baselineResult = await patientInventoryGRPC(patientInventoryJSON)
+//             // logger.debug("The patientList GRPC is ", baselineResult)
+//             tempbaselineResult = baselineResult["result"]["trndsPtnt"]
+//             if (parseInt(baselineResult["status"]) != 0) {
+//                 // patientList will be loaded with error
+//                 logger.error("Patient List from GRPC is errored")
+//                 // req.apiRes = PATIENT_CODE["1"]
+//                 // req.apiRes["error"] = {
+//                 //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
+//                 // }
+//                 // return next()
+//             }
+//         } catch (err) {
+//             logger.debug("Patient Inventory Fetch Error GRPC " + err)
+//             // req.apiRes = PATIENT_CODE["1"]
+//             // req.apiRes["error"] = {
+//             //     errMessage: "Patient Inventory Fetch Error RPC",
+//             // }
+//             // return next()
+//         }
+//         let pidlist = []
+//         try {
+//             pidlist = baselineResult["result"]["trndsPtnt"]
+//                 .map((x) => x["patientUUID"])
+//                 .filter((item) => item !== undefined && item !== null)
+//             totalCount = baselineResult["result"]["numPatients"]
+//         } catch (error) {
+//             logger.debug("Pid List failed.. Sorting based on Name")
+//         }
+//         // logger.debug("The Total Count, pidlist is ", totalCount, pidlist)
+//         if (pidlist.length > 0) {
+//             req.query["pidlist"] = pidlist
+//         } else {
+//             logger.error(
+//                 "The Baseline Provided info has no patients - Something went really wrong",
+//                 baselineResult["result"]
+//             )
+//         }
 
-        try {
-            // req.query.offset = 0
-            logger.debug("the querty pidlist is", pidlist.length.toString())
-            // logger.debug("the query for patients is", req.query)
-            patients = await db_get_patient_list(tenant_id, username, req)
-            let newtotalCount = await db_patient_count(tenant_id)
-            patients = dbOutput_JSON(patients)
-            totalCount != newtotalCount
-                ? logger.debug(
-                    "Total Count in DB and Baseliner are different ",
-                    totalCount,
-                    newtotalCount
-                )
-                : totalCount
+//         try {
+//             // req.query.offset = 0
+//             logger.debug("the querty pidlist is", pidlist.length.toString())
+//             // logger.debug("the query for patients is", req.query)
+//             patients = await db_get_patient_list(tenant_id, username, req)
+//             let newtotalCount = await db_patient_count(tenant_id)
+//             patients = dbOutput_JSON(patients)
+//             totalCount != newtotalCount
+//                 ? logger.debug(
+//                     "Total Count in DB and Baseliner are different ",
+//                     totalCount,
+//                     newtotalCount
+//                 )
+//                 : totalCount
 
-            if (totalCount == 0) {
-                totalCount = dbOutput_JSON(newtotalCount)
-            }
-        } catch (err) {
-            logger.debug("Patient Inventory Fetch Error " + err)
-            req.apiRes = PATIENT_CODE["1"]
-            req.apiRes["error"] = {
-                errMessage: "Patient Inventory Fetch Error",
-            }
-            return next()
-        }
-    } else {
-        // This logic is for filtered patients from UI and getting the trend for each of those patient separately
-        logger.debug("Filter Logic is called", tenant_id, username, req.query)
-        try {
-            // req.query.pagesize should be say unlimited so we get all the patient of that filter
-            // and then pass to the trend to get that values
-            curr_limit = req.query.limit
-            req.query.limit = 10000 // 10K max patients as of now in single tenant:-)
-            patients = await db_get_patient_list(tenant_id, username, req)
-            req.query.limit = curr_limit
-            let newtotalCount = await db_patient_count(tenant_id)
-            patients = dbOutput_JSON(patients)
-            // logger.debug('the filter is called with the patients', Object.keys(patients))
-            let pidArray = []
+//             if (totalCount == 0) {
+//                 totalCount = dbOutput_JSON(newtotalCount)
+//             }
+//         } catch (err) {
+//             logger.debug("Patient Inventory Fetch Error " + err)
+//             req.apiRes = PATIENT_CODE["1"]
+//             req.apiRes["error"] = {
+//                 errMessage: "Patient Inventory Fetch Error",
+//             }
+//             return next()
+//         }
+//     } else {
+//         // This logic is for filtered patients from UI and getting the trend for each of those patient separately
+//         logger.debug("Filter Logic is called", tenant_id, username, req.query)
+//         try {
+//             // req.query.pagesize should be say unlimited so we get all the patient of that filter
+//             // and then pass to the trend to get that values
+//             curr_limit = req.query.limit
+//             req.query.limit = 10000 // 10K max patients as of now in single tenant:-)
+//             patients = await db_get_patient_list(tenant_id, username, req)
+//             req.query.limit = curr_limit
+//             let newtotalCount = await db_patient_count(tenant_id)
+//             patients = dbOutput_JSON(patients)
+//             // logger.debug('the filter is called with the patients', Object.keys(patients))
+//             let pidArray = []
            
-            patients.map((item) => {
-                pidArray.push(item.pid)
-            })
-            logger.debug('the pid array is ', pidArray) //this gives the patient pid 
-            // let redisResponse
-            // let redisSortKey
-            // let currentDate = new Date()
-            // logger.debug('current date is', currentDate)
-            // currentDate = new Date().toISOString()
-            // logger.debug('new current date is', currentDate)
-            // redisResponse = updateRedisCache("sort_pid", pidArray)
-            // pidArray.map((item) => {
-            //     logger.debug('the pid array item is', item)
-            //     redisSortKey = updateRedisCache("sort_key", "sort" + "_" + item + "_" + currentDate)
-            //     logger.debug('the redis sort key is', redisSortKey)
+//             patients.map((item) => {
+//                 pidArray.push(item.pid)
+//             })
+//             logger.debug('the pid array is ', pidArray) //this gives the patient pid 
+//             // let redisResponse
+//             // let redisSortKey
+//             // let currentDate = new Date()
+//             // logger.debug('current date is', currentDate)
+//             // currentDate = new Date().toISOString()
+//             // logger.debug('new current date is', currentDate)
+//             // redisResponse = updateRedisCache("sort_pid", pidArray)
+//             // pidArray.map((item) => {
+//             //     logger.debug('the pid array item is', item)
+//             //     redisSortKey = updateRedisCache("sort_key", "sort" + "_" + item + "_" + currentDate)
+//             //     logger.debug('the redis sort key is', redisSortKey)
 
-            // })
+//             // })
 
           
 
-            patientInventoryJSON = {
-                limit: parseInt(req.query.limit),
-                offset: parseInt(req.query.offset),
-                duration: parseInt(req.query.duration),
-                tenantUUID: tenant_id,
-                patientUUIDList: pidArray
-            }
-            logger.debug("the GRPC Calling in else limit,offset,duration are", patientInventoryJSON)
+//             patientInventoryJSON = {
+//                 limit: parseInt(req.query.limit),
+//                 offset: parseInt(req.query.offset),
+//                 duration: parseInt(req.query.duration),
+//                 tenantUUID: tenant_id,
+//                 patientUUIDList: pidArray
+//             }
+//             logger.debug("the GRPC Calling in else limit,offset,duration are", patientInventoryJSON)
             
-            baselineResult = await patientInventoryGRPC(patientInventoryJSON)
-            tempbaselineResult = baselineResult["result"]["trndsPtnt"]
-            // currentIdx = baselineResult["result"]['currentIdx']
+//             baselineResult = await patientInventoryGRPC(patientInventoryJSON)
+//             tempbaselineResult = baselineResult["result"]["trndsPtnt"]
+//             // currentIdx = baselineResult["result"]['currentIdx']
 
-            // logger.debug("Baseliner Result is ", baselineResult)
-            // if (parseInt(baselineResult["status"]) != 0) {
-            //     // patientList will be loaded with error
-            //     logger.error("Patient List from GRPC is errored")
-            //     // req.apiRes = PATIENT_CODE["1"]
-            //     // req.apiRes["error"] = {
-            //     //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
-            //     // }
-            //     // return next()
-            // }
-            // let pidlist = []
-            // try {
-            //     pidlist = baselineResult["result"]["trndsPtnt"]
-            //         .map((x) => x["patientUUID"])
-            //         .filter((item) => item !== undefined && item !== null)
-            //     // pidlist = []
-            //     totalCount = baselineResult["result"]["numPatients"] // This gives total patients without pid filter
-            //     // So the above totalCount is wrong for pageNo display
-            //     totalCount = pidArray.length
-            // } catch (error) {
-            //     logger.debug("Pid List failed.. Sorting based on Name")
-            // }
-            // // logger.debug("The Total Count, pidlist is ", totalCount, pidlist)
-            // if (pidlist.length > 0) {
-            //     req.query["pidlist"] = pidlist
-            // } else {
-            //     logger.error(
-            //         "The Baseline Provided info has no patients - Something went really wrong",
-            //         baselineResult["result"]
-            //     )
-            // }
+//             // logger.debug("Baseliner Result is ", baselineResult)
+//             // if (parseInt(baselineResult["status"]) != 0) {
+//             //     // patientList will be loaded with error
+//             //     logger.error("Patient List from GRPC is errored")
+//             //     // req.apiRes = PATIENT_CODE["1"]
+//             //     // req.apiRes["error"] = {
+//             //     //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
+//             //     // }
+//             //     // return next()
+//             // }
+//             // let pidlist = []
+//             // try {
+//             //     pidlist = baselineResult["result"]["trndsPtnt"]
+//             //         .map((x) => x["patientUUID"])
+//             //         .filter((item) => item !== undefined && item !== null)
+//             //     // pidlist = []
+//             //     totalCount = baselineResult["result"]["numPatients"] // This gives total patients without pid filter
+//             //     // So the above totalCount is wrong for pageNo display
+//             //     totalCount = pidArray.length
+//             // } catch (error) {
+//             //     logger.debug("Pid List failed.. Sorting based on Name")
+//             // }
+//             // // logger.debug("The Total Count, pidlist is ", totalCount, pidlist)
+//             // if (pidlist.length > 0) {
+//             //     req.query["pidlist"] = pidlist
+//             // } else {
+//             //     logger.error(
+//             //         "The Baseline Provided info has no patients - Something went really wrong",
+//             //         baselineResult["result"]
+//             //     )
+//             // }
 
-            try {
-                req.query.offset = 0
-                // logger.debug("the querty pidlist is", pidlist.length.toString())
-                // logger.debug("the query for patients is", req.query)
-                // patients = await db_get_patient_list(tenant_id, username, req.query)
-                // let newtotalCount = await db_patient_count(tenant_id)
-                // patients = dbOutput_JSON(patients)
-                totalCount != newtotalCount
-                    ? logger.debug(
-                        "Total Count in DB and Baseliner are different ",
-                        totalCount,
-                        newtotalCount
-                    )
-                    : totalCount
+//             try {
+//                 req.query.offset = 0
+//                 // logger.debug("the querty pidlist is", pidlist.length.toString())
+//                 // logger.debug("the query for patients is", req.query)
+//                 // patients = await db_get_patient_list(tenant_id, username, req.query)
+//                 // let newtotalCount = await db_patient_count(tenant_id)
+//                 // patients = dbOutput_JSON(patients)
+//                 totalCount != newtotalCount
+//                     ? logger.debug(
+//                         "Total Count in DB and Baseliner are different ",
+//                         totalCount,
+//                         newtotalCount
+//                     )
+//                     : totalCount
 
-                if (totalCount == 0) {
-                    totalCount = dbOutput_JSON(newtotalCount)
-                }
-            } catch (err) {
-                console.log(erre)
-                logger.debug("Patient Inventory Fetch Error " + err)
-                req.apiRes = PATIENT_CODE["1"]
-                req.apiRes["error"] = {
-                    errMessage: "Patient Inventory Fetch Error",
-                }
-                return next()
-            }
-        } catch (err) {
-            logger.debug("Patient Inventory Fetch Error " + err)
-            req.apiRes = PATIENT_CODE["1"]
-            req.apiRes["error"] = {
-                errMessage: "Patient Inventory Fetch Error",
-            }
-            return next()
-        }
+//                 if (totalCount == 0) {
+//                     totalCount = dbOutput_JSON(newtotalCount)
+//                 }
+//             } catch (err) {
+//                 console.log(erre)
+//                 logger.debug("Patient Inventory Fetch Error " + err)
+//                 req.apiRes = PATIENT_CODE["1"]
+//                 req.apiRes["error"] = {
+//                     errMessage: "Patient Inventory Fetch Error",
+//                 }
+//                 return next()
+//             }
+//         } catch (err) {
+//             logger.debug("Patient Inventory Fetch Error " + err)
+//             req.apiRes = PATIENT_CODE["1"]
+//             req.apiRes["error"] = {
+//                 errMessage: "Patient Inventory Fetch Error",
+//             }
+//             return next()
+//         }
         
      
-    }
-    // Formating the data function
-    try {
-        // logger.debug("Patients are",patients)
-        logger.debug("Patients are", patients.length)
-        // if (patients.length > 0) {
+//     }
+//     // Formating the data function
+//     try {
+//         // logger.debug("Patients are",patients)
+//         logger.debug("Patients are", patients.length)
+//         // if (patients.length > 0) {
            
-        //     // var temp_new_patients = lodash.intersectionWith(patients, tempbaselineResult, function (o1, o2) {
-        //     //     console.log('OOO1', o1, o2)
-        //     //     return o1['pid'] === o2['patientUUID']
-        //     // });
-        //     var temp_new_patients = lodash.intersectionWith(patients, tempbaselineResult, lodash.isEqual);
+//         //     // var temp_new_patients = lodash.intersectionWith(patients, tempbaselineResult, function (o1, o2) {
+//         //     //     console.log('OOO1', o1, o2)
+//         //     //     return o1['pid'] === o2['patientUUID']
+//         //     // });
+//         //     var temp_new_patients = lodash.intersectionWith(patients, tempbaselineResult, lodash.isEqual);
             
-        //     logger.debug("Patients are", temp_new_patients.length)
-        //     temp_new_patients[0]["baselineResult"] = tempbaselineResult // Temp way of doing it
-        //     listPatient = await genPatientRespData(temp_new_patients) // This function needs to be Optimized
-        // }
-    } catch (err) {
-        logger.debug("Patient Historical Info error " + err)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient Trend Fetch Error",
-        }
-        return next()
-    }
+//         //     logger.debug("Patients are", temp_new_patients.length)
+//         //     temp_new_patients[0]["baselineResult"] = tempbaselineResult // Temp way of doing it
+//         //     listPatient = await genPatientRespData(temp_new_patients) // This function needs to be Optimized
+//         // }
+//     } catch (err) {
+//         logger.debug("Patient Historical Info error " + err)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient Trend Fetch Error",
+//         }
+//         return next()
+//     }
 
-    // This block is for pushing all the PID to GRPC - when grpc service has gone down
-    // for (let i = 0; i < patients.length; i++) {
-    //     logger.debug("In the patient grpc", patients[i]["pid"])
-    //     patientRegisterGRPC({
-    //         patientUUID: patients[i]["pid"],
-    //     })
-    // }
+//     // This block is for pushing all the PID to GRPC - when grpc service has gone down
+//     // for (let i = 0; i < patients.length; i++) {
+//     //     logger.debug("In the patient grpc", patients[i]["pid"])
+//     //     patientRegisterGRPC({
+//     //         patientUUID: patients[i]["pid"],
+//     //     })
+//     // }
 
-    logger.debug("All Success in Patient Inventory")
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        patients: patients,
-        count: patients.length,
-        patientTotalCount: totalCount,
-        // currentIdx: currentIdx
-    }
-    return next()
-}
+//     logger.debug("All Success in Patient Inventory")
+//     req.apiRes = PATIENT_CODE["2"]
+//     req.apiRes["response"] = {
+//         patients: patients,
+//         count: patients.length,
+//         patientTotalCount: totalCount,
+//         // currentIdx: currentIdx
+//     }
+//     return next()
+// }
 
 // bulk patient creation
 async function createPatientInBulk(req, res, next) {
@@ -889,6 +889,15 @@ async function grpcCall(given_pid, duration, tenant_id) {
     return { pidlist: pidlist, baselineResult: tempbaselineResult }
 }
 
+async function patientList(req, res, next) {
+    let data = []
+    try {
+        patient_exist = await db_patient_exist(tenant_id, given_pid)
+    } catch (error) {
+        console.log(error)
+    }
+    return next()
+}
 // Validated
 async function getPatientDetail(req, res, next) {
     // This API gets the username and tenant and other HTTP Headers info
@@ -4213,9 +4222,46 @@ async function updatePatientProcedure(req, res, next) {
     return next()
 }
 
+async function getPatientInventory(req, res, next) {
+    let patients_list = []
+
+    let given_pid = req.body.pid
+    let tenant_id = req.body.tenantId
+    let duration = 3
+
+    try {
+        patients_list = await db_get_patient_inventory(req.body)
+        patients_list = JSON.stringify(patients_list)
+        patients_list = JSON.parse(patients_list)
+
+        const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
+        const totalCount = await db_patient_count(tenant_id)
+
+        let data = []
+        for (const obj of patients_list) {
+            obj["baselineResult"] = baseLineDict["baselineResult"]
+            const patient = await genPatientRespData([obj])
+            data.push(patient[0])
+        }
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            patients: data,
+            count: data.length, 
+            patientTotalCount: totalCount
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["1"]
+        logger.debug("Exception : %s", e)
+        return next()
+    }
+    
+    return next()
+}
+
 module.exports = {
     createPatientInBulk,
-    patientInventory,
+    // patientInventory,
     deletePatient,
     getUserPatientMap,
     getPatientDetail,
@@ -4263,4 +4309,5 @@ module.exports = {
     getPatientProcedure,
     updatePatientProcedure,
     registerPatientInventory,
+    getPatientInventory
 }

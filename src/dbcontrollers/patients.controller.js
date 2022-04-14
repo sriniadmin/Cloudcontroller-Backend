@@ -394,6 +394,18 @@ async function db_patient_exist(
     return patient_id // This returns tenant_uuid only
 }
 
+async function db_get_patient_inventory(params) {
+    const data = await Patients_Data.findAll({
+        limit: parseInt(params.limit),
+        offset: parseInt(params.offset),
+        where: {
+            tenant_id: params.tenantId
+        },
+        raw: false,
+    });
+    return data
+}
+
 async function db_get_patient_details(pid) {
     const data = await Patients_Data.findOne({
         pid: pid
@@ -631,5 +643,6 @@ module.exports = {
     db_patient_count,
     db_med_record_exist,
     db_patient_info,
-    db_get_patient_details
+    db_get_patient_details,
+    db_get_patient_inventory
 }

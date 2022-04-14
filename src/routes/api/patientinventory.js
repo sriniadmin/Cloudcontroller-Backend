@@ -8,7 +8,7 @@ const {
 
 
 const {
-  patientInventory, registerPatientInventory
+  patientInventory, registerPatientInventory, getPatientInventory
 } = require("../../business_logic/routes/patient")
 
 /**
@@ -49,10 +49,10 @@ const {
  */
 
 
-router.get("/", patientInventory, apiFinalProcess)
+// router.get("/", patientInventory, apiFinalProcess)
 
  //Chanage to post method to get data
-router.post("/", patientInventory, apiFinalProcess)
+router.post("/", getPatientInventory, apiFinalProcess)
 
 /**
  * @openapi
