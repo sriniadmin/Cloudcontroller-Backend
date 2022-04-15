@@ -6,7 +6,7 @@ var {
     getUserInventory,
     createUser,
     passwordReset,
-    createUserTenant,
+    // createUserTenant,
     getUserTenant,
 } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
@@ -177,7 +177,7 @@ router.put("/:user_uuid", updateUser, apiFinalProcess)
  */
 
 
-  router.post("/user_tenant", createUserTenant, apiFinalProcess)
+//   router.post("/user_tenant", createUserTenant, apiFinalProcess)
 
   /**
  * @openapi

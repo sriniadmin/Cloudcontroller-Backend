@@ -144,6 +144,6 @@ async function db_create_user_tenant(tenant_id, user_tenant_data, transaction) {
 // }
 
 module.exports = {
-    db_create_user_tenant,
+    // db_create_user_tenant,
     db_get_user_tenant,
 }

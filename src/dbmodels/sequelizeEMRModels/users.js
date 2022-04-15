@@ -445,10 +445,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: false,
             },
-            // pid: {
-            //     type: DataTypes.STRING(255),
-            //     allowNull: true,
-            // },
+            pid: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
+            },
             date: {
                 type: DataTypes.DATE,
                 allowNull: true,

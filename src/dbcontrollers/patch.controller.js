@@ -205,6 +205,7 @@ async function db_create_patch(tenant_id, patch_data, transaction) {
             patch_list = patch_data
         })
         .catch((err) => {
+            console.log('GUGGG',err)
             logger.debug(
                 "Patch insert  error " + tenant_id + " not found Err:" + err
             )

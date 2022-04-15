@@ -5,9 +5,9 @@ module.exports = (sequelize, DataTypes) => {
 		route : {
       type: Sequelize.STRING
 		},
-		route_str : {
-      type: Sequelize.STRING
-		},
+		// route_str : {
+    //   type: Sequelize.STRING
+		// },
 		verb : {
       type: Sequelize.STRING
 		},

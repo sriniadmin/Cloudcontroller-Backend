@@ -182,8 +182,8 @@ async function db_create_patch_associate(
                         config: patch_patient_map_data[i]["config"],
                         duration: patch_patient_map_data[i]["duration"],
 
-                        command: patch_patient_map_data[i]["command"],
-                        keepaliveTime: patch_patient_map_data[i]["keepaliveTime"],
+                        command: patch_patient_map_data[i]["command"], 
+                        //keepaliveTime: patch_patient_map_data[i]["keepaliveTime"],
                         keepaliveHistory: patch_patient_map_data[i]["keepaliveHistory"],
 
                         tenant_id: tenant_id,
@@ -201,6 +201,7 @@ async function db_create_patch_associate(
             patch_patient_map_list = patch_patient_map_data;
         })
         .catch((err) => {
+            console.log('BUG:', err)
             logger.debug(
                 "Prac insert  error " + tenant_id + " not found Err:" + err
             );

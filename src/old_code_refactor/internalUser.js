@@ -161,7 +161,7 @@ const {
 } = require("../dbcontrollers/task.controller")
 const { emailer } = require("../external_services/email/email")
 const {
-    db_create_user_tenant,
+    // db_create_user_tenant,
     db_get_user_tenant,
 } = require("../dbcontrollers/user_tenant.controller")
 
@@ -631,9 +631,9 @@ async function createUser(req, res, next) {
                     user_tenant_data.map((item) => {
                         item.user_uuid = user_info.dataValues.user_uuid
                     })
-                    return db_create_user_tenant(tenant_id, user_tenant_data, {
-                        transaction: t,
-                    })
+                    // return db_create_user_tenant(tenant_id, user_tenant_data, {
+                    //     transaction: t,
+                    // })
                 })
             })
         })
@@ -2719,36 +2719,36 @@ async function passwordReset(req, res, next) {
     return next()
 }
 
-async function createUserTenant(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let user_tenant_data = req.body
-    let user_tenant
-    tenant_id = req.body[0]["tenant_uuid"]
-    user_uuid = req.body[0]["user_uuid"]
-    role = req.body[0]["role"]
-    try {
-        user_tenant = await sequelizeDB.transaction(function (t) {
-            return db_create_user_tenant(tenant_id, user_tenant_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        logger.debug("The error in catch is ", error)
-        req.apiRes = USER_CODE["8"]
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN CREATING THE USER TENANT",
-        }
-        return next()
-    }
-    logger.debug("USER TENANT DATA IS ", JSON.stringify(user_tenant))
-    logger.debug("THE USER TENANT ARE", req.body, JSON.stringify(req.body))
-    //locations = req.body
-    req.apiRes = USER_CODE["8"]
-    req.apiRes["response"] = {
-        user_tenant_data: user_tenant,
-    }
-    return next()
-}
+// async function createUserTenant(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let user_tenant_data = req.body
+//     let user_tenant
+//     tenant_id = req.body[0]["tenant_uuid"]
+//     user_uuid = req.body[0]["user_uuid"]
+//     role = req.body[0]["role"]
+//     try {
+//         user_tenant = await sequelizeDB.transaction(function (t) {
+//             return db_create_user_tenant(tenant_id, user_tenant_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = USER_CODE["8"]
+//         req.apiRes["error"] = {
+//             errMessage: "ERROR IN CREATING THE USER TENANT",
+//         }
+//         return next()
+//     }
+//     logger.debug("USER TENANT DATA IS ", JSON.stringify(user_tenant))
+//     logger.debug("THE USER TENANT ARE", req.body, JSON.stringify(req.body))
+//     //locations = req.body
+//     req.apiRes = USER_CODE["8"]
+//     req.apiRes["response"] = {
+//         user_tenant_data: user_tenant,
+//     }
+//     return next()
+// }
 
 async function getUserTenant(req, res, next) {
     //let tenant_id = req.userTenantId
@@ -2908,7 +2908,7 @@ module.exports = {
     createTasks,
     getTask,
     passwordReset,
-    createUserTenant,
+    // createUserTenant,
     getUserTenant,
     getRoleData,
     createRemoteLocation,

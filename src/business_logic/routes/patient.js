@@ -23,10 +23,10 @@ const {
     get_trend_data,
     get_healthscoreObj
 } = require("../../utils/vitalAnalytics/ews")
-const {
-    db_create_user_tenant,
-    db_get_user_tenant,
-} = require("../../dbcontrollers/user_tenant.controller")
+// const {
+//     db_create_user_tenant,
+//     db_get_user_tenant,
+// } = require("../../dbcontrollers/user_tenant.controller")
 const patientRegisterGRPC =
     require("../../external_services/grpc/kafka_service").patientRegisterGRPC
 const patientDetailsGRPC =
@@ -1006,7 +1006,7 @@ async function patientKafkaRegister(msg) {
 async function createPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
 
-    let tenant_id = req.userTenantId
+    let tenant_id = req.body.tenantId
     logger.debug('the tenant id , while creating patient is', tenant_id)
     let tenant_name = req.userTenant
     logger.debug('the tenant name is', tenant_name)
@@ -1190,15 +1190,16 @@ async function createPatient(req, res, next) {
                                 user_tenant_data[0]['tenant_id'] = tenant_id
                                 user_tenant_data[0]['role'] = 'Patient'
                                 user_tenant_data[0]['tenant_name'] = tenant_name
-                                return db_create_user_tenant(tenant_id, user_tenant_data, {
-                                    transaction: t
-                                })
+                                // return db_create_user_tenant(tenant_id, user_tenant_data, {
+                                //     transaction: t
+                                // })
                             })
                         })
                 })
             })
         })
     } catch (err) {
+        console.log('BUG:', err)
         logger.debug("User Create error " + err)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = {
@@ -1207,7 +1208,7 @@ async function createPatient(req, res, next) {
         return next()
     }
     logger.debug("Result  is" + result)
-    respResult = dbOutput_JSON(result)
+    // respResult = dbOutput_JSON(result)
     respResult = req.body
     // patientRegisterGRPC({
     //     patientUUID: req.body["demographic_map"]["pid"],
