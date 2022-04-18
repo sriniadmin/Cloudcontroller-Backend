@@ -915,14 +915,19 @@ async function getPatchInventory(req, res, next) {
     // email = req.userEmail
     // username = email.split("@")[0]
     // tenant_name = req.userTenant
-    tenant_id = req.body.tenant_id
+    let request = req.body
+    let tenant_id = request.tenentId
+    if(request.tenentId === undefined){
+        request = req.query
+        tenant_id = req.query.tenentId
+    }
     logger.debug("THE QUERY IS", req.query)
     logger.debug("THE PARAMS ARE", req.params)
     let patches
     let filtered_patches = []
     let totalCount = 0
     try {
-        let patch_data = await db_get_patch_list(tenant_id, req.body)
+        let patch_data = await db_get_patch_list(tenant_id, request)
         patches = patch_data[0]
         totalCount = patch_data[1]
         patches = dbOutput_JSON(patches)
