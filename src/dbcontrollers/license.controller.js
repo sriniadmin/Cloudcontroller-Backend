@@ -16,6 +16,7 @@ async function db_get_license_report(tenant_id, params) {
             where: whereStatement,
         })
     } catch (err) {
+        console.log(err)
         throw new Error("Error in fetching the license report" + err)
     }
     return license

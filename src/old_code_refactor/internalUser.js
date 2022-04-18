@@ -916,10 +916,10 @@ async function getPatchInventory(req, res, next) {
     // username = email.split("@")[0]
     // tenant_name = req.userTenant
     let request = req.body
-    let tenant_id = request.tenentId
-    if(request.tenentId === undefined){
+    let tenant_id = request.tenantId
+    if(request.tenantId === undefined){
         request = req.query
-        tenant_id = req.query.tenentId
+        tenant_id = req.query.tenantId
     }
     logger.debug("THE QUERY IS", req.query)
     logger.debug("THE PARAMS ARE", req.params)
@@ -968,25 +968,25 @@ async function getPatchInventory(req, res, next) {
 //validated
 async function createPatch(req, res, next) {
     const t = await sequelizeDB.transaction()
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
-    tenant_id = req.userTenantId
+    // email = req.userEmail
+    // username = email.split("@")[0]
+    // tenant_name = req.userTenant
+    tenant_id = req.body.tenantId
     let patch_data = req.body
 
-    let alertEventId = uuid()
-    let patchType = patch_data[0]['patch_type']
+    // let alertEventId = uuid()
+    // let patchType = patch_data[0]['patch_type']
     let createPatchAlert = alertEnum['1']
 
-    createPatchAlert['event'] = `create patch id: ${alertEventId}`
-    createPatchAlert['text'] = `${patchType} patch created for ${username}`
-    createPatchAlert['service'] = [`${req.userTenant} `]
+    // createPatchAlert['event'] = `create patch id: ${alertEventId}`
+    // createPatchAlert['text'] = `${patchType} patch created for ${username}`
+    // createPatchAlert['service'] = [`${req.userTenant} `]
 
-    logger.debug("PATCH body is", patch_data, patch_data[0]["patch_serial"])
-    let patch_type = patch_data[0]["patch_type"].toLowerCase()
-    logger.debug("the patch type is", patch_type)
-    let patchSerial = patch_data[0]["patch_serial"]
-    logger.debug("PATCH SERIAL NUMBER IS", patchSerial)
+    // logger.debug("PATCH body is", patch_data, patch_data[0]["patch_serial"])
+    // let patch_type = patch_data[0]["patch_type"].toLowerCase()
+    // logger.debug("the patch type is", patch_type)
+    // let patchSerial = patch_data[0]["patch_serial"]
+    // logger.debug("PATCH SERIAL NUMBER IS", patchSerial)
     let patch_serial_exist
 
     req.query = {
@@ -995,59 +995,60 @@ async function createPatch(req, res, next) {
         filter: 0,
         tenant_id: tenant_id,
     }
-    let licenseResponse = await getLicenseData(req) //TODO: license and roles needs to be pushed for redis
+    // let licenseResponse = await getLicenseData(req)? //TODO: license and roles needs to be pushed for redis
     // logger.debug('the license data is', licenseResponse)
-    logger.debug(
-        "the license data is",
-        JSON.stringify(licenseResponse, null, 2)
-    )
-    let sensors = licenseResponse["licenseData"][0]["license"][0]["Devices"]
-    let allDevices = []
-    sensors.map((item) => {
-        logger.debug("thr item is", item)
-        logger.debug("the iem sensors is", item.sensors)
-        allDevices.push(item.sensors)
-    })
-    logger.debug("the sensors are", sensors)
-    logger.debug("the all devices are", allDevices)
+    // logger.debug(
+    //     "the license data is",
+    //     JSON.stringify(licenseResponse, null, 2)
+    // )
+    // let sensors = licenseResponse["licenseData"][0]["license"][0]["Devices"]
+    // let allDevices = []
+    // sensors.map((item) => {
+    //     logger.debug("thr item is", item)
+    //     logger.debug("the iem sensors is", item.sensors)
+    //     allDevices.push(item.sensors)
+    // })
+    // logger.debug("the sensors are", sensors)
+    // logger.debug("the all devices are", allDevices)
 
-    if (!allDevices.includes(patch_type)) {
-        logger.debug("Patches are not a part of license", patch_type)
-        req.apiRes = LICENSE_CODE["8"]
-        req.apiRes["error"] = {
-            error: "PATCHES ARE NOT INCLUDED IN THE LICENSE",
-        }
-        return next()
-    }
+    // if (!allDevices.includes(patch_type)) {
+    //     logger.debug("Patches are not a part of license", patch_type)
+    //     req.apiRes = LICENSE_CODE["8"]
+    //     req.apiRes["error"] = {
+    //         error: "PATCHES ARE NOT INCLUDED IN THE LICENSE",
+    //     }
+    //     return next()
+    // }
     //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["patchSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed " + error,
-        }
-        return next()
-    }
-    try {
-        patch_serial_exist = await db_patch_serial_exist(patchSerial)
-        logger.debug(
-            "THIS IS IN PATCH SERIAL EXIST FUNCTION",
-            patch_serial_exist
-        )
-        if (patch_serial_exist) {
-            req.apiRes = PATCH_CODE["11"]
-            req.apiRes["error"] = {
-                error: "PATCH SERIAL ALREADY EXISTS :",
-            }
-            return next()
-        }
-    } catch (err) {
-        logger.debug("PATCH SERIAL ALREADY EXISTS", err)
-        return next()
-    }
+    // let schema_status = schemaValidator.validate_schema(?
+    //     req,
+    //     SCHEMA_CODE["patchSchema"]
+    // )
+    // if (!schema_status["status"]) {
+    //     req.apiRes = JSON_SCHEMA_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         error: "Schema Validation Failed " + error,
+    //     }
+    //     return next()
+    // }
+    // try {
+    //     patch_serial_exist = await db_patch_serial_exist(patchSerial)?
+    //     logger.debug(
+    //         "THIS IS IN PATCH SERIAL EXIST FUNCTION",
+    //         patch_serial_exist
+    //     )
+    //     if (patch_serial_exist) {
+    //         req.apiRes = PATCH_CODE["11"]
+    //         req.apiRes["error"] = {
+    //             error: "PATCH SERIAL ALREADY EXISTS :",
+    //         }
+    //         return next()
+    //     }
+    // } catch (err) {
+    //     console.log(err)
+    //     logger.debug("PATCH SERIAL ALREADY EXISTS", err)
+    //     return next()
+    // }
 
     logger.debug("Patch Data Variable is ", patch_data)
     const promises = []

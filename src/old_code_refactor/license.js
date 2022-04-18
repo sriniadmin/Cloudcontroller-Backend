@@ -106,7 +106,7 @@ async function getLicenseData(req) {
         req.apiRes["error"] = {
             error: "ERROR IN FETCHING LICENSE INVENTORY",
         }
-        return next()
+        // return next()
     }
     logger.debug("License list is " + license)
     return {
