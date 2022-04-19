@@ -1097,7 +1097,7 @@ async function createPatch(req, res, next) {
                             if (group_id)
                                 patch_data[i]["patch_group_id"] = group_id
                             else patch_data[i]["patch_group_id"] = uuid_result
-                            return db_create_patch(tenant_id, [patch_data[i]], {
+                            return db_create_patch(tenant_id, req.body, {
                                 transaction: t,
                             })
                         }

@@ -168,36 +168,88 @@ async function db_get_patch_list(tenant_id, query_param) {
     return [patch_list, TotalCount]
 }
 
-async function db_create_patch(tenant_id, patch_data, transaction) {
+async function db_create_patch(tenant_id, params, transaction) {
+    let patch_data = params.data
     //This route created new patch in the db
     patch_list = ""
     if (!patch_data) return
     logger.debug("Patch data is " + JSON.stringify(patch_data))
 
     const promises = []
-    for (let i = 0; i < patch_data.length; i++) {
-        // await
-        logger.debug("patch type is", patch_data[i]["patch_uuid"])
-        promises.push(
-            Patches.create(
-                {
-                    patch_type: patch_data[i]["patch_type"],
-                    // patch_name: patch_data[i]["patch_name"],
-                    patch_uuid: patch_data[i]["patch_uuid"],
-                    patch_status: patch_data[i]["patch_status"],
-                    patch_group_id: patch_data[i]["patch_group_id"],
-                    // specialty: patch_data[i]["specialty"],
-                    patch_mac: patch_data[i]["patch_mac"],
-                    // patch_bluetooth: patch_data[i]["patch_bluetooth"],
-                    // patch_sensor_id: patch_data[i]["patch_sensor_id"],
-                    patch_serial: patch_data[i]["patch_serial"],
-                    tenant_id: tenant_id,
-                    // pid: patch_data[i]["pid"],
-                },
-                { transaction: transaction["transaction"] }
+
+    if(params.actionType !== 'bundle'){
+        for (let i = 0; i < patch_data.length; i++) {
+            // await
+            logger.debug("patch type is", patch_data[i]["patch_uuid"])
+            promises.push(
+                Patches.create(
+                    {
+                        patch_type: patch_data[i]["patch_type"],
+                        // patch_name: patch_data[i]["patch_name"],
+                        patch_uuid: patch_data[i]["patch_uuid"],
+                        patch_status: patch_data[i]["patch_status"],
+                        patch_group_id: patch_data[i]["patch_group_id"],
+                        // specialty: patch_data[i]["specialty"],
+                        patch_mac: patch_data[i]["patch_mac"],
+                        // patch_bluetooth: patch_data[i]["patch_bluetooth"],
+                        // patch_sensor_id: patch_data[i]["patch_sensor_id"],
+                        patch_serial: patch_data[i]["patch_serial"],
+                        tenant_id: tenant_id,
+                        // pid: patch_data[i]["pid"],
+                    },
+                    { transaction: transaction["transaction"] }
+                )
             )
-        )
+        }
     }
+
+    else {
+        if(patch_data[0].ecg){
+            promises.push(
+                Patches.update(
+                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    { where: { 
+                        patch_serial: patch_data[0].ecg,
+                        patch_type: 'ecg'
+                    } }
+                )
+            )
+        }
+        if(patch_data[0].gateway){
+            promises.push(
+                Patches.update(
+                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    { where: { 
+                        patch_serial: patch_data[0].gateway,
+                        patch_type: 'gateway'
+                    } }
+                )
+            )
+        }
+        if(patch_data[0].spo2){
+            promises.push(
+                Patches.update(
+                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    { where: { 
+                        patch_serial: patch_data[0].spo2,
+                        patch_type: 'spo2'
+                    } }
+                )
+            )
+        }
+        if(patch_data[0].temperature){
+            promises.push(
+                Patches.update(
+                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    { where: { 
+                        patch_serial: patch_data[0].temperature,
+                        patch_type: 'temperature'
+                    } }
+                )
+            )
+        }
+    }
+
     logger.debug("Promise is ", promises)
     await Promise.all(promises)
         .then((patch_data) => {
