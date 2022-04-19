@@ -972,7 +972,7 @@ async function createPatch(req, res, next) {
     // username = email.split("@")[0]
     // tenant_name = req.userTenant
     tenant_id = req.body.tenantId
-    let patch_data = req.body
+    let patch_data = req.body.data
 
     // let alertEventId = uuid()
     // let patchType = patch_data[0]['patch_type']

@@ -182,17 +182,17 @@ async function db_create_patch(tenant_id, patch_data, transaction) {
             Patches.create(
                 {
                     patch_type: patch_data[i]["patch_type"],
-                    patch_name: patch_data[i]["patch_name"],
+                    // patch_name: patch_data[i]["patch_name"],
                     patch_uuid: patch_data[i]["patch_uuid"],
                     patch_status: patch_data[i]["patch_status"],
                     patch_group_id: patch_data[i]["patch_group_id"],
-                    specialty: patch_data[i]["specialty"],
+                    // specialty: patch_data[i]["specialty"],
                     patch_mac: patch_data[i]["patch_mac"],
-                    patch_bluetooth: patch_data[i]["patch_bluetooth"],
-                    patch_sensor_id: patch_data[i]["patch_sensor_id"],
+                    // patch_bluetooth: patch_data[i]["patch_bluetooth"],
+                    // patch_sensor_id: patch_data[i]["patch_sensor_id"],
                     patch_serial: patch_data[i]["patch_serial"],
                     tenant_id: tenant_id,
-                    pid: patch_data[i]["pid"],
+                    // pid: patch_data[i]["pid"],
                 },
                 { transaction: transaction["transaction"] }
             )
