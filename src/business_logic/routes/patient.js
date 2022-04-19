@@ -1171,7 +1171,12 @@ async function createPatient(req, res, next) {
                     patch_data[0]["patch_uuid"] = uuidPatch
                     patch_data[0]["patch_group_id"] = uuidPatch
                     patch_data[0]["patch_serial"] = user_data.dataValues.pid
-                    return db_create_patch(tenant_id, patch_data, {
+                    const params = {
+                        actionType: '',
+                        data: patch_data,
+                        tenantId: tenant_id
+                    }
+                    return db_create_patch(tenant_id, params, {
                         transaction: t,
                     })
                         .then((patch_info) => {

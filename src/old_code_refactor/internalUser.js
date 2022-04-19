@@ -1119,9 +1119,17 @@ async function createPatch(req, res, next) {
                     logger.debug(`Alert ERROR: ${err.message} `)
                 }
 
+                let data = patches
+                if(req.body.actionType === 'bundle'){
+                    data = {patch_group_id: patch_data[0]["patch_group_id"]}
+                }
+                else {
+                    data = patches.concat(patch_gw)
+                }
+
                 return res.status(PATCH_CODE["3"].HttpStatus).json({
                     result: PATCH_CODE["3"].Code,
-                    response: { patches: patches.concat(patch_gw) },
+                    response: { patches: data },
                     error: {},
                     privilege: {},
                 })
