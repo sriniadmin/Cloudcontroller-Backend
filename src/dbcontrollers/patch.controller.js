@@ -321,12 +321,48 @@ async function db_update_patch(tenant_id, patch_data, given_pid, transaction) {
     return patch_patient_map_list
 }
 
+async function db_check_patch_exist(tenant_uuid, patch_list) {
+    let data
+    const promises = []
+    try {
+        patch_list.forEach(obj => {
+            promises.push(
+                Patches.findOne({
+                    where: {
+                        tenant_id: tenant_uuid,
+                        patch_uuid: obj["patch_uuid"],
+                    },
+                    raw: true,
+                })
+            )
+        });
+        await Promise.all(promises)
+        .then((result) => {
+            let check = false
+            data = result
+            for (const obj of result) {
+                if(obj === null){
+                    check = true
+                    break
+                }
+            }
+            if(check){
+                data = undefined
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+    
+    return data
+}
+
 async function db_patch_exist(tenant_uuid, patch_list) {
     let patch_id = ""
     const promises = []
     for (let i = 0; i < patch_list.length; i++) {
         promises.push(
-            Patches.findAll({
+            Patches.findOne({
                 where: {
                     tenant_id: tenant_uuid,
                     patch_uuid: patch_list[i]["patch_uuid"],
@@ -548,7 +584,7 @@ async function db_get_patch(tenant_id, patch_uuid) {
     whereStatement = { tenant_id: tenant_id, patch_uuid: patch_uuid }
 
     try {
-        patch_data = await Patches.findAll({
+        patch_data = await Patches.findOne({
             include: [
                 {
                     model: models.patch_patient_map
@@ -574,5 +610,6 @@ module.exports = {
     db_patch_uuid_exist,
     db_patch_count,
     db_patch_serial_exist,
-    db_get_patch
+    db_get_patch,
+    db_check_patch_exist
 }

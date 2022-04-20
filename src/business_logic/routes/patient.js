@@ -80,6 +80,7 @@ const {
     db_create_patch,
     db_update_patch,
     db_patch_exist,
+    db_check_patch_exist,
     db_get_patch,
 } = require("../../dbcontrollers/patch.controller")
 const {
@@ -87,6 +88,7 @@ const {
     db_update_patch_associate,
     db_get_patch_map_list,
     db_delete_patch_patient_map,
+    db_create_patch_associate_one,
 
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
@@ -1364,9 +1366,8 @@ async function createPatientPatchMap(req, res, next) {
     //if the pid in the patch map of a specific patch is pid , then associate happens
 
     let patch_map = req.body
-    logger.debug("THE PATCH MAP PID IS", patch_map[0]["pid"], patch_map)
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
+    let given_pid = patch_map.pid
+    let tenant_id = patch_map.tenantId
     let patient_exist
     let result
     const t = await sequelizeDB.transaction()
@@ -1381,13 +1382,13 @@ async function createPatientPatchMap(req, res, next) {
     }
 
     try {
-        patchInfo = await db_get_patch(tenant_id, req.body[0]['patch_uuid'])
-        patchInfo = JSON.parse(JSON.stringify(patchInfo))[0]['patch_name']
+        patchInfo = await db_get_patch(tenant_id, req.body.list[0]['patch_uuid'])
+        patchInfo = JSON.parse(JSON.stringify(patchInfo))['patch_name']
     } catch (err) {
         logger.debug('ERROR : ', err.message)
     }
 
-    let { fname, lname } = JSON.parse(JSON.stringify(patientInfo[0], null, 2))
+    let { fname, lname } = JSON.parse(JSON.stringify(patientInfo, null, 2))
 
     let alertEventId = uuid()
 
@@ -1397,17 +1398,17 @@ async function createPatientPatchMap(req, res, next) {
     createPatientPatchAlert['service'] = [`${req.userTenant}`]
 
     //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["patchPatientMap"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
+    // let schema_status = schemaValidator.validate_schema(?
+    //     [req],
+    //     SCHEMA_CODE["patchPatientMap"]
+    // )
+    // if (!schema_status["status"]) {
+    //     req.apiRes = JSON_SCHEMA_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         error: "Schema Validation Failed ",
+    //     }
+    //     return next()
+    // }
 
     logger.debug("PATIENT EXIST CHECK")
     patient_exist = await db_patient_exist(tenant_id, given_pid)
@@ -1420,7 +1421,7 @@ async function createPatientPatchMap(req, res, next) {
         return next()
     }
 
-    patch_exist = await db_patch_exist(tenant_id, patch_map)
+    patch_exist = await db_check_patch_exist(tenant_id, patch_map.list)
     logger.debug("THIS IS IN PATCH EXIST FUNCTION", patch_exist)
     if (!patch_exist) {
         req.apiRes = PATCH_CODE["5"]
@@ -1430,30 +1431,30 @@ async function createPatientPatchMap(req, res, next) {
         return next()
     }
 
-     for (let i = 0; i < patch_exist.length; i++) {
-        logger.debug("patch info is ", patch_exist[i])
-        if (patch_exist[i].length == 0) {
-            logger.debug("Patch does not exist", given_pid)
-            req.apiRes = PATCH_CODE["5"]
-            return next()
-        }
-         patch_map[i]["config"] = [{ "sample_freq": "30", "sample_count": "1", "stop_sample": "undefined" }]
-         patch_map[i]["command"] = "clearPatient"
-         patch_map[i]["keepaliveTime"] = "30"
-    }
+    //  for (let i = 0; i < patch_exist.length; i++) {
+    //     logger.debug("patch info is ", patch_exist[i])
+    //     if (patch_exist[i].length == 0) {
+    //         logger.debug("Patch does not exist", given_pid)
+    //         req.apiRes = PATCH_CODE["5"]
+    //         return next()
+    //     }
+    //      patch_map[i]["config"] = [{ "sample_freq": "30", "sample_count": "1", "stop_sample": "undefined" }]
+    //      patch_map[i]["command"] = "clearPatient"
+    //      patch_map[i]["keepaliveTime"] = "30"
+    // }
 
 
     try {
         result = await sequelizeDB.transaction(function (t) {
-            logger.debug(
-                "THE GIVEN PID IS",
-                given_pid,
-                patch_map["pid"],
-                patch_map[0]["pid"]
-            )
-            if (patch_map[0]["pid"] != "0") patch_map[0]["pid"] = given_pid
+            // logger.debug(
+            //     "THE GIVEN PID IS",
+            //     given_pid,
+            //     patch_map["pid"],
+            //     patch_map[0]["pid"]
+            // )
+            if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
 
-            return db_create_patch_associate(tenant_id, patch_map, given_pid, {
+            return db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
                 transaction: t,
             })
         })

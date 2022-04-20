@@ -211,6 +211,78 @@ async function db_create_patch_associate(
     return patch_patient_map_list;
 }
 
+async function db_create_patch_associate_one(
+    tenant_id,
+    patch_patient_map_data,
+    pid
+) {
+    //This route created new patch_patient_map in the db
+    let data
+
+    let promises = [];
+
+    patch_patient_map_data.forEach(obj => {
+        if (obj["pid"] == 0) {
+            logger.debug("The Patch is getting removed now..");
+            promises.push(
+                Patch_Patient_Map.destroy(
+                    {
+                        where: {
+                            // pid:patch_patient_map_data['pid'],
+                            patch_uuid: obj["patch_uuid"],
+                            tenant_id: tenant_id,
+                        },
+                    },
+                    {
+                        transaction: transaction["transaction"],
+                    }
+                )
+            );
+        } else {
+            logger.debug("The Patch is getting created/updated now..");
+            promises.push(
+                updateOrCreate(
+                    Patch_Patient_Map,
+                    {
+                        pid: pid,
+                        patch_uuid: obj["patch_uuid"],
+                        tenant_id: tenant_id,
+                    },
+                    {
+                        pid: pid,
+                        patch_uuid: obj["patch_uuid"],
+                        config: obj["config"],
+                        duration: obj["duration"],
+    
+                        command: obj["command"],
+                        //keepaliveTime: patch_patient_map_data["keepaliveTime"],
+                        keepaliveHistory: obj["keepaliveHistory"],
+    
+                        tenant_id: tenant_id,
+                    }
+                )
+            );
+        }
+    });
+
+    await Promise.all(promises)
+        .then((patch_patient_map_data) => {
+            logger.debug(
+                "patch_patient_map insert output is" + patch_patient_map_data
+            );
+            data = patch_patient_map_data;
+        })
+        .catch((err) => {
+            console.log('BUG:', err)
+            logger.debug(
+                "Prac insert  error " + tenant_id + " not found Err:" + err
+            );
+            throw new Error("patch_patient_map insert  error -  tenant check");
+        });
+
+    return data;
+}
+
 async function db_update_patch_associate(
     tenant_id,
     patch_data,
@@ -434,4 +506,5 @@ module.exports = {
     db_delete_patch_patient_map,
     clear_command,
     update_keepalive,
+    db_create_patch_associate_one
 };

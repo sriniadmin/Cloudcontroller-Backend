@@ -321,7 +321,7 @@ async function db_patient_count(tenant_uuid) {
 
 async function db_patient_info(pid) {
     try {
-        let patientInfo = await Patients_Data.findAll(
+        let patientInfo = await Patients_Data.findOne(
             {
                 where: {
                     pid: pid,
