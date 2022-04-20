@@ -401,6 +401,9 @@ async function db_get_patient_inventory(params) {
         where: {
             tenant_id: params.tenantId
         },
+        order: [
+            ['date', 'DESC']
+        ],
         raw: false,
     });
     return data
