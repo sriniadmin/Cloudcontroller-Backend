@@ -850,7 +850,10 @@ async function grpcCall(given_pid, duration, tenant_id) {
             tenantUUID: tenant_id,
         }
         logger.debug("Patient GRPC calling.. ", tenant_id)
-        baselineResult = await patientDetailsGRPC(patientInventoryJSON)
+        // baselineResult = await patientDetailsGRPC(patientInventoryJSON)
+
+        baselineResult = {"status":1,"result":{"code":14,"details":"Name resolution failed for target dns:sensor_consumer:9010","metadata":{}}}
+
         // logger.debug("The patientList GRPC is ", baselineResult)
         tempbaselineResult = [baselineResult["result"]]
         tempbaselineResult[0]["patientUUID"] = given_pid
@@ -903,28 +906,28 @@ async function patientList(req, res, next) {
 // Validated
 async function getPatientDetail(req, res, next) {
     // This API gets the username and tenant and other HTTP Headers info
-    let username = req.userName
+    // let username = req.userName
     let given_pid = req.params.pid
-    let tenant_id = req.body.tenantId
-    let patient_exist, patients_list
+    let tenant_id = req.query.tenantId
+    // let patient_exist, patients_list
     let duration = 3
-    // let duration = req.query.duration
-    let baseLineDict
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - Check failed",
-        }
-        return next()
-    }
-    let query_param = {
-        ...req.params,
-        ...req.query,
-    }
+    // // let duration = req.query.duration
+    // let baseLineDict
+    // try {
+    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
+    //     if (!validate_patient_exist(patient_exist, req)) return next()
+    // } catch (error) {
+    //     logger.debug("Exception : %s PID %s", error, given_pid)
+    //     req.apiRes = PATIENT_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         errMessage: "Patient - Check failed",
+    //     }
+    //     return next()
+    // }
+    // let query_param = {
+    //     ...req.params,
+    //     ...req.query,
+    // }
     try {
         baseLineDict = await grpcCall(given_pid, duration, tenant_id)
         logger.debug("BASELINE DICT", baseLineDict)
@@ -933,16 +936,16 @@ async function getPatientDetail(req, res, next) {
         logger.debug("Error in GRPC Call is ", error)
     }
     try {
-        patients_list = await db_get_patient_details(query_param.pid)
+        patients_list = await db_get_patient_details(req.params.pid)
     } catch (e) {
         req.apiRes = PATIENT_CODE["1"]
         logger.debug("Exception : %s", e)
         return next()
     }
-    patients_list = JSON.stringify(patients_list)
-    patients_list = JSON.parse(patients_list)
+    // patients_list = JSON.stringify(patients_list)
+    // patients_list = JSON.parse(patients_list)
 
-    let patients = patients_list
+    // let patients = patients_list
     //let patch_ref = patients["patch_patient_map"]
     //let location_ref = patients["location"]
     patients_list["baselineResult"] = baseLineDict["baselineResult"]
