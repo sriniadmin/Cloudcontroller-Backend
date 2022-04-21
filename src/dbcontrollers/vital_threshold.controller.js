@@ -18,7 +18,7 @@ var Vital_threshold = function (vital_thresholdobj) {
 }
 
 async function db_get_vital_threshold_list(tenant_uuid, username, params) {
-    vital_threshold_list = ""
+    let vital_threshold_list
     let { limit, offset, filter, pid } = params
     let whereStatement = {
         tenant_uuid: tenant_uuid,

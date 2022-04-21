@@ -1184,15 +1184,15 @@ async function updatePatchUuid(req, res, next) {
 
     uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
     try {
-        result = await sequelizeDB.transaction(function (t) {
+        // result = await sequelizeDB.transaction(function (t) {
             patch_data[0]["patch_uuid"] = given_patch_uuid
-            return db_update_patch_uuid(
+            result =  await db_update_patch_uuid(
                 tenant_id,
                 patch_data[0],
                 given_patch_uuid,
                 { transaction: t }
             )
-        })
+        // })
     } catch (error) {
         req.apiRes = TRANSACTION_CODE["1"]
         req.apiRes["error"] = {

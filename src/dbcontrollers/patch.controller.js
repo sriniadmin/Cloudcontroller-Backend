@@ -110,7 +110,8 @@ async function db_get_patch_list(tenant_id, query_param) {
         raw: false,
         // required:true,
         required: false,
-        order: [["id", "DESC"]],
+        group: ['patch_group_id'],
+        order: [["date", "DESC"]],
         // group: ["patch.patch_group_id"]
     })
         .then((patch_data) => {
@@ -207,7 +208,10 @@ async function db_create_patch(tenant_id, params, transaction) {
         if(patch_data[0].ecg){
             promises.push(
                 Patches.update(
-                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    {
+                        patch_group_id: patch_data[0]["patch_group_id"],
+                        data: Sequelize.fn("now")
+                    },
                     { where: { 
                         patch_serial: patch_data[0].ecg,
                         patch_type: 'ecg'
@@ -218,7 +222,10 @@ async function db_create_patch(tenant_id, params, transaction) {
         if(patch_data[0].gateway){
             promises.push(
                 Patches.update(
-                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    {
+                        patch_group_id: patch_data[0]["patch_group_id"],
+                        data: Sequelize.fn("now")
+                    },
                     { where: { 
                         patch_serial: patch_data[0].gateway,
                         patch_type: 'gateway'
@@ -229,7 +236,10 @@ async function db_create_patch(tenant_id, params, transaction) {
         if(patch_data[0].spo2){
             promises.push(
                 Patches.update(
-                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    {
+                        patch_group_id: patch_data[0]["patch_group_id"],
+                        data: Sequelize.fn("now")
+                    },
                     { where: { 
                         patch_serial: patch_data[0].spo2,
                         patch_type: 'spo2'
@@ -240,7 +250,10 @@ async function db_create_patch(tenant_id, params, transaction) {
         if(patch_data[0].temperature){
             promises.push(
                 Patches.update(
-                    {patch_group_id: patch_data[0]["patch_group_id"]},
+                    {
+                        patch_group_id: patch_data[0]["patch_group_id"],
+                        data: Sequelize.fn("now")
+                    },
                     { where: { 
                         patch_serial: patch_data[0].temperature,
                         patch_type: 'temperature'
@@ -484,7 +497,7 @@ async function db_update_patch_new(tenant_id, patch_data, transaction) {
 }
 
 async function db_patch_uuid_exist(patch_uuid) {
-    let patch_id = ""
+    let patch_id
     logger.debug("the patch uuid number is", patch_uuid)
     await Patches.findAll({
         where: {
@@ -544,7 +557,7 @@ async function db_update_patch_uuid(
     let patch
     try {
         patch = await Patches.update(
-            patch_data,
+            { patch_status: patch_data.patch_status },
             {
                 where: {
                     patch_uuid: given_patch_uuid,
