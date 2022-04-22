@@ -33,10 +33,10 @@ async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', 'patch_serial'],
+            attributes: ['id', 'patch_type', 'patch_serial', 'patch_uuid'],
             where: {
                 patch_type: params.devicetype,
-                patch_status: 'Active'
+                patch_status: 'inactive'
             },
             order: [["date", "DESC"]]
         });
@@ -188,7 +188,7 @@ async function db_get_patch_list(tenant_id, query_param) {
 async function db_create_patch(tenant_id, params, transaction) {
     let patch_data = params.data
     //This route created new patch in the db
-    patch_list = ""
+    let patch_list
     if (!patch_data) return
     logger.debug("Patch data is " + JSON.stringify(patch_data))
 
@@ -204,7 +204,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         patch_type: patch_data[i]["patch_type"],
                         // patch_name: patch_data[i]["patch_name"],
                         patch_uuid: patch_data[i]["patch_uuid"],
-                        patch_status: patch_data[i]["patch_status"],
+                        patch_status: 'Inactive',
                         patch_group_id: patch_data[i]["patch_group_id"],
                         // specialty: patch_data[i]["specialty"],
                         patch_mac: patch_data[i]["patch_mac"],
