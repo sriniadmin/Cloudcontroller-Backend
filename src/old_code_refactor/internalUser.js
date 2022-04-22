@@ -928,14 +928,12 @@ async function getPatchInventory(req, res, next) {
     let totalCount = 0
     try {
         let patch_data = await db_get_patch_list(tenant_id, request)
-        console.log('BUGGGGGGGGGGGGGGGG_RES:',patch_data )
         patches = patch_data[0]
         totalCount = patch_data[1]
         patches = dbOutput_JSON(patches)
         let i = 0
         filtered_patches = patches
     } catch (err) {
-        console.log('BUGGGGGGGGGGGGGGGG:',err )
         logger.debug("Patch list error " + err)
         req.apiRes = PATCH_CODE["1"]
         req.apiRes["error"] = {
