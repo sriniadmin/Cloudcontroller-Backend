@@ -127,6 +127,7 @@ async function db_get_patch_list(tenant_id, query_param) {
             // return [JSON.stringify(patch_data), patch_data.length]
         })
         .catch((err) => {
+            console.log('BUGGGGGGGGGGGGGGGG_DB:',err )
             logger.debug(
                 "Patch list fetch error " + tenant_id + "not found Err:" + err
             )
