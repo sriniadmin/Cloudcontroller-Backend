@@ -110,9 +110,8 @@ async function db_get_patch_list(tenant_id, query_param) {
         raw: false,
         // required:true,
         required: false,
-        group: ['patch_group_id'],
         order: [["date", "DESC"]],
-        // group: ["patch.patch_group_id"]
+        group: ["patch.patch_group_id"]
     })
         .then((patch_data) => {
             // logger.debug("Patch list value is" + patch_data, JSON.stringify(patch_data))
