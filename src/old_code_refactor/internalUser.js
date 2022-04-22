@@ -934,6 +934,7 @@ async function getPatchInventory(req, res, next) {
         let i = 0
         filtered_patches = patches
     } catch (err) {
+        console.log('BUGGGGGGGGGGGGGGGG:',err )
         logger.debug("Patch list error " + err)
         req.apiRes = PATCH_CODE["1"]
         req.apiRes["error"] = {
