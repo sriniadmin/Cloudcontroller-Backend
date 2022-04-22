@@ -1,7 +1,7 @@
 //This handles patch inventory
 var express = require("express")
 var router = express.Router()
-var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial } = require("../../old_code_refactor/internalUser")
+var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial, getSelectBoxPatch } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 
@@ -52,7 +52,7 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 router.post("/patchinventory", getPatchInventory,apiFinalProcess)
 
-router.get("/patchinventory", getPatchInventory,apiFinalProcess)
+router.get("/patchinventory", getSelectBoxPatch,apiFinalProcess)
 /**
  * @openapi
  *  /api/patch/:

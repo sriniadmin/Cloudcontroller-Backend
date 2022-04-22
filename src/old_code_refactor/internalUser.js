@@ -111,6 +111,7 @@ const {
     db_patch_count,
     db_patch_serial_exist,
     db_get_patch,
+    db_get_patch_select_boxes
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -905,6 +906,23 @@ async function logoutUser(req, res, next) {
         logger.debug(`Alert ERROR : ${err.message}`)
     }
     req.apiRes = SYSTEM_AAA_CODE["7"]
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getSelectBoxPatch(req, res, next) {
+    let data
+    try {
+        data = await db_get_patch_select_boxes(req.query)
+    } catch (error) {
+        console.log(error)
+    }
+    req.apiRes = PATCH_CODE["2"]
+    req.apiRes["response"] = {
+        patches: data,
+        count: data.length
+    }
     res.response(req.apiRes)
     return next()
 }
@@ -2930,5 +2948,6 @@ module.exports = {
     postProfiles,
     putProfiles,
     updateRemoteLocation,
-    updateImageUpload
+    updateImageUpload,
+    getSelectBoxPatch
 }

@@ -29,6 +29,23 @@ models.patch.hasMany(models.patch, {
     as: "AssociatedPatch",
 })
 
+async function db_get_patch_select_boxes(params) {
+    let data
+    try {
+        data = await Patches.findAll({
+            attributes: ['id', 'patch_type', 'patch_serial'],
+            where: {
+                patch_type: params.devicetype,
+                patch_status: 'Active'
+            },
+            order: [["date", "DESC"]]
+        });
+    } catch (error) {
+        console.log(error)
+    }
+    return data
+}
+
 
 async function db_get_patch_list(tenant_id, query_param) {
     // This async function gets the tenants matching the tenant_name
@@ -623,5 +640,6 @@ module.exports = {
     db_patch_count,
     db_patch_serial_exist,
     db_get_patch,
-    db_check_patch_exist
+    db_check_patch_exist,
+    db_get_patch_select_boxes
 }
