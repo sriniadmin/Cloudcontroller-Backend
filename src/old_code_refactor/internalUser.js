@@ -12,6 +12,7 @@ const alerter = require('../alerter/globalAlert')
 const alertEnum = require('../alerter/alertEnum')
 const { v1: uuid } = require('uuid')
 const { createWorker, PSM, createScheduler } = require("tesseract.js")
+const lodash = require("lodash")
 
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
@@ -947,6 +948,8 @@ async function getPatchInventory(req, res, next) {
     try {
         let patch_data = await db_get_patch_list(tenant_id, request)
         patches = patch_data[0]
+        patches = lodash.uniqBy(patches,'patch_group_id')
+        // lodash.uniqBy(patches,'patch_group_id');
         totalCount = patch_data[1]
         patches = dbOutput_JSON(patches)
         let i = 0
@@ -1071,32 +1074,32 @@ async function createPatch(req, res, next) {
     logger.debug("Patch Data Variable is ", patch_data)
     const promises = []
     let group_id = ""
-    for (let i = 0; i < patch_data.length; i++) {
-        if (patch_data[i]["patch_type"] == "gateway") {
-            logger.debug("patch_type is gateway", i)
-            uuidDict = {
-                uuidType: UUID_CONST["patch"],
-                tenantID: tenant_id,
-            }
-            promises.push(
-                sequelizeDB.transaction(function (t) {
-                    return getUUID(uuidDict, { transaction: t }).then(
-                        (uuid_result) => {
-                            logger.debug("The uuid result is", uuid_result)
-                            patch_data[i]["patch_uuid"] = uuid_result
-                            patch_data[i]["patch_group_id"] = uuid_result
-                            group_id = uuid_result
-                            let temp_patch = patch_data[i]
-                            patch_data.splice(i, 1)
-                            return db_create_patch(tenant_id, [temp_patch], {
-                                transaction: t,
-                            })
-                        }
-                    )
-                })
-            )
-        }
-    }
+    // for (let i = 0; i < patch_data.length; i++) {
+    //     if (patch_data[i]["patch_type"] == "gateway") {
+    //         logger.debug("patch_type is gateway", i)
+    //         uuidDict = {
+    //             uuidType: UUID_CONST["patch"],
+    //             tenantID: tenant_id,
+    //         }
+    //         promises.push(
+    //             sequelizeDB.transaction(function (t) {
+    //                 return getUUID(uuidDict, { transaction: t }).then(
+    //                     (uuid_result) => {
+    //                         logger.debug("The uuid result is", uuid_result)
+    //                         patch_data[i]["patch_uuid"] = uuid_result
+    //                         patch_data[i]["patch_group_id"] = uuid_result
+    //                         group_id = uuid_result
+    //                         let temp_patch = patch_data[i]
+    //                         patch_data.splice(i, 1)
+    //                         return db_create_patch(tenant_id, [temp_patch], {
+    //                             transaction: t,
+    //                         })
+    //                     }
+    //                 )
+    //             })
+    //         )
+    //     }
+    // }
 
     await Promise.all(promises).then(async (patch_gw) => {
         logger.debug("After slice, patch is", patch_data)
