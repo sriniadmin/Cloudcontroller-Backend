@@ -1169,43 +1169,43 @@ async function createPatient(req, res, next) {
                 logger.debug("the user pid is", user_data["pid"])
                 user_data["user_uuid"] = uuidUser
 
-                return db_create_user(tenant_id, user_data, {
-                    transaction: t,
-                }).then((user_data) => {
-                    logger.debug("the user data is", user_data.dataValues.pid)
-                    patch_data[0]["patch_uuid"] = uuidPatch
-                    patch_data[0]["patch_group_id"] = uuidPatch
-                    patch_data[0]["patch_serial"] = user_data.dataValues.pid
-                    const params = {
-                        actionType: '',
-                        data: patch_data,
-                        tenantId: tenant_id
-                    }
-                    return db_create_patch(tenant_id, params, {
-                        transaction: t,
-                    })
-                        .then((patch_info) => {
-                            logger.debug('the patch information is', patch_info)
-                            logger.debug('the patch uuid and patch pid is', patch_info[0])
-                            logger.debug('the patch info uuid is', patch_info[0].dataValues.patch_uuid)
-                            patch_patient_map_data[0]['patch_uuid'] = patch_info[0].dataValues.patch_uuid
-                            patch_patient_map_data[0]['pid'] = patch_info[0].dataValues.patch_serial
-                            patch_patient_map_data[0]['tenant_id'] = tenant_id
-                            let given_pid = patch_info[0].dataValues.patch_serial
-                            return db_create_patch_associate(tenant_id, patch_patient_map_data, given_pid, {
-                                transaction: t
-                            }).then((patch_patient_info) => {
-                                logger.debug('the patch patient info is', patch_patient_info)
-                                user_tenant_data[0]['user_uuid'] = uuidUser
-                                user_tenant_data[0]['tenant_id'] = tenant_id
-                                user_tenant_data[0]['role'] = 'Patient'
-                                user_tenant_data[0]['tenant_name'] = tenant_name
-                                // return db_create_user_tenant(tenant_id, user_tenant_data, {
-                                //     transaction: t
-                                // })
-                            })
-                        })
-                })
+                // return db_create_user(tenant_id, user_data, {
+                //     transaction: t,
+                // }).then((user_data) => {
+                //     logger.debug("the user data is", user_data.dataValues.pid)
+                //     patch_data[0]["patch_uuid"] = uuidPatch
+                //     patch_data[0]["patch_group_id"] = uuidPatch
+                //     patch_data[0]["patch_serial"] = user_data.dataValues.pid
+                //     const params = {
+                //         actionType: '',
+                //         data: patch_data,
+                //         tenantId: tenant_id
+                //     }
+                //     return db_create_patch(tenant_id, params, {
+                //         transaction: t,
+                //     })
+                //         .then((patch_info) => {
+                //             logger.debug('the patch information is', patch_info)
+                //             logger.debug('the patch uuid and patch pid is', patch_info[0])
+                //             logger.debug('the patch info uuid is', patch_info[0].dataValues.patch_uuid)
+                //             patch_patient_map_data[0]['patch_uuid'] = patch_info[0].dataValues.patch_uuid
+                //             patch_patient_map_data[0]['pid'] = patch_info[0].dataValues.patch_serial
+                //             patch_patient_map_data[0]['tenant_id'] = tenant_id
+                //             let given_pid = patch_info[0].dataValues.patch_serial
+                //             return db_create_patch_associate(tenant_id, patch_patient_map_data, given_pid, {
+                //                 transaction: t
+                //             }).then((patch_patient_info) => {
+                //                 logger.debug('the patch patient info is', patch_patient_info)
+                //                 user_tenant_data[0]['user_uuid'] = uuidUser
+                //                 user_tenant_data[0]['tenant_id'] = tenant_id
+                //                 user_tenant_data[0]['role'] = 'Patient'
+                //                 user_tenant_data[0]['tenant_name'] = tenant_name
+                //                 // return db_create_user_tenant(tenant_id, user_tenant_data, {
+                //                 //     transaction: t
+                //                 // })
+                //             })
+                //         })
+                // })
             })
         })
     } catch (err) {

@@ -36,7 +36,8 @@ async function db_get_patch_select_boxes(params) {
             attributes: ['id', 'patch_type', 'patch_serial', 'patch_uuid'],
             where: {
                 patch_type: params.devicetype,
-                patch_status: 'inactive'
+                patch_status: 'inactive',
+                group_type: 'Device'
             },
             order: [["date", "DESC"]]
         });
@@ -210,6 +211,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         // patch_bluetooth: patch_data[i]["patch_bluetooth"],
                         // patch_sensor_id: patch_data[i]["patch_sensor_id"],
                         patch_serial: patch_data[i]["patch_serial"],
+                        group_type: 'Device',
                         tenant_id: tenant_id,
                         // pid: patch_data[i]["pid"],
                     },
@@ -225,7 +227,8 @@ async function db_create_patch(tenant_id, params, transaction) {
                 Patches.update(
                     {
                         patch_group_id: patch_data[0]["patch_group_id"],
-                        data: Sequelize.fn("now")
+                        data: Sequelize.fn("now"),
+                        group_type: 'Bundle',
                     },
                     { where: { 
                         patch_serial: patch_data[0].ecg,
@@ -239,7 +242,8 @@ async function db_create_patch(tenant_id, params, transaction) {
                 Patches.update(
                     {
                         patch_group_id: patch_data[0]["patch_group_id"],
-                        data: Sequelize.fn("now")
+                        data: Sequelize.fn("now"),
+                        group_type: 'Bundle',
                     },
                     { where: { 
                         patch_serial: patch_data[0].gateway,
@@ -253,7 +257,8 @@ async function db_create_patch(tenant_id, params, transaction) {
                 Patches.update(
                     {
                         patch_group_id: patch_data[0]["patch_group_id"],
-                        data: Sequelize.fn("now")
+                        data: Sequelize.fn("now"),
+                        group_type: 'Bundle',
                     },
                     { where: { 
                         patch_serial: patch_data[0].spo2,
@@ -267,7 +272,8 @@ async function db_create_patch(tenant_id, params, transaction) {
                 Patches.update(
                     {
                         patch_group_id: patch_data[0]["patch_group_id"],
-                        data: Sequelize.fn("now")
+                        data: Sequelize.fn("now"),
+                        group_type: 'Bundle',
                     },
                     { where: { 
                         patch_serial: patch_data[0].temperature,

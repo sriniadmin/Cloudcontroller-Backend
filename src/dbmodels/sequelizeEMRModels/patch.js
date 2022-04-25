@@ -205,6 +205,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: true
             },
+            group_type: {
+                type: DataTypes.STRING(10),
+                allowNull: false
+            },
         },
         {
             sequelize,
