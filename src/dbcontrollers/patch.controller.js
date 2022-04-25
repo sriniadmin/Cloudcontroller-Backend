@@ -37,7 +37,8 @@ async function db_get_patch_select_boxes(params) {
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
-                group_type: 'Device'
+                group_type: 'Device',
+                in_use: 'false'
             },
             order: [["date", "DESC"]]
         });
@@ -65,40 +66,40 @@ async function db_get_patch_list(tenant_id, query_param) {
     let whereStmtForFree = "patch.tenant_id = '" + tenant_id + "'"
     let innerRequired = false
     logger.debug("patch serial is ", query_param.patch_serial)
-    if (query_param.patch_serial) {
-        whereStatement.patch_serial = { [Op.like]: "%" + patch_serial + "%" }
-        whereStmtForFree +=
-            " and patch.patch_serial like '%" + patch_serial + "%' "
-        // patch_serial: { [Op.like]: }
-    }
+    // if (query_param.patch_serial) {
+    //     whereStatement.patch_serial = { [Op.like]: "%" + patch_serial + "%" }
+    //     whereStmtForFree +=
+    //         " and patch.patch_serial like '%" + patch_serial + "%' "
+    //     // patch_serial: { [Op.like]: }
+    // }
 
-    if (query_param.devicetype) {
-        // whereStatement.patch_type = {$like: '%' + query_param.devicetype + '%'};
-        if (query_param.devicetype == "bundle") {
-            whereStatement.patch_type = "gateway"
-            whereStmtForFree += " and patch.patch_type = 'gateway'"
-            // whereStatement.patch_uuid = models.patch_patient_map.patch_group_id;
-        } else {
-            whereStatement.patch_type = query_param.devicetype
-            whereStmtForFree +=
-                " and patch.patch_type = '" + query_param.devicetype + "'"
-        }
-    }
+    // if (query_param.devicetype) {
+    //     // whereStatement.patch_type = {$like: '%' + query_param.devicetype + '%'};
+    //     if (query_param.devicetype == "bundle") {
+    //         whereStatement.patch_type = "gateway"
+    //         whereStmtForFree += " and patch.patch_type = 'gateway'"
+    //         // whereStatement.patch_uuid = models.patch_patient_map.patch_group_id;
+    //     } else {
+    //         whereStatement.patch_type = query_param.devicetype
+    //         whereStmtForFree +=
+    //             " and patch.patch_type = '" + query_param.devicetype + "'"
+    //     }
+    // }
 
-    if (query_param.inuse == 1) {
-        // whereStatement1.pid != '0';
-        innerRequired = true
-    }
-    let patch_uuid_from_patient_map
+    // if (query_param.inuse == 1) {
+    //     // whereStatement1.pid != '0';
+    //     innerRequired = true
+    // }
+    // let patch_uuid_from_patient_map
 
-    if (query_param.inuse == -1) {
-        whereStatement = Sequelize.literal(
-            "((patch.patch_uuid NOT IN (SELECT R.patch_uuid FROM patch_patient_map R )) and " +
-            whereStmtForFree +
-            ")"
-        )
-        // innerRequired = true;
-    }
+    // if (query_param.inuse == -1) {
+    //     whereStatement = Sequelize.literal(
+    //         "((patch.patch_uuid NOT IN (SELECT R.patch_uuid FROM patch_patient_map R )) and " +
+    //         whereStmtForFree +
+    //         ")"
+    //     )
+    //     // innerRequired = true;
+    // }
     logger.debug("The WhereStatement is ", whereStatement)
     await Patches.findAll({
         include: [
@@ -212,6 +213,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         // patch_sensor_id: patch_data[i]["patch_sensor_id"],
                         patch_serial: patch_data[i]["patch_serial"],
                         group_type: 'Device',
+                        in_use: 'false',
                         tenant_id: tenant_id,
                         // pid: patch_data[i]["pid"],
                     },
@@ -229,6 +231,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         patch_group_id: patch_data[0]["patch_group_id"],
                         data: Sequelize.fn("now"),
                         group_type: 'Bundle',
+                        in_use: 'false'
                     },
                     { where: { 
                         patch_serial: patch_data[0].ecg,
@@ -244,6 +247,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         patch_group_id: patch_data[0]["patch_group_id"],
                         data: Sequelize.fn("now"),
                         group_type: 'Bundle',
+                        in_use: 'false'
                     },
                     { where: { 
                         patch_serial: patch_data[0].gateway,
@@ -259,6 +263,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         patch_group_id: patch_data[0]["patch_group_id"],
                         data: Sequelize.fn("now"),
                         group_type: 'Bundle',
+                        in_use: 'false'
                     },
                     { where: { 
                         patch_serial: patch_data[0].spo2,
@@ -274,6 +279,7 @@ async function db_create_patch(tenant_id, params, transaction) {
                         patch_group_id: patch_data[0]["patch_group_id"],
                         data: Sequelize.fn("now"),
                         group_type: 'Bundle',
+                        in_use: 'false'
                     },
                     { where: { 
                         patch_serial: patch_data[0].temperature,

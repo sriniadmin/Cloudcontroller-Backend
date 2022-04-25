@@ -209,6 +209,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(10),
                 allowNull: false
             },
+            in_use: {
+                type: DataTypes.STRING(5),
+                allowNull: false
+            },
         },
         {
             sequelize,

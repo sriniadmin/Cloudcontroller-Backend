@@ -6,6 +6,7 @@ var models = initModels(sequelizeDB);
 const logger = require("../config/logger");
 const uuidAPIKey = require("uuid-apikey");
 const Tenants = models.tenant;
+const Patches = models.patch
 const Patch_Patient_Map = models.patch_patient_map;
 // const Patch_Patient_Map = models.patch_patient_map
 var PatchPatientMap = function (patch_patient_map_obj) {
@@ -260,6 +261,16 @@ async function db_create_patch_associate_one(
     
                         tenant_id: tenant_id,
                     }
+                )
+            );
+            promises.push(
+                Patches.update(
+                    {
+                        in_use: 'true'
+                    },
+                    { where: { 
+                        patch_uuid: obj["patch_uuid"],
+                    } }
                 )
             );
         }
