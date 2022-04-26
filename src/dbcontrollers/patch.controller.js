@@ -56,6 +56,9 @@ async function db_get_patch_list(tenant_id, query_param) {
     patch_list = []
 
     let { limit, offset, filter, patch_serial } = query_param
+    const hardLimit = 10
+    offset = parseInt(offset)* hardLimit
+    limit = parseInt(limit)
     let whereStatement = {
         tenant_id: tenant_id,
     }
@@ -124,8 +127,8 @@ async function db_get_patch_list(tenant_id, query_param) {
 
         ],
         where: whereStatement,
-        limit: parseInt(limit),
-        offset: parseInt(offset),
+        limit: limit,
+        offset: offset,
         // required:true,
         required: false,
         order: [["date", "DESC"]],

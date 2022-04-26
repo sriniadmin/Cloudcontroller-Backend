@@ -252,6 +252,7 @@ var _approval_type = require("./approval_type")
 var _product = require("./product")
 var _patient_location_table = require("./patient_location_table")
 var _patient_medication_table = require("./patient_medication_table")
+var _device_type = require("./device_type")
 var _upgradeMobile = require("./upgradeMobile");
 
 var _upgradeGateway = require("./upgradeGateway");
@@ -586,6 +587,7 @@ function initModels(sequelize) {
     var user_tenant_map = _user_tenant_map(sequelize, DataTypes)
     var profile = _profile(sequelize, DataTypes)
     var medical_illness_map=_medical_illness_map(sequelize,DataTypes)
+    var device_type = _device_type(sequelize, DataTypes)
 
 
     return {
@@ -857,7 +859,8 @@ function initModels(sequelize) {
         license,
         tasks,
         user_tenant_map,
-        medical_illness_map
+        medical_illness_map,
+        device_type
     }
 }
 //Relations

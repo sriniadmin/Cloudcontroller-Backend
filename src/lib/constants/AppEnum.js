@@ -1395,6 +1395,16 @@ let DEVICE_CODE = {
         "Code": "DELETE_DEVICE_FAILURE",
         "HttpStatus": "500",
         "Message": "patch_uuid, tenant_id do not match or device is in use",
+    },
+    "7": {
+        "Code": "GET_DEVICE_TYPE_SUCCESS",
+        "HttpStatus": "200",
+        "Message": "Success in getting the device type",
+    },
+    "8": {
+        "Code": "GET_DEVICE_TYPE_FAILURE",
+        "HttpStatus": "500",
+        "Message": "Failure in getting the device type",
     }
 }
 

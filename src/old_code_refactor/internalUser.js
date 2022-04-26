@@ -51,6 +51,10 @@ const {
 const getUUID = require("../lib/system/uuidSystem").getUUID
 
 const {
+    db_get_device_type
+} = require("../dbcontrollers/deivce_type.controller")
+
+const {
     db_create_images,
     db_get_images_list,
     db_create_report,
@@ -187,39 +191,11 @@ function getFilter(filter, subfilter) {
 
 // Validated
 async function getUserInventory(req, res, next) {
-    username = req.userName
-    let tenant_id = req.userTenantId
-    let tenant_name = req.userTenant
-    logger.debug("the tenant name is in user inventory is", tenant_name)
-    logger.debug("the user inven tenant id is", tenant_id)
-    if (
-        typeof req.query.tenant_id !== "undefined" &&
-        req.query.tenant_id.includes("tenant")
-    ) {
-        tenant_id = req.query.tenant_id
-        logger.debug(
-            "The TenantID for User Inventory is ",
-            tenant_id,
-            req.query.tenant_id
-        )
-    }
+    let tenant_id = req.query.tenantId
+
     let users
     let totalCount = 0
-    let filter_flag = false
-    logger.debug("Query, Params ", req.query, req.params)
-    req.query.fname = getFilter(req.query.filter, "fname")["fname"]
-    req.query.lname = getFilter(req.query.filter, "lname")["lname"]
-    req.query.phone = getFilter(req.query.filter, "phone")["phone"]
-    req.query.role = getFilter(req.query.filter, "role")["role"]
 
-    if (
-        req.query.fname ||
-        req.query.lname ||
-        req.query.phone ||
-        req.query.role
-    ) {
-        filter_flag = true
-    }
     try {
         users = await db_get_user_list(tenant_id, username, req.query)
         totalCount = await db_user_count(tenant_id)
@@ -232,7 +208,6 @@ async function getUserInventory(req, res, next) {
         }
         return next()
     }
-    logger.debug("USER list is " + JSON.stringify(users))
     req.apiRes = USER_CODE["2"]
     req.apiRes["response"] = {
         users: [users],
@@ -2923,6 +2898,22 @@ async function deletePatch(req, res, next) {
     return next()
 }
 
+async function getDeviceType(req, res, next) {
+    try {
+        const data = await db_get_device_type()
+        req.apiRes = DEVICE_CODE["7"]
+        req.apiRes["response"] = { data: data }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = DEVICE_CODE["8"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 module.exports = {
     getUserInventory,
     getSelfUser,
@@ -2978,5 +2969,6 @@ module.exports = {
     updateRemoteLocation,
     updateImageUpload,
     getSelectBoxPatch,
-    deletePatch
+    deletePatch,
+    getDeviceType
 }

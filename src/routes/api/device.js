@@ -3,6 +3,7 @@ var express = require("express")
 var router = express.Router()
 const { getDevices, getDevicesFactoryFile } = require("../../dbcontrollers/device.controller")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
+const { getDeviceType } = require("../../old_code_refactor/internalUser")
 
 
 
@@ -39,6 +40,8 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 */
 
 router.get("/", getDevices, apiFinalProcess)
+
+router.get("/type", getDeviceType, apiFinalProcess)
 
 /**
  * @openapi
