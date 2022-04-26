@@ -45,6 +45,7 @@ const {
     TASK_CODE,
     PASSWORD_CODE,
     PROFILE_CODE,
+    DEVICE_CODE
 } = require("../lib/constants/AppEnum")
 
 const getUUID = require("../lib/system/uuidSystem").getUUID
@@ -112,7 +113,8 @@ const {
     db_patch_count,
     db_patch_serial_exist,
     db_get_patch,
-    db_get_patch_select_boxes
+    db_get_patch_select_boxes,
+    db_delete_patch
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -2898,6 +2900,29 @@ async function putProfiles(req, res, next) {
     return next()
 }
 
+async function deletePatch(req, res, next) {
+    let data
+    try {
+        data = await db_delete_patch(req.body)
+        if(data[0] === 1){
+            req.apiRes = DEVICE_CODE["5"]
+            req.apiRes["response"] = { delete: true }
+        }
+        else{
+            req.apiRes = DEVICE_CODE["6"]
+            req.apiRes["response"] = { delete: false }
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = DEVICE_CODE["4"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 module.exports = {
     getUserInventory,
     getSelfUser,
@@ -2952,5 +2977,6 @@ module.exports = {
     putProfiles,
     updateRemoteLocation,
     updateImageUpload,
-    getSelectBoxPatch
+    getSelectBoxPatch,
+    deletePatch
 }

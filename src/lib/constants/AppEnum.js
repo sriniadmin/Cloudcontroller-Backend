@@ -1380,6 +1380,21 @@ let DEVICE_CODE = {
         "Code": "FETCH_DEVICE_SUCCESS",
         "HttpStatus": "200",
         "Message": "Success in fetching the new device",
+    },
+    "4": {
+        "Code": "DELETE_DEVICE_FAILURE",
+        "HttpStatus": "470",
+        "Message": "Failure in deleting the device",
+    },
+    "5": {
+        "Code": "DELETE_DEVICE_SUCCESS",
+        "HttpStatus": "200",
+        "Message": "Success in deleting the device",
+    },
+    "6": {
+        "Code": "DELETE_DEVICE_FAILURE",
+        "HttpStatus": "500",
+        "Message": "patch_uuid, tenant_id do not match or device is in use",
     }
 }
 

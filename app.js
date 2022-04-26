@@ -68,7 +68,8 @@ const routes = {
     "/api/license": "license",
     "/api/tasks": "tasks",
     "/api/device": "device",
-    "/api/profile": "profiles"
+    "/api/profile": "profiles",
+    "/api/patch/delete": "patch",
 }
 
 // XXX - this needs to be generic prestart checks

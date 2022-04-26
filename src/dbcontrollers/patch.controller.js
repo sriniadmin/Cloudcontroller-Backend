@@ -639,6 +639,35 @@ async function db_get_patch(tenant_id, patch_uuid) {
     return patch_data
 }
 
+async function db_delete_patch(params) {
+    let data
+    let promises = []
+    try {
+        params.list.forEach(obj => {
+            promises.push(
+                Patches.destroy({
+                    where: {
+                        tenant_id: params.tenantId,
+                        patch_uuid: obj.patch_uuid,
+                        in_use: 'false'
+                    }
+                })
+            )
+        });
+
+        await Promise.all(promises)
+        .then((result) => {
+            data = result
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    } catch (error) {
+        console.log(error)
+    }
+    return data
+}
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -652,5 +681,6 @@ module.exports = {
     db_patch_serial_exist,
     db_get_patch,
     db_check_patch_exist,
-    db_get_patch_select_boxes
+    db_get_patch_select_boxes,
+    db_delete_patch
 }
