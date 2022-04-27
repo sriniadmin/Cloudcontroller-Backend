@@ -305,7 +305,9 @@ async function db_get_patient_list(tenant_id, username, query_param) {
 async function db_patient_count(tenant_uuid) {
     let total_patient_count
     try {
-        total_patient_count = await Patients_Data.count()
+        total_patient_count = await Patients_Data.count({
+            where: { disabled: 1 }
+        })
     } catch (error) {
         logger.debug(
             "Patient list count failed error " +
@@ -487,6 +489,7 @@ async function db_create_patient(tenant_id, patient_data, transaction) {
             idtype: patient_data["idtype"],
             idnumber: patient_data["idnumber"],
             discharge_date: patient_data["discharge_date"],
+            disabled: 1,
             tenant_id: tenant_id,
         },
         { transaction: transaction["transaction"] }
