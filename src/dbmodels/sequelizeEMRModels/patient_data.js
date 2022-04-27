@@ -396,17 +396,17 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: true,
                 defaultValue: "",
-                validate: {
-                    is: /^$|[a-z ,.'-]+$/i,
-                },
+                // validate: {
+                //     is: /^$|[a-z ,.'-]+$/i,
+                // },
             },
             lname: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
                 defaultValue: "",
-                validate: {
-                    is: /^[a-z ,.'-]+$/i,
-                },
+                // validate: {
+                //     is: /^[a-z ,.'-]+$/i,
+                // },
             },
             mname: {
                 type: DataTypes.STRING(255),

@@ -1137,6 +1137,7 @@ async function createPatient(req, res, next) {
     if (!schema_status["status"]) {
         req.apiRes = JSON_SCHEMA_CODE["1"]
         req.apiRes["error"] = {
+            isExist: false,
             error: "ERROR IN SCHEMA VALIDATION",
         }
         return next()
@@ -1147,6 +1148,7 @@ async function createPatient(req, res, next) {
     if (medRecord_exist) {
         req.apiRes = PATIENT_CODE["6"]
         req.apiRes["error"] = {
+            isExist: true,
             error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + med_record,
         }
         return next()
@@ -1237,6 +1239,7 @@ async function createPatient(req, res, next) {
         logger.debug("User Create error " + err)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = {
+            isExist: false,
             error: "ERROR IN CREATE PATIENT" + err,
         }
         return next()

@@ -142,23 +142,23 @@ module.exports = function (sequelize, DataTypes) {
             fname: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
-                validate: {
-                    is: /^[a-z ,.'-]+$/i,
-                },
+                // validate: {
+                //     is: /^[a-z ,.'-]+$/i,
+                // },
             },
             mname: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
-                validate: {
-                    isAlpha: true,
-                },
+                // validate: {
+                //     isAlpha: true,
+                // },
             },
             lname: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
-                validate: {
-                    is: /^[a-z ,.'-]+$/i,
-                },
+                // validate: {
+                //     is: /^[a-z ,.'-]+$/i,
+                // },
             },
             suffix: {
                 type: DataTypes.STRING(255),
