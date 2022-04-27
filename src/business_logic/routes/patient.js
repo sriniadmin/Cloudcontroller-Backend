@@ -68,6 +68,7 @@ const db_patient_count = patient_controller.db_patient_count
 const db_med_record_exist = patient_controller.db_med_record_exist
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
+const db_disable_patient = patient_controller.db_disable_patient
 
 const { db_get_patient_details, db_get_patient_inventory } = patient_controller
 
@@ -799,6 +800,29 @@ async function deletePatient(req, res, next) {
     req.apiRes = TRANSACTION_CODE["2"]
     req.apiRes["response"] = {}
 
+    return next()
+}
+
+async function disablePatient(req, res, next) {
+    let data
+    try {
+        data = await db_disable_patient(req.body)
+        if(data[0][0] === 1){
+            req.apiRes = PATIENT_CODE["9"]
+            req.apiRes["response"] = { delete: true }
+        }
+        else{
+            req.apiRes = PATIENT_CODE["10"]
+            req.apiRes["response"] = { delete: false }
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["11"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
     return next()
 }
 
@@ -4319,5 +4343,6 @@ module.exports = {
     getPatientProcedure,
     updatePatientProcedure,
     registerPatientInventory,
-    getPatientInventory
+    getPatientInventory,
+    disablePatient
 }

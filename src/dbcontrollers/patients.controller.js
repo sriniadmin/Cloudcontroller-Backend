@@ -399,7 +399,8 @@ async function db_get_patient_inventory(params) {
         limit: parseInt(params.limit),
         offset: parseInt(params.offset),
         where: {
-            tenant_id: params.tenantId
+            tenant_id: params.tenantId,
+            disabled: 1
         },
         order: [
             ['date', 'DESC']
@@ -635,6 +636,33 @@ async function db_med_record_exist(med_record) {
     return patient_data
 }
 
+async function db_disable_patient(params) {
+    let data
+    let promises = []
+    params.list.forEach(obj => {
+        promises.push(
+            Patients_Data.update(
+                { disabled: 0 },
+                {
+                    where:{ 
+                        tenant_id: params.tenantId,
+                        pid: obj.pid
+                    }
+                }
+            )
+        )
+    });
+
+    await Promise.all(promises)
+    .then((result) => {
+        data = result
+    })
+    .catch((error) => {
+        console.log(error)
+    })
+    return data
+}
+
 module.exports = {
     db_get_patient_list,
     db_get_patient_list_new,
@@ -647,5 +675,6 @@ module.exports = {
     db_med_record_exist,
     db_patient_info,
     db_get_patient_details,
-    db_get_patient_inventory
+    db_get_patient_inventory,
+    db_disable_patient
 }

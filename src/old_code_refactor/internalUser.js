@@ -197,7 +197,7 @@ async function getUserInventory(req, res, next) {
     let totalCount = 0
 
     try {
-        users = await db_get_user_list(tenant_id, username, req.query)
+        users = await db_get_user_list(tenant_id, req.query)
         totalCount = await db_user_count(tenant_id)
         users = dbOutput_JSON(users)
         totalCount = dbOutput_JSON(totalCount)

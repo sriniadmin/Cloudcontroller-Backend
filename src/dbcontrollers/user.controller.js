@@ -13,35 +13,11 @@ models.users.belongsTo(models.user_tenant_map, {
     targetKey: "user_uuid",
 })
 
-async function db_get_user_list(tenant_id, username, params) {
-    let { limit, offset, filter, email, fname, lname, role } = params
-    logger.debug(
-        "USER FILTER IS",
-        params.fname,
-        params.lname,
-        params.phone,
-        params.role
-    )
-    logger.debug("the phone is", params.phone)
-    //let whereStatement = { tenant_id: tenant_id} //commented this because we are searching on the user_tenant_map tenant_id 
-    let whereStatement = {} 
+async function db_get_user_list(tenant_id, params) {
+    let data
 
-    // if ("self" in params) {
-    //     whereStatement.email = username
-    // }
-    logger.debug("user where class ", whereStatement)
-    if (params.fname || params.lname || params.phone) {
-        let users = await Users.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            include:[
-                {
-                    model:models.user_tenant_map,
-                    where:{
-                        tenant_id:tenant_id
-                    }
-                }
-            ],
+    try {
+        data = await Users.findAll({
             attributes: [
                 "id",
                 "username",
@@ -55,146 +31,17 @@ async function db_get_user_list(tenant_id, username, params) {
                 "user_uuid",
                 "title",
                 "tenant_id",
-                "user_uuid",
             ],
             where: {
-                [Op.or]: [
-                    {
-                        fname: {
-                            [Op.like]: `%${params.fname}%`,
-                        },
-                    },
-                    {
-                        lname: {
-                            [Op.like]: `%${params.lname}%`,
-                        },
-                    },
-                    {
-                        phone: {
-                            [Op.like]: `%${params.phone}%`,
-                        },
-                    },
-                    {
-                        role: {
-                            [Op.like]: `${params.role}`,
-                        },
-                    },
-                ],
+                tenant_id: tenant_id,
+                role: ['Doctor', 'doctor', 'Nurse', 'nurse']
             },
-            raw: false,
+            raw: false
         })
-
-        return users
-    } else if (params.role) {
-        logger.debug('in params role',params.role)
-        let users = await Users.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            include: [
-                {
-                    model: models.user_tenant_map,
-                    where: {
-                        [Op.and]: [
-                            {
-                                tenant_id: tenant_id,
-                            },
-                            {
-                                role: {
-                                    [Op.like]: `${params.role}`,
-                                },
-                            },
-                        ],
-                    },
-                },
-            ],
-            attributes: [
-                "id",
-                "username",
-                "fname",
-                "lname",
-                "mname",
-                "active",
-                "email",
-                "role",
-                "phone",
-                "user_uuid",
-                "title",
-                "tenant_id",
-            ],
-            raw: false,
-        })
-
-        return users
-    } 
-    else if (params.email) {
-        logger.debug('in params role',params.role)
-        let users = await Users.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            where:{
-                email:email
-            },
-            attributes: [
-                "id",
-                "username",
-                "fname",
-                "lname",
-                "mname",
-                "active",
-                "email",
-                "role",
-                "phone",
-                "user_uuid",
-                "title",
-                "tenant_id",
-            ],
-            raw: false,
-        })
-
-        return users
+    } catch (error) {
+        console.log(error)
     }
-      else {
-        let users = await Users.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            include: [
-                {
-                    model: models.user_tenant_map,
-                    where: {
-                        [Op.and]: [
-                            {
-                                tenant_id: tenant_id,
-                            },
-                            {
-                                role: {
-                                    [Op.notLike]: "Patient",
-                                },
-                            },
-                        ],
-                    },
-                    raw:false
-                },
-            ],
-            attributes: [
-                "id",
-                "username",
-                "fname",
-                "lname",
-                "mname",
-                "active",
-                "email",
-                "role",
-                "phone",
-                "user_uuid",
-                "title",
-                "tenant_id",
-            ],
-            raw: false,
-            where: whereStatement
-        })
-
-        return users
-    }
+    return data
 }
 
 async function db_validate_user_auth(email, password) {

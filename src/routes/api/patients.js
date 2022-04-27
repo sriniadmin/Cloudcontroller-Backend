@@ -48,7 +48,8 @@ const {
     getDeboardReport,
     createPatientProcedure,
     getPatientProcedure,
-    updatePatientProcedure
+    updatePatientProcedure,
+    disablePatient
 } = require("../../business_logic/routes/patient")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse");
 
@@ -1140,6 +1141,27 @@ router.get("/:pid/ews", getEws, apiFinalProcess)
  *            description: The uuid of specific patient
  */
 router.delete("/:pid", deletePatient, apiFinalProcess)
+
+
+/**
+ * @openapi
+ * /api/patients:
+ *   delete:
+ *       tags:
+ *         - Patient
+ *       summary: Delete Patient
+ *       responses:
+ *         '201':
+ *           description: Patient delete with pid.
+ *       parameters:
+ *          - in: path
+ *            name: pid
+ *            default: 0
+ *            schema:
+ *               type: uuid
+ *            description: The uuid of specific patient
+ */
+ router.delete("/", disablePatient, apiFinalProcess)
 
 
 /**

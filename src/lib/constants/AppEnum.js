@@ -167,6 +167,24 @@ let PATIENT_CODE = {
         Message: "Failure in updating the new patient  information",
         Details: {},
     },
+    9: {
+        Code: "DELETE_PATIENT_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in deleting the patient information",
+        Details: {},
+    },
+    10: {
+        Code: "DELETE_PATIENT_FAILURE",
+        HttpStatus: "500",
+        Message: "Patient has not been updated or deleted",
+        Details: {},
+    },
+    11: {
+        Code: "DELETE_PATIENT_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in deleting the patient  information",
+        Details: {},
+    },
 }
 
 let USER_CODE = {

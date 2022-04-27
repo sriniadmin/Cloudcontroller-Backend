@@ -969,6 +969,10 @@ module.exports = function (sequelize, DataTypes) {
                 //     isDate: true,
                 // },
             },
+            disabled: {
+                type: DataTypes.TINYINT,
+                allowNull: false
+            }
         },
         {
             sequelize,
