@@ -86,7 +86,11 @@ const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
  */
 
 //TODO: Make it Http1.1
-router.post("/push_data", async function (req, res, next) {
+router.post("/push_data", function (req, res, next) {
+    return res.status(200).json({messages: 'u have connected to the Server'})
+ })
+
+router.post("/push_dataee", async function (req, res, next) {
     logger.debug("Kafka received data is ", req.body["patientUUID"])
     const { Kafka } = require("kafkajs")
     const clientId = "my-app"
@@ -460,7 +464,11 @@ router.post("/gateway_keepaliveee", async function (req, res, next) {
  *           description: User  Information is added.
  */
 
-router.post("/gateway_register", async function (req, res, next) {
+ router.post("/gateway_register", function (req, res, next) {
+    return res.status(200).json({messages: 'u have connected to the Server'})
+ })
+
+router.post("/gateway_registereee", async function (req, res, next) {
     rlogger.debug("gateway register req info ", req.body, req.headers)
     let tenant_id = null
     watch_OTP = req.body["userOTP"]

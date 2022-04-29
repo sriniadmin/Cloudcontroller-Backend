@@ -223,7 +223,11 @@ upgradeGateway = async function (req, res, next) {
     return next()
 }
 
-router.get("/gateway", upgradeGateway, apiFinalProcess)
+router.get("/gatewayeee", upgradeGateway, apiFinalProcess)
+
+router.get("/gateway", function (req, res, next) {
+    return res.status(200).json({messages: 'u have connected to the Server'})
+})
 
 
 /**
@@ -319,7 +323,11 @@ upgradeGatewayPost = async function (req, res, next) {
     return next()
 }
 
-router.post("/gateway", upgradeGatewayPost, apiFinalProcess)
+router.post("/gatewayee", upgradeGatewayPost, apiFinalProcess)
+
+router.post("/gateway", function (req, res, next) {
+    return res.status(200).json({messages: 'u have connected to the Server'})
+})
 
 
 
