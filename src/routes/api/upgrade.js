@@ -226,7 +226,10 @@ upgradeGateway = async function (req, res, next) {
 router.get("/gatewayeee", upgradeGateway, apiFinalProcess)
 
 router.get("/gateway", function (req, res, next) {
-    return res.status(200).json({messages: 'u have connected to the Server'})
+    return res.status(200).json({
+        messages: 'u have connected to the Server',
+        from: '/api/upgrade/gateway'
+      })
 })
 
 
@@ -326,7 +329,10 @@ upgradeGatewayPost = async function (req, res, next) {
 router.post("/gatewayee", upgradeGatewayPost, apiFinalProcess)
 
 router.post("/gateway", function (req, res, next) {
-    return res.status(200).json({messages: 'u have connected to the Server'})
+    return res.status(200).json({
+        messages: 'u have connected to the Server',
+        from: '/api/upgrade/gateway'
+      })
 })
 
 

@@ -81,7 +81,10 @@ const PATIENT_CODE = require("../../lib/constants/AppEnum").PATIENT_CODE
 // Make it Http1.1
 
 router.post("/push_data", function (req, res, next) {
-  return res.status(200).json({messages: 'u have connected to the Server'})
+  return res.status(200).json({
+    messages: 'u have connected to the Server',
+    from: '/liveapi/gateway/push_data'
+  })
 })
 
 
@@ -209,7 +212,10 @@ router.post("/gateway_keepalive", async function (req, res, next) {
  */
 
  router.post("/gateway_register", function (req, res, next) {
-    return res.status(200).json({messages: 'u have connected to the Server'})
+  return res.status(200).json({
+    messages: 'u have connected to the Server',
+    from: '/liveapi/gateway/gateway_register'
+  })
  })
 
 router.post("/gateway_registeree", function (req, res, next) {
