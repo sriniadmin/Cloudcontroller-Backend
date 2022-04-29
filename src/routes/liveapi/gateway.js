@@ -234,7 +234,11 @@ function parseDiscover(disData, devType) {
  *           description: User  Information is added.
  */
 
-router.post("/gateway_keepalive", async function (req, res, next) {
+ router.post("/gateway_keepalive", async function (req, res, next) {
+    return res.status(200).json({messages: 'u have connected to the Server'})
+ })
+
+router.post("/gateway_keepaliveee", async function (req, res, next) {
     klogger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
     klogger.debug("Gateway Keepalive received data is ", req.body)
     let resp = { Keepalive: "Success" }
