@@ -506,6 +506,18 @@ async function update_keepalive(tenant_id, patch_data, transaction) {
     return patch_patient_map_list;
 }
 
+async function db_delete_associate_device(params) {
+    try {
+        return await Patch_Patient_Map.destroy({
+            where: {
+                pid: params.list[0].pid
+            }
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 
 
@@ -517,5 +529,6 @@ module.exports = {
     db_delete_patch_patient_map,
     clear_command,
     update_keepalive,
-    db_create_patch_associate_one
+    db_create_patch_associate_one,
+    db_delete_associate_device
 };

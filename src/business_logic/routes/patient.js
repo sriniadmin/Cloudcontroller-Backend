@@ -90,7 +90,7 @@ const {
     db_get_patch_map_list,
     db_delete_patch_patient_map,
     db_create_patch_associate_one,
-
+    db_delete_associate_device,
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
 
@@ -804,10 +804,11 @@ async function deletePatient(req, res, next) {
 }
 
 async function disablePatient(req, res, next) {
-    let data
     try {
-        data = await db_disable_patient(req.body)
+        let data = await db_disable_patient(req.body)
         if(data[0][0] === 1){
+            //change logic and code later
+            await db_delete_associate_device(req.body)
             req.apiRes = PATIENT_CODE["9"]
             req.apiRes["response"] = { delete: true }
         }
@@ -819,8 +820,6 @@ async function disablePatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["11"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
     }
     res.response(req.apiRes)
     return next()
