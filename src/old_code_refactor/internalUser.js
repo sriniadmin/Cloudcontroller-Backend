@@ -118,7 +118,8 @@ const {
     db_patch_serial_exist,
     db_get_patch,
     db_get_patch_select_boxes,
-    db_delete_patch
+    db_delete_patch,
+    db_get_patch_saas
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -2914,6 +2915,27 @@ async function getDeviceType(req, res, next) {
     return next()
 }
 
+async function getPathSaas(req, res, next) {
+    let data
+    try {
+        data = await db_get_patch_saas(req.query)
+    } catch (error) {
+        console.log(error)
+    }
+    if((data === null) || (data.length===0)){
+        req.apiRes = PATCH_CODE["13"]
+    }
+    else{
+        req.apiRes = PATCH_CODE["2"]
+    }
+    req.apiRes["response"] = {
+        patch: data,
+        count: data.length
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 module.exports = {
     getUserInventory,
     getSelfUser,
@@ -2970,5 +2992,6 @@ module.exports = {
     updateImageUpload,
     getSelectBoxPatch,
     deletePatch,
-    getDeviceType
+    getDeviceType,
+    getPathSaas
 }

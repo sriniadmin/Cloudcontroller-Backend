@@ -12,7 +12,7 @@ const Sequelize = require("sequelize")
  *       pid:
  *         type: string
  *         default: patient12345
- *       code_tasks:
+ *       params:
  *         type: array
  *         items:
  *          "$ref": '#/components/schemas/Billing_Info'
@@ -27,23 +27,31 @@ const Sequelize = require("sequelize")
  *     properties:
  *       code_type:
  *         type: string
- *         default: CPTR
+ *         default: CPT
  *       code:
- *         type: string
- *         default: 919457
- *       status:
- *         type: string
+ *         type: integer
  *         default: 99453
- *       bill_date:
- *         type: string
- *         default: 2021-06-21
  *       pid:
  *         type: string
- *         default: patient12345
- *       code_tasks:
- *         type: array
- *         items:
- *          "$ref": '#/components/schemas/Billing_Info'
+ *         default: patient1ad72cd5-c7a3-4d9f-8e9d-f446605a387e
+ *       bill_date:
+ *         type: string
+ *         default: 2022-05-05
+ *       time_spent:
+ *         type: integer
+ *         default: 20
+ *       revenue_code:
+ *         type: string
+ *         default: 123
+ *       notecodes:
+ *         type: string
+ *         default: pending
+ *       bill_process:
+ *         type: string
+ *         default: 0
+ *       fee:
+ *         type: string
+ *         default: 20
  */
 
 /**
@@ -77,7 +85,7 @@ const Sequelize = require("sequelize")
  *     type: object
  *     properties:
  *       code:
- *         type: string
+ *         type: integer
  *         default: 99457
  *       code_internal:
  *         type: string
@@ -137,7 +145,7 @@ const Sequelize = require("sequelize")
  *       bill_date:
  *         type: string
  *         default: 2021-06-21
- *       code_tasks:
+ *       params:
  *         type: array
  *         items:
  *          "$ref": '#/components/schemas/Billing_Info'
@@ -191,7 +199,7 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.INTEGER,
                 allowNull: true,
             },
-            code_tasks: {
+            params: {
                 type: DataTypes.JSON,
                 allowNull: true,
                 comment:"Task performed by the user"
@@ -214,7 +222,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: 0,
             },
             bill_date: {
-                type: DataTypes.STRING(255),
+                type: DataTypes.DATE,
                 allowNull: true,
                 comment: "User date update",
             },
@@ -274,19 +282,7 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: true,
                 defaultValue: "",
                 comment: "Item revenue code",
-            },
-            tenant_id: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-            },
-            status: {
-                type: DataTypes.STRING(255),
-                allowNull: true,
-            },
-            billing_uuid: {
-                type: DataTypes.STRING(255),
-                allowNull: true,
-            },
+            }
         },
         {
             sequelize,

@@ -11,6 +11,7 @@ const patient_controller = require("../../dbcontrollers/patients.controller")
 const redisClient = require("../../external_services/redis/cache_service/redis_client")
 const { otpverify } = require("../../../src/business_logic/routes/patient")
 const db_patient_exist = patient_controller.db_patient_exist
+const db_check_patient_exist = patient_controller.db_check_patient_exist
 const { db_patch_exist } = require("../../dbcontrollers/patch.controller")
 const { db_get_patch_map_list, clear_command,
     update_keepalive } =
@@ -86,6 +87,7 @@ const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
  */
 
 //TODO: Make it Http1.1
+
 router.post("/push_data", async function (req, res, next) {
     logger.debug("Kafka received data is ", req.body["patientUUID"])
     const { Kafka } = require("kafkajs")
@@ -234,15 +236,24 @@ function parseDiscover(disData, devType) {
  *           description: User  Information is added.
  */
 
+
 router.post("/gateway_keepalive", async function (req, res, next) {
     klogger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
     klogger.debug("Gateway Keepalive received data is ", req.body)
-    let resp = { Keepalive: "Success" }
+    let resp = {
+    }
+    // let resp = { Keepalive: "Success" }
     let pid = req.body['patientUUID']
     let keepaliveHistory = {}
     let discoverHistory = {}
     let connectedGw = []
-    deviceListFromGateway = JSON.parse(req.body['connectedDevices'])
+    if(!req.body['connectedDevices'] || !req.body['patientUUID']){
+        return res.status(470).json({
+            status: '407',
+            messages: 'connectedDevices, patientUUID are required'
+        })
+    }
+    deviceListFromGateway = req.body['connectedDevices']
     let softkill = false
     // try{
     //     if (deviceListFromGateway) {
@@ -290,6 +301,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         connectedGw = parseConnected(deviceListFromGateway)
         klogger.debug("discovered device", deviceDiscoveredListFromGateway)
     } catch ( error) {
+        console.log(error)
         klogger.debug("discovered device", req.body['discovered'], req.body['discovered_ble'], req.body['discovered_viva'], error )
     }
     let promises = []
@@ -298,139 +310,155 @@ router.post("/gateway_keepalive", async function (req, res, next) {
     //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
     // updated with the battery details etc - Better to come up with the JSON model for this.
 
-    await db_patient_exist("",pid)
-        .then((patientResp)=> {
+    await db_check_patient_exist(pid)
+        .then((patientResp) => {
             klogger.debug("The patient info is : ", patientResp[pid])
             tenant_id = patientResp['tenant_id']
         })
-    for (let i = 0; i < deviceListFromGateway.length; i++) {
-        sn_no = deviceListFromGateway[i]['serial_no']
-        klogger.debug("SN of keepalive : ", sn_no)
-        promises.push(
-            db_get_patch_map_list(tenant_id, "", {
-                sn: sn_no
-            })
-        )
-        // get the values of the keepalive and config change status and command from gateway device
-        // Update the threads, version etc  from the Keepalive message.
-    }
-    await Promise.all(promises).then(async (patch_patient_list) => {
-        klogger.debug(
-            "THE  PATCH PATIENT LIST IS",
-            patch_patient_list.length
-        )
-        let command, keepaliveTime
-        for (let i = 0; i < patch_patient_list.length; i++) {
-           
-            if (patch_patient_list[i].length == 0) {
-                klogger.debug(
-                    "THE  PATCH serial LIST IS Empty",i,
-                    patch_patient_list[i][0]
-                )
-                continue
-            }
-            keepaliveHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].keepaliveHistory
-            discoverHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].discoverDevices
-            if (patch_patient_list[i][0].keepaliveTime) {
-                keepaliveTime = patch_patient_list[i][0].keepaliveTime
-                resp['KeepaliveTime'] = keepaliveTime
-            }
-            if (patch_patient_list[i][0].command) {
-                command = patch_patient_list[i][0].command
-                resp['Command'] = command
-            }
-            if(softkill){
-                resp['Command'] = 'softkill'
-            }
-        }
-    })
-    klogger.debug("The response for keepalive is", resp, keepaliveHistory.length )
-    // clear the command from the patch_patient_map table for that specific gateway device
-    promises = []
-    for (let i = 0; i < deviceListFromGateway.length; i++) {
-        sn_no = deviceListFromGateway[i]['serial_no']
-        klogger.debug("Clearing the commands", sn_no)
-        promises.push(
-            clear_command(tenant_id, {
-                pid: pid
-            })
-        )
-    }
-    await Promise.all(promises).then(async (clear_command_list) => {
-        klogger.debug("The commands are cleared : ", clear_command_list)
 
-    })
-    // the response from the keepalive should be stored in keepalive_history - as last 50 entries only
-    promises = []
-    for (let i = 0; i < deviceListFromGateway.length; i++) {
-        sn_no = deviceListFromGateway[i]['serial_no']
-        typeDevice = deviceListFromGateway[i]['type']
-        klogger.debug("Updaing keepalive data the commands", sn_no, typeDevice)
-        if (typeDevice == 'gateway') {
-            let dateNow = Date()
-            
-            let keepaliveGw = []
-            let discoverGw = []
-            
-            let discoverData = {}
-            klogger.debug("Gateway selected commands", sn_no, typeDevice, dateNow)
-            if (keepaliveHistory[sn_no]) {
-                keepaliveGw = keepaliveHistory[sn_no]
-                if (discoverHistory[sn_no]) {
-                    try {
-                        discoverGw = discoverHistory[sn_no]["devices"]["discover"]
-                    } catch (err) {
-                        klogger("Resetting the Discoveries to Empty", err)
-                        discoverGw = []
-                    }
-                    
-                }
-                    
-            }
-            klogger.debug("keepalive Gw output", discoverGw)
-            // klogger.debug("keepalive Gw output",keepaliveGw)
-            // let keys = []
-            // for (var key in keepaliveGw) keys.push(Object.keys(keepaliveGw[key]))
-            // klogger.debug("keepalive data  time ", keys)
-            
-            keepaliveGw.splice(0, 0, { [dateNow]: req.body });
-            keepaliveGw = keepaliveGw.slice(0, 40)
-            if (Object.getOwnPropertyNames(deviceDiscoveredListFromGateway).length > 0) {
-                deviceDiscoveredListFromGateway["GATEWAY"] = sn_no
-                
-                if (discoverGw && discoverGw.length > 0) {
-                    discoverGw.splice(0, 0, { [dateNow]: deviceDiscoveredListFromGateway });
-                    discoverGw = discoverGw.slice(0, 3)
-                } else {
-                    discoverGw = []
-                    discoverGw.push({ [dateNow]: deviceDiscoveredListFromGateway })
-                }
-               
-                klogger.debug("Updating Gateway discovered devices", discoverGw)
-            }            
-            discoverData["cloudstatus"] = dateNow
-            
-            let devicesKeep = {"discover":discoverGw,
-            "connected":connectedGw}
-            discoverData["devices"] = devicesKeep
-            // discoverData["devices"].push(devicesKeep)
-
+    if ( (typeof deviceListFromGateway !=='string') && (deviceListFromGateway.length > 0)) {
+        for (let i = 0; i < deviceListFromGateway.length; i++) {
+            sn_no = deviceListFromGateway[i]['serial_no']
+            klogger.debug("SN of keepalive : ", sn_no)
             promises.push(
-                update_keepalive(tenant_id, {
-                    pid: pid,
-                    sn: sn_no,
-                    keepaliveData: keepaliveGw,
-                    discoverData: discoverData
+                db_get_patch_map_list(tenant_id, "", {
+                    sn: sn_no
+                })
+            )
+            // get the values of the keepalive and config change status and command from gateway device
+            // Update the threads, version etc  from the Keepalive message.
+        }
+        await Promise.all(promises).then(async (patch_patient_list) => {
+            klogger.debug(
+                "THE  PATCH PATIENT LIST IS",
+                patch_patient_list.length
+            )
+            let command, keepaliveTime
+            for (let i = 0; i < patch_patient_list.length; i++) {
+
+                if (patch_patient_list[i].length == 0) {
+                    klogger.debug(
+                        "THE  PATCH serial LIST IS Empty", i,
+                        patch_patient_list[i][0]
+                    )
+                    continue
+                }
+                keepaliveHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].keepaliveHistory
+                discoverHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].discoverDevices
+                if (patch_patient_list[i][0].keepaliveTime !== undefined) {
+                    keepaliveTime = patch_patient_list[i][0].keepaliveTime
+                    resp['KeepaliveTime'] = keepaliveTime
+                }
+                if (patch_patient_list[i][0].command !== undefined) {
+                    command = patch_patient_list[i][0].command
+                    resp['Command'] = command
+                }
+                if (softkill !== undefined) {
+                    resp['Command'] = 'softkill'
+                }
+            }
+        })
+
+        klogger.debug("The response for keepalive is", resp, keepaliveHistory.length)
+        // clear the command from the patch_patient_map table for that specific gateway device
+        promises = []
+        for (let i = 0; i < deviceListFromGateway.length; i++) {
+            sn_no = deviceListFromGateway[i]['serial_no']
+            klogger.debug("Clearing the commands", sn_no)
+            promises.push(
+                clear_command(tenant_id, {
+                    pid: pid
                 })
             )
         }
+        await Promise.all(promises).then(async (clear_command_list) => {
+            klogger.debug("The commands are cleared : ", clear_command_list)
 
+        })
+
+        promises = []
+        try {
+            for (let i = 0; i < deviceListFromGateway.length; i++) {
+                sn_no = deviceListFromGateway[i]['serial_no']
+                typeDevice = deviceListFromGateway[i]['type']
+                klogger.debug("Updaing keepalive data the commands", sn_no, typeDevice)
+                if (typeDevice == 'gateway') {
+                    let dateNow = Date()
+    
+                    let keepaliveGw = []
+                    let discoverGw = []
+    
+                    let discoverData = {}
+                    klogger.debug("Gateway selected commands", sn_no, typeDevice, dateNow)
+                    if (keepaliveHistory[sn_no]) {
+                        keepaliveGw = keepaliveHistory[sn_no]
+                        if (discoverHistory[sn_no]) {
+                            try {
+                                discoverGw = discoverHistory[sn_no]["devices"]["discover"]
+                            } catch (err) {
+                                klogger("Resetting the Discoveries to Empty", err)
+                                discoverGw = []
+                            }
+    
+                        }
+    
+                    }
+                    klogger.debug("keepalive Gw output", discoverGw)
+                    // klogger.debug("keepalive Gw output",keepaliveGw)
+                    // let keys = []
+                    // for (var key in keepaliveGw) keys.push(Object.keys(keepaliveGw[key]))
+                    // klogger.debug("keepalive data  time ", keys)
+    
+                    keepaliveGw.splice(0, 0, { [dateNow]: req.body });
+                    keepaliveGw = keepaliveGw.slice(0, 40)
+                    if (Object.getOwnPropertyNames(deviceDiscoveredListFromGateway).length > 0) {
+                        deviceDiscoveredListFromGateway["GATEWAY"] = sn_no
+    
+                        if (discoverGw && discoverGw.length > 0) {
+                            discoverGw.splice(0, 0, { [dateNow]: deviceDiscoveredListFromGateway });
+                            discoverGw = discoverGw.slice(0, 3)
+                        } else {
+                            discoverGw = []
+                            discoverGw.push({ [dateNow]: deviceDiscoveredListFromGateway })
+                        }
+    
+                        klogger.debug("Updating Gateway discovered devices", discoverGw)
+                    }
+                    discoverData["cloudstatus"] = dateNow
+    
+                    let devicesKeep = {
+                        "discover": discoverGw,
+                        "connected": connectedGw
+                    }
+                    discoverData["devices"] = devicesKeep
+                    // discoverData["devices"].push(devicesKeep)
+    
+                    promises.push(
+                        update_keepalive(tenant_id, {
+                            pid: pid,
+                            sn: sn_no,
+                            keepaliveData: keepaliveGw,
+                            discoverData: discoverData
+                        })
+                    )
+                }
+    
+            }
+            await Promise.all(promises).then(async (keepalive_list) => {
+                klogger.debug("The keepalive data is updated : ", keepalive_list)
+    
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
-    await Promise.all(promises).then(async (keepalive_list) => {
-        klogger.debug("The keepalive data is updated : ", keepalive_list)
-
-    })
+    else{
+        resp.response = 'Invalid data of connectedDevices'
+    }
+    // the response from the keepalive should be stored in keepalive_history - as last 50 entries only
+    
     klogger.debug("The keepalive response is", resp)
+    resp
        return res.status(200).json(resp)
 })
 
@@ -456,9 +484,11 @@ router.post("/gateway_keepalive", async function (req, res, next) {
  *           description: User  Information is added.
  */
 
+
+
 router.post("/gateway_register", async function (req, res, next) {
     rlogger.debug("gateway register req info ", req.body, req.headers)
-    let tenant_id = null
+    let tenant_id = req.body.tenant_id
     watch_OTP = req.body["userOTP"]
     watch_imei = req.body["IMEI"]
     oldPid = req.body["pid"]
@@ -499,33 +529,21 @@ router.post("/gateway_register", async function (req, res, next) {
             tenant_id = patients.tenant_id
             let promises = []
             promises.push(
-                db_get_patch_map_list(tenant_id, "", {
+                db_get_patch_map_list(tenant_id, {
                     limit: 100,
                     offset: 0,
                     pid: patients.pid,
                 })
             )
             await Promise.all(promises).then(async (patch_patient_list) => {
-                // rlogger.debug(
-                //     "the patch patient list is ",
-                //     JSON.stringify(patch_patient_list)
-                // )
-                
-                //logger.debug('THE CONFIG IS',patch_patient_list[0].config[0])
+
                 patch_patient_list = patch_patient_list[0]
-                // rlogger.debug(
-                //     "THE CHECK FOR PATCH PATIENT LIST IS",
-                //     patch_patient_list
-                // )
+
                 let index = 0
                 promises = []
                 promises.push(db_patch_exist(tenant_id, patch_patient_list[0]))
                 await Promise.all(promises).then((patch_device_info_list) => {
-                    // patch_device_info_list = patch_device_info_list[0]
-                    // logger.debug(
-                    //     "The Patch Devices are ",
-                    //     patch_device_info_list
-                    // )
+
                     let device_list = []
                     for (
                         index = 0;
@@ -534,16 +552,14 @@ router.post("/gateway_register", async function (req, res, next) {
                         index++
                     ) {
                         let temp_device = {}
-                        rlogger.debug("THE INDEX IS", index)
-                        rlogger.debug(
-                            "THE PATCH PATIENTS LIST LENGTH IS",
-                            patch_patient_list.length
-                        )
+
                         // rlogger.debug("Patch", patch_patient_list[index])
                         temp_device["type"] =
                             patch_patient_list[index].patches[0]["patch_type"]
                         temp_device["serial_no"] =
                             patch_patient_list[index].patches[0]["patch_serial"]
+                        temp_device["mac_address"] =
+                            patch_patient_list[index].patches[0]["patch_mac"]
                         temp_device["config"] = patch_patient_list[index].config
                         device_list.push(temp_device)
                     }

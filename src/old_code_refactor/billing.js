@@ -1,6 +1,7 @@
 const logger = require("../config/logger")
 const sequelizeDB = require("../config/emrmysqldb")
 const RBAC = require("../middleware/rbac")
+const constant = require("../utils/constants");
 const {
     db_create_billing,
     db_update_billing,
@@ -9,6 +10,10 @@ const {
     db_billing_pid_exist,
     db_update_billing_information,
 } = require("../dbcontrollers/billing.controller")
+
+const {
+    db_patient_exist
+} = require("../dbcontrollers/patients.controller")
 
 const { UUID_CONST, BILLING_CODE } = require("../lib/constants/AppEnum")
 const getUUID = require("../lib/system/uuidSystem").getUUID
@@ -23,6 +28,7 @@ async function getBilling(req, res, next) {
         billing = await db_get_billing_report(tenant_id, req.query)
     } catch (err) {
         logger.debug("Billing list error " + err)
+        console.log(err);
         req.apiRes = BILLING_CODE["1"]
         req.apiRes["error"] = {
             error: "ERROR IN FETCHING BILLING INVENTORY",
@@ -61,81 +67,56 @@ async function getBillingData(req,next) {
         count: billing.length,
     }
 }
+const prepareDataForCreateBilling = (postData) => {
+    const listAllCodeSupport = Object.values(constant.CPT_CODE);
+    let params = {};
+    if(!listAllCodeSupport.includes(Number(postData.code))){
+        return false;
+    }
+    if(postData.code == constant.CPT_CODE.CPT_99453){
+        if(postData.time_spent != null && postData.time_spent != ''){
+            return false;
+        }
+        params = {time_spent: postData.time_spent};
+    }
+    if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
+    postData.params = JSON.stringify(params);
+    return postData;
+}
 
 async function createBilling(req, res, next) {
     const t = await sequelizeDB.transaction()
-    tenant_id = req.userTenantId
-    let billing_data = req.body
-    logger.debug("the new billing data body is", billing_data)
-    let given_pid=req.body['pid']
-    let newBillingTask=req.body['code_tasks'][0]['Billing_Information'][0]
-    logger.debug(
-        "the code tasks in the new billing data body is",newBillingTask
-    )
-    let billing
-    req.query = {
-        limit: 10,
-        offset: 0,
-        filter: 0,
-        pid: given_pid,
-        bill_date:0,
-        billing_uuid:0,
-        status:0
+    const pid = req.body.pid;
+    if(!pid){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Invalid params",
+        }
+        return next();
     }
-    let newBillingUpdated
-    let getBilling=await getBillingData(req,next)
-    logger.debug('the get billing  is',JSON.stringify(getBilling))
-    logger.debug('the get billing billing data is',getBilling['billingData'],typeof(getBilling['billingData'],getBilling['billingData'].length))
-    if(getBilling['billingData'].length===0){
-        logger.debug('in if loop ')
-        newBillingUpdated=[newBillingTask]
-    } else {
-        logger.debug('in else loop')
-        logger.debug('the new billing updated for if loop is',newBillingUpdated)
-    newBillingUpdated=getBilling['billingData'][0]['code_tasks'][0]['Billing_Information']
-    logger.debug('the new billing updated is',newBillingUpdated)
-    newBillingUpdated.push(newBillingTask)
-    logger.debug('the  billing updated array data is',newBillingUpdated)
+    const existPid = await db_patient_exist(tenant_id, pid)
+    if(!existPid){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Patient Id is no longer exist",
+        }
+        return next();
+    }
 
+    let billing_data= prepareDataForCreateBilling(req.body);
+    console.log(billing_data.bill_date);
+    if(!billing_data){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Invalid params",
+        }
+        return next();
     }
-        logger.debug('the  billing updated array data outseide if else loop is',newBillingUpdated)
-    req.query = {
-        limit: 10,
-        offset: 0,
-        filter: 0,
-        pid: given_pid,
-    }
-    let task_data={
-        pid:given_pid
-    }
-    uuidDict = { uuidType: UUID_CONST["billing"], tenantID: tenant_id }
     try {
         billing = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            billing_data["billing_uuid"] = uuid_result
-            billing_data["tenant_id"] = tenant_id
-            billing_data["pid"] = given_pid
-            return db_get_billing_report(tenant_id, req.query).then(
-                (get_billing_data) => {
-                    logger.debug(
-                        "all billing data in transaction is",
-                        get_billing_data
-                    )
-                    billing_data['code_tasks'][0]['Billing_Information']=newBillingUpdated
-                    logger.debug('the final code tasks billing information is',billing_data['code_tasks'][0]['Billing_Information'])
-                    return db_update_billing(tenant_id, billing_data, {
-                        transaction: t,
-                    }).then((billing_info)=> {
-                        logger.debug('the billing info is',billing_info)
-                        task_data['task']=newBillingUpdated
-                        task_data['tenant_id']=tenant_id
-                        return db_update_task(tenant_id,task_data,{
-                            transaction:t
-                        })
-                    })
-                }
-            )
+            return db_update_billing(tenant_id, billing_data, {
+                transaction: t,
+            })
         })
     } catch (err) {
         logger.debug("Billing list error " + err)
@@ -143,9 +124,9 @@ async function createBilling(req, res, next) {
         req.apiRes["error"] = {
             error: "ERROR IN CREATING THE BILLING",
         }
+        console.log(err);
         return next()
     }
-    logger.debug("Billing list is " + billing)
     req.apiRes = BILLING_CODE["3"] 
     billing=req.body
     req.apiRes["response"] = {
@@ -155,6 +136,7 @@ async function createBilling(req, res, next) {
     res.response(req.apiRes)
     return next()
 }
+
 let code=[]
 
 async function updateBilling(req, res, next) {

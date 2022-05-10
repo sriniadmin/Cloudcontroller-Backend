@@ -55,8 +55,9 @@ async function db_upgrade_list(tenant_id) {
 
 
 async function db_upgrade_entry_create_gw(upgrade_data, transaction) {
-    upgrade_data = JSON.stringify(upgrade_data)
-    upgrade_data = JSON.parse(upgrade_data)
+    upgrade_data.upgradeDetails = {}
+    // upgrade_data = JSON.stringify(upgrade_data)
+    // upgrade_data = JSON.parse(upgrade_data)
     let trans = null
     if (typeof transaction !== "undefined") {
         logger.debug("Transacation is not undefined")

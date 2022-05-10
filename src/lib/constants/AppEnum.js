@@ -324,6 +324,11 @@ let PATCH_CODE = {
         HttpStatus: "470",
         Message: "Failure in fetching ,as patch_serial number does not exist",
     },
+    13: {
+        Code: "FETCH_PATCH_INVENTORY_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in fetching, serial number does not exist",
+    },
 }
 
 let VITAL_CODE = {

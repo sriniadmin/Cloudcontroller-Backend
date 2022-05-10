@@ -140,7 +140,7 @@ upgradeMobilePost = async function (req, res, next) {
             })
         })
     } catch (err) {
-        logger.debug("UPGRADE Create error " + err)
+        // logger.debug("UPGRADE Create error " + err)
         req.apiRes = UPGRADE_CODE["0"]
         req.apiRes["error"] = {
             error: "Creation of Upgrade failed :" + err,
@@ -223,7 +223,14 @@ upgradeGateway = async function (req, res, next) {
     return next()
 }
 
-router.get("/gateway", upgradeGateway, apiFinalProcess)
+router.get("/gatewayeee", upgradeGateway, apiFinalProcess)
+
+router.get("/gateway", function (req, res, next) {
+    return res.status(200).json({
+        messages: 'u have connected to the Server',
+        from: '/api/upgrade/gateway'
+      })
+})
 
 
 /**
@@ -279,8 +286,8 @@ router.get("/gateway", upgradeGateway, apiFinalProcess)
 upgradeGatewayPost = async function (req, res, next) {
     // tenant_id = req.userTenantId
     // tenantuuid = req.body.tenantuuid
-    tenant_id = req.body.tenantuuid
-    logger.debug("Upgrade gateway Version POST")
+    tenant_id = req.body.tenant_id
+    // logger.debug("Upgrade gateway Version POST")
     // let upgradeJson = req.body
     // let upgradeJson = {
     //     "versionName": "999.0.0",
@@ -303,7 +310,8 @@ upgradeGatewayPost = async function (req, res, next) {
             })
         })
     } catch (err) {
-        logger.debug("UPGRADE Create error " + err)
+        console.log(err)
+        // logger.debug("UPGRADE Create error " + err)
         req.apiRes = UPGRADE_CODE["0"]
         req.apiRes["error"] = {
             error: "Creation of Upgrade failed :" + err,
@@ -320,18 +328,5 @@ upgradeGatewayPost = async function (req, res, next) {
 }
 
 router.post("/gateway", upgradeGatewayPost, apiFinalProcess)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = router

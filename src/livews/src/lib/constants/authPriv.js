@@ -3,6 +3,7 @@ let IGNORE_AUTH_PATH = [
   "/api/login",
   "/signup",
   "/sign/signup",
+  "/saasapi/device/",
 
   // Live Api - Needs to be authenticated - and Ratelimited at Nginx
   "/liveapi/gateway/gateway_register",

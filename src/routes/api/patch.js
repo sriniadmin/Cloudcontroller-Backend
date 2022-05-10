@@ -1,8 +1,41 @@
 //This handles patch inventory
 var express = require("express")
 var router = express.Router()
-var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial, getSelectBoxPatch, deletePatch } = require("../../old_code_refactor/internalUser")
+var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial, getSelectBoxPatch, deletePatch, getPathSaas } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
+
+/**
+ * @openapi
+ *  /saasapi/device/:
+ *   get:
+ *       tags:
+ *         - Device
+ *       summary: Inventory of the Devices
+ *       responses:
+ *         '201':
+ *           description: Device Information is provided.
+ *       parameters:
+ *          - in: query
+ *            name: limit
+ *            default: 10
+ *            schema:
+ *               type: integer
+ *            description: The number of items to return
+ *          - in: query
+ *            name: offset
+ *            default: 0
+ *            schema:
+ *               type: integer
+ *            description: The number of items to skip before starting to collect the result set
+ *          - in: query
+ *            name: filter
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: Filter on fields:serial_number=123
+ */
+
+router.get("/", getPathSaas,apiFinalProcess)
 
 
 

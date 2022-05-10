@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize")
 const Op = Sequelize.Op
+const moment = require('moment');
 const sequelizeDB = require("../config/emrmysqldb")
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
@@ -29,15 +30,10 @@ models.patch_patient_map.hasMany(models.patch, {
 })
 
 async function db_get_billing_report(tenant_id, params) {
-    let { limit, offset, filter, bill_date, pid, billing_uuid,status } = params
-    logger.debug("the params name is", params, params.pid)
+    let { limit, offset } = params
     let whereStatement = { tenant_id: tenant_id }
-    logger.debug("the where statement is", whereStatement)
-    logger.debug("the pid statement is", pid)
-
     let billing
-    if (params.pid != "0" && params.bill_date == "0") {
-        logger.debug("in if loop", params.pid)
+    if (params.pid && params.bill_date == "0") {
         billing = await Billing.findAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
@@ -53,9 +49,6 @@ async function db_get_billing_report(tenant_id, params) {
                 {
                     model:models.patient_data,
                     attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
-                },
-                {
-                    model:models.tasks,
                 }
                
             ],
@@ -68,7 +61,10 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.like]: `${params.bill_date}`,
+                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        },
+                        bill_date: {
+                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
                         },
                     },
                     {
@@ -87,8 +83,7 @@ async function db_get_billing_report(tenant_id, params) {
         })
 
         return billing
-    } else if (params.pid != "0" && params.bill_date != "0") {
-        logger.debug("in else if", params.pid, params.bill_date)
+    } else if (params.pid && params.bill_date != "0") {
         billing = await Billing.findAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
@@ -104,19 +99,16 @@ async function db_get_billing_report(tenant_id, params) {
                 {
                     model:models.patient_data,
                     attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
-                },
-                {
-                    model:models.tasks,
                 }
             ],
             where: {
                 [Op.and]: [
                     {
-                        tenant_id: tenant_id,
-                    },
-                    {
                         bill_date: {
-                            [Op.like]: `%${params.bill_date}%`,
+                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        },
+                        bill_date: {
+                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
                         },
                     },
                     {
@@ -126,11 +118,12 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: false,
+            raw: true,
+            logging: console.log
         })
 
         return billing
-    } else if (params.bill_date != "0" && params.pid == "0" && params.status=="0") {
+    } else if (params.bill_date != "0" && params.pid == "0") {
         logger.debug("in else if 2nd loop", params.pid, params.bill_date)
         billing = await Billing.findAll({
             limit: parseInt(limit),
@@ -159,7 +152,10 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.like]: `%${params.bill_date}%`,
+                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        },
+                        bill_date: {
+                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
                         },
                     },
                 ],
@@ -169,7 +165,7 @@ async function db_get_billing_report(tenant_id, params) {
         })
 
         return billing
-    } else if (params.status != "0" || params.bill_date!="0") {
+    } else if (params.bill_date!="0") {
         logger.debug("in else if 3rd loop", params.pid, params.bill_date)
         billing = await Billing.findAll({
             limit: parseInt(limit),
@@ -186,23 +182,10 @@ async function db_get_billing_report(tenant_id, params) {
                 {
                     model:models.patient_data,
                     attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
-                },
-                {
-                    model:models.tasks,
                 }
             ],
             where: {
-                 [Op.or]: [
-                    {
-                        status: {
-                            [Op.like]: `${params.status}`,
-                        },
-                    },
-                ],
                 [Op.and]: [
-                    {
-                        tenant_id: tenant_id,
-                    },
                     {
                         bill_date: {
                             [Op.like]: `%${params.bill_date}%`,
@@ -231,23 +214,19 @@ async function db_get_billing_report(tenant_id, params) {
 
 
 async function db_update_billing(tenant_id, billing_data, transaction) {
-    billing_data = JSON.stringify(billing_data)
-    billing_data = JSON.parse(billing_data)
-    logger.debug('the billing data in the controller file is',billing_data)
     let trans = null
-    let pid=await db_billing_pid_exist(billing_data['pid'])
-    logger.debug('the pid in the billing is',pid)
+    let id= billing_data['id'] ? await db_billing_pid_exist(billing_data['id']) : null;
     if (typeof transaction !== "undefined") {
         logger.debug("Transacation is not undefined")
         trans = transaction["transaction"]
     }
     let billing
-    if(!pid){
+    if(!id){
         billing=await Billing.create(billing_data,{transaction:trans})
     } else {
         billing=await Billing.update(billing_data,{
             where:{
-                pid:billing_data['pid']
+                id:billing_data['id']
             }
         })
     }
@@ -255,17 +234,17 @@ async function db_update_billing(tenant_id, billing_data, transaction) {
    
   }
 
-  async function db_billing_pid_exist(pid) {
+  async function db_billing_pid_exist(id) {
     let billing_data
     try {
         billing_data = await Billing.count({
             where: {
-                pid: pid,
+                id: id,
             },
             raw: true,
         })
     } catch (err) {
-        throw new Error("tasks  " + pid + "not found Err:" + err)
+        throw new Error("tasks  " + id + "not found Err:" + err)
     }
     return billing_data
 }

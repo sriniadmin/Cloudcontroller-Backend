@@ -346,7 +346,7 @@ async function db_patient_exist(
     // This async function gets the tenants matching the tenant_name
     // It currently does not check if more than one tenant exist or not. TODO
     // Returns a promise of the tenant_id number
-    let patient_id = ""
+    let data
     let whereStatement = {}
     if (type == "uuid") {
         whereStatement.pid = patient_identifier
@@ -360,40 +360,18 @@ async function db_patient_exist(
     if (tenant_uuid) {
         whereStatement.tenant_id = tenant_uuid
     }
-    await Patients_Data.findAll({
+    await Patients_Data.findOne({
         where: whereStatement,
         raw: true,
     })
         .then((patient_data) => {
-            // logger.debug(
-            //     "Patient list is" + patient_data,
-            //     typeof patient_data,
-            //     patient_data.length
-            // )
-            if (patient_data.length == 0) return patient_id
-            patient_id = patient_data[0]
-            // logger.debug("Tenant uuid " + patient_id)
+            data = patient_data
         })
         .catch((err) => {
-            logger.debug(
-                "Patient  " +
-                tenant_uuid +
-                ":" +
-                patient_id +
-                "not found Err:" +
-                err
-            )
-            throw new Error(
-                "Patient  " +
-                tenant_uuid +
-                ":" +
-                patient_id +
-                "not found Err:" +
-                err
-            )
+            console.log(err)
+            throw new Error(err)
         })
-    logger.debug("Done with Await of Patient")
-    return patient_id // This returns tenant_uuid only
+    return data
 }
 
 async function db_get_patient_inventory(params) {
@@ -666,6 +644,19 @@ async function db_disable_patient(params) {
     return data
 }
 
+async function db_check_patient_exist(params) {
+    try {
+        return await Patients_Data.findOne({
+            where: {
+                pid: params,
+            },
+        })
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
 module.exports = {
     db_get_patient_list,
     db_get_patient_list_new,
@@ -679,5 +670,6 @@ module.exports = {
     db_patient_info,
     db_get_patient_details,
     db_get_patient_inventory,
-    db_disable_patient
+    db_disable_patient,
+    db_check_patient_exist
 }

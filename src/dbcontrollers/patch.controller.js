@@ -48,6 +48,35 @@ async function db_get_patch_select_boxes(params) {
     return data
 }
 
+//for customer testing change latter
+async function db_get_patch_saas(params) {
+    let data
+    let attributes = ['id', 'patch_type', 'patch_serial', 'patch_uuid', 'patch_mac', 'enterprise']
+    let filter
+
+    if(params.filter){
+        filter = params.filter.split("=")
+    }
+
+    try {
+        if(filter[1]){
+            data = await Patches.findAll({
+                attributes: attributes,
+                where: {patch_serial: filter[1]},
+            });
+        }
+        else{
+            data = await Patches.findAll({
+                attributes: attributes,
+                limit: parseInt(params.limit)
+            });
+        }
+    } catch (error) {
+        console.log(error)
+    }
+    return data
+}
+
 
 async function db_get_patch_list(tenant_id, query_param) {
     // This async function gets the tenants matching the tenant_name
@@ -401,50 +430,57 @@ async function db_check_patch_exist(tenant_uuid, patch_list) {
 }
 
 async function db_patch_exist(tenant_uuid, patch_list) {
-    let patch_id = ""
-    const promises = []
-    for (let i = 0; i < patch_list.length; i++) {
-        promises.push(
-            Patches.findOne({
+    let data
+    // const promises = []
+    // for (let i = 0; i < patch_list.length; i++) {
+    //     promises.push(
+        try {
+            data = await Patches.findOne({
                 where: {
                     tenant_id: tenant_uuid,
-                    patch_uuid: patch_list[i]["patch_uuid"],
+                    patch_uuid: patch_list["patch_uuid"],
                 },
                 raw: true,
             })
-        )
-    }
-    await Promise.all(promises)
-        .then((patch_data) => {
-            logger.debug(
-                "Patch list is" + JSON.stringify(patch_data),
-                typeof patch_data,
-                patch_data.length
-            )
-            if (patch_data.length == 0) return patch_data
-            patch_id = patch_data
-            logger.debug("patch uuid " + patch_id)
-        })
-        .catch((err) => {
-            logger.debug(
-                "Patch  " +
-                tenant_uuid +
-                ":" +
-                patch_list +
-                "not found Err:" +
-                err
-            )
-            throw new Error(
-                "Patch  " +
-                tenant_uuid +
-                ":" +
-                patch_list +
-                "not found Err:" +
-                err
-            )
-        })
-    logger.debug("Done with Await of Patch")
-    return patch_id
+        } catch (error) {
+            console.log(error)
+            throw new Error(error)
+        }
+        return data
+            
+    //     )
+    // }
+    // await Promise.all(promises)
+    //     .then((patch_data) => {
+    //         logger.debug(
+    //             "Patch list is" + JSON.stringify(patch_data),
+    //             typeof patch_data,
+    //             patch_data.length
+    //         )
+    //         if (patch_data.length == 0) return patch_data
+    //         patch_id = patch_data
+    //         logger.debug("patch uuid " + patch_id)
+    //     })
+    //     .catch((err) => {
+    //         logger.debug(
+    //             "Patch  " +
+    //             tenant_uuid +
+    //             ":" +
+    //             patch_list +
+    //             "not found Err:" +
+    //             err
+    //         )
+    //         throw new Error(
+    //             "Patch  " +
+    //             tenant_uuid +
+    //             ":" +
+    //             patch_list +
+    //             "not found Err:" +
+    //             err
+    //         )
+    //     })
+    // logger.debug("Done with Await of Patch")
+    // return patch_id
 }
 
 async function db_patch_exist_new(patch_serial) {
@@ -685,5 +721,6 @@ module.exports = {
     db_get_patch,
     db_check_patch_exist,
     db_get_patch_select_boxes,
-    db_delete_patch
+    db_delete_patch,
+    db_get_patch_saas
 }

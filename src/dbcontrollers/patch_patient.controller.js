@@ -20,8 +20,8 @@ models.patch_patient_map.hasMany(models.patch, {
     sourceKey: "patch_uuid",
 });
 
-async function db_get_patch_map_list(tenant_id, username, params) {
-    prac_list = "";
+async function db_get_patch_map_list(tenant_id, params) {
+    let patch_patient_map_list
     let { limit, offset, filter, pid, sn } = params;
     if (!limit) {
         limit = 100;
@@ -55,9 +55,7 @@ async function db_get_patch_map_list(tenant_id, username, params) {
             },
         })
             .then((patch_patient_map_data) => {
-                logger.debug(
-                    "Patient Patch Map list is" + patch_patient_map_data
-                );
+
                 patch_patient_map_list = patch_patient_map_data;
             })
             .catch((err) => {
@@ -86,20 +84,10 @@ async function db_get_patch_map_list(tenant_id, username, params) {
             raw: true,
         })
             .then((patch_patient_map_data) => {
-                // logger.debug("patch patient list is" + patch_patient_map_data);
-
                 patch_patient_map_list = patch_patient_map_data;
             })
             .catch((err) => {
-                logger.debug(
-                    "patch_patient_map list fetch error " +
-                    tenant_id +
-                    "not found Err:" +
-                    err
-                );
-                throw new Error(
-                    "patch_patient_map list fetch error -  tenant check"
-                );
+                throw new Error(err);
             });
 
         return patch_patient_map_list;
