@@ -94,6 +94,7 @@ router.post("/push_data", async function (req, res, next) {
     const clientId = "my-app"
     const brokers = [process.env.KAFKA_BROKER + ":9092"]
     const topic = req.body["patientUUID"]
+    console.log('TOPIC:', topic)
     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
     logger.debug("Created kakfa handle", req.body)
     let producer
@@ -109,7 +110,7 @@ router.post("/push_data", async function (req, res, next) {
         await producer.connect()
         await producer.send({
             topic: topic,
-            messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
+            messages: [{ key: "data", value: JSON.stringify(req.body) }],
         })
         await producer.disconnect()
 
