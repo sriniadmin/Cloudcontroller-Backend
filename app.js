@@ -201,7 +201,7 @@ app.use(function (err, req, res, next) {
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-let global_variable = require('./globle-config/global-variable')
+global.global_variable = require('./globle-config/global-variable')
 
 io.on('connection', (socket) => {
     global_variable.socket = socket
