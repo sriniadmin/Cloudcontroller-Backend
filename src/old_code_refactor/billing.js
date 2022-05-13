@@ -9,6 +9,7 @@ const {
     db_billing_exist,
     db_billing_pid_exist,
     db_update_billing_information,
+    db_get_patch_data
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -21,11 +22,11 @@ const { db_update_task } = require("../dbcontrollers/task.controller")
 
 async function getBilling(req, res, next) {
     let tenant_id = req.userTenantId
-    logger.debug("tenant ID is ", tenant_id)
-    logger.debug('the req query is',req.query)
     let billing
+    let patch_data
     try {
-        billing = await db_get_billing_report(tenant_id, req.query)
+        billing = await db_get_billing_report(tenant_id, req.query);
+        patch_data = await db_get_patch_data(req.query)
     } catch (err) {
         logger.debug("Billing list error " + err)
         console.log(err);
@@ -39,6 +40,7 @@ async function getBilling(req, res, next) {
     req.apiRes = BILLING_CODE["2"]
     req.apiRes["response"] = {
         billingData: billing,
+        patchData: patch_data,
         count: billing.length,
     }
     res.response(req.apiRes)

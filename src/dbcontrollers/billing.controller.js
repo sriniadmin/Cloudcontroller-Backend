@@ -7,6 +7,7 @@ var initModels =
 var models = initModels(sequelizeDB)
 const logger = require("../config/logger")
 const Billing = models.billing
+const PatchPatientMap = models.patch_patient_map
 
 models.billing.belongsTo(models.patch_patient_map, {
     foreignKey: "pid",
@@ -29,6 +30,28 @@ models.patch_patient_map.hasMany(models.patch, {
     sourceKey: "patch_uuid",
 })
 
+async function db_get_patch_data(params){
+    let result = [];
+    if(params.pid){
+        result = await PatchPatientMap.findAll({
+            include: [
+                {
+                    model: models.patch,
+                },
+            ],
+            where: {
+                [Op.and]:[
+                    {
+                        pid: params.pid,
+                    },
+                ],
+            },
+            raw: true,
+            logging: console.log
+        })
+    }
+    return result;
+}
 async function db_get_billing_report(tenant_id, params) {
     let { limit, offset } = params
     let whereStatement = { tenant_id: tenant_id }
@@ -118,8 +141,7 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: true,
-            logging: console.log
+            raw: false
         })
 
         return billing
@@ -299,5 +321,6 @@ module.exports = {
     db_get_billing_report,
     db_billing_exist,
     db_billing_pid_exist,
-    db_update_billing_information
+    db_update_billing_information,
+    db_get_patch_data
 }

@@ -4289,7 +4289,7 @@ async function getPatientInventory(req, res, next) {
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
+        logger.debug("Exception : %s", error)
         return next()
     }
     
