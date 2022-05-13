@@ -207,10 +207,10 @@ io.on('connection', (socket) => {
     global_variable.socket = socket
 });
 
-server.listen(8000);
+server.listen(7124);
 
-app.listen(port, function () {
-    logger.debug("Server running on port => ", port)
-})
+// app.listen(port, function () {
+//     logger.debug("Server running on port => ", port)
+// })
 
 module.exports = app;

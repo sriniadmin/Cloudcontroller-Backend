@@ -1001,7 +1001,7 @@ async function patientKafkaRegister(msg) {
     var sendMessage = async () => {
         await producer.connect()
         await producer.send({
-            topic: "patient-discovery",
+            topic: "patientDiscovery",
             messages: [
                 {
                     key: "patientDiscovery",
