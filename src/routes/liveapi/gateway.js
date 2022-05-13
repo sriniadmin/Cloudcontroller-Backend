@@ -19,6 +19,7 @@ const { db_get_patch_map_list, clear_command,
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 
+const global_variable = require('../../../globle-config/global-variable');
 /**
  * @openapi
  *  components:
@@ -93,7 +94,8 @@ router.post("/push_data", async function (req, res, next) {
     const { Kafka } = require("kafkajs")
     const clientId = "my-app"
     const brokers = [process.env.KAFKA_BROKER + ":9092"]
-    const topic = req.body["patientUUID"]
+    // const topic = req.body["patientUUID"]
+    const topic = "sensor-data"
     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
     logger.debug("Created kakfa handle", req.body)
     let producer
@@ -109,9 +111,19 @@ router.post("/push_data", async function (req, res, next) {
         await producer.connect()
         await producer.send({
             topic: topic,
-            messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
+            messages: [{ key: "data", value: JSON.stringify(req.body) }],
         })
         await producer.disconnect()
+
+
+        //Passing data to UI via socket.io
+        const data = {
+            time: new Date(),
+            originalUrl: req.originalUrl,
+            body: req.body
+
+        }
+        global_variable.socket.emit('SENSOR_LOG', data)
 
         // }
         // catch(error) {

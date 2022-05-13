@@ -198,6 +198,17 @@ app.use(function (err, req, res, next) {
 //   console.log(`Express server listening on port ${app.get('port')}`);
 // })
 
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+
+global.global_variable = require('./globle-config/global-variable')
+
+io.on('connection', (socket) => {
+    global_variable.socket = socket
+});
+
+server.listen(8000);
+
 app.listen(port, function () {
     logger.debug("Server running on port => ", port)
 })

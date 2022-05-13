@@ -664,7 +664,7 @@ router.put('/prescription/:prsc_id', async function (req, res, next) {
 
 async function runMedCron() {
 
-    let tenantList = null 
+    let tenantList = [] 
 
     try {
         tenantList = await db_get_tenant_list(null, null)
