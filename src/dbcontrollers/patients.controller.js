@@ -377,12 +377,22 @@ async function db_patient_exist(
 async function db_get_patient_inventory(params) {
     let limit = params.limit
     let offset = (params.offset-1) * limit
+    let condition = {
+        tenant_id: params.tenantId,
+        disabled: 1
+    }
+    if(params.name){
+        condition = {
+            tenant_id: params.tenantId,
+            disabled: 1,
+            [Op.or]: [
+                {fname: {[Op.like]: params.name}}, {lname: {[Op.like]: params.name}}
+            ]
+        }
+    }
     try {
         const data = await Patients_Data.findAll({
-            where: {
-                tenant_id: params.tenantId,
-                disabled: 1
-            },
+            where: condition,
             order: [
                 ['date', 'DESC']
             ],
