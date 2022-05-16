@@ -122,7 +122,7 @@ router.post("/push_data", async function (req, res, next) {
             body: req.body
 
         }
-        global_variable.socket.emit('SENSOR_LOG', data)
+        global_variable?.socket?.emit('SENSOR_LOG', data)
 
         // }
         // catch(error) {
