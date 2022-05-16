@@ -4260,17 +4260,12 @@ async function updatePatientProcedure(req, res, next) {
 }
 
 async function getPatientInventory(req, res, next) {
-    let patients_list = []
-
     let given_pid = req.body.pid
     let tenant_id = req.body.tenantId
     let duration = 3
 
     try {
-        patients_list = await db_get_patient_inventory(req.body)
-        patients_list = JSON.stringify(patients_list)
-        patients_list = JSON.parse(patients_list)
-
+        const patients_list = await db_get_patient_inventory(req.body)
         const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
         const totalCount = await db_patient_count(tenant_id)
 
@@ -4292,7 +4287,6 @@ async function getPatientInventory(req, res, next) {
         logger.debug("Exception : %s", error)
         return next()
     }
-    
     return next()
 }
 
