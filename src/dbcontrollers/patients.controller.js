@@ -376,11 +376,7 @@ async function db_patient_exist(
 
 async function db_get_patient_inventory(params) {
     let limit = params.limit
-    let offset = params.offset
-    if(offset === 0){
-        offset = 1
-    }
-    offset = (offset-1) * limit
+    let offset = (params.offset-1) * limit
     try {
         const data = await Patients_Data.findAll({
             where: {
