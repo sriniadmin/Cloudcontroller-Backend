@@ -494,6 +494,34 @@ async function update_keepalive(tenant_id, patch_data, transaction) {
     return patch_patient_map_list;
 }
 
+async function db_get_patch_map_detail(params) {
+
+    try {
+        let data = await Patch_Patient_Map.findAll({
+            include: [
+                {
+                    model: models.patch,
+                    raw: false,
+                    where: {},
+                },
+            ],
+            raw: true
+            // where: {
+            //     pid: params.params.pid,
+            // },
+        })
+
+        if(data.length > 0){
+            data = data.filter(function (el) {
+                return el.pid === params.params.pid
+            });
+        }
+        return data
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 
 
@@ -505,5 +533,6 @@ module.exports = {
     db_delete_patch_patient_map,
     clear_command,
     update_keepalive,
-    db_create_patch_associate_one
+    db_create_patch_associate_one,
+    db_get_patch_map_detail
 };
