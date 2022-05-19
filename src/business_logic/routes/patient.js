@@ -90,6 +90,8 @@ const {
     db_get_patch_map_list,
     db_delete_patch_patient_map,
     db_create_patch_associate_one,
+    db_get_patch_map_detail,
+
 
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
@@ -1001,7 +1003,7 @@ async function patientKafkaRegister(msg) {
     var sendMessage = async () => {
         await producer.connect()
         await producer.send({
-            topic: "patient-discovery",
+            topic: "patientDiscovery",
             messages: [
                 {
                     key: "patientDiscovery",
@@ -1257,7 +1259,7 @@ async function createPatient(req, res, next) {
         Thresholds: AlertThresholdsDict,
         FrequencySetting: 1800,
     }
-    await patientKafkaRegister(msg)
+    patientKafkaRegister(msg)
     logger.debug("THE REDIS RESPONSE  IS", demographic_map["pid"])
     try {
         redisResponse = updateRedisCache(
@@ -1595,38 +1597,36 @@ async function getPatientPatch(req, res, next) {
     let username = req.userName
     let given_pid = req.params.pid
     let tenant_id = req.userTenantId
-    let patient_exist, patch_patient_map
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
+    // let patient_exist, patch_patient_map
+    // try {
+    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
+    //     if (!validate_patient_exist(patient_exist, req)) return next()
+    // } catch (error) {
+    //     logger.debug("Exception : %s PID %s", error, given_pid)
+    //     logger.debug("The error in catch is ", error)
+    //     req.apiRes = PATIENT_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         errMessage: "Patient - ",
+    //     }
+    //     return next()
+    // }
     req.query.pid = req.params.pid
     try {
-        patch_patient_map = await db_get_patch_map_list(
-            tenant_id,
-            username,
-            req.query
-        )
+        // patch_patient_map = await db_get_patch_map_list(req)
+        patch_patient_map = await db_get_patch_map_detail(req)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            patch_patient_map: patch_patient_map,
+            count: patch_patient_map.length,
+        }
+
+        next()
     } catch (e) {
+        console.log(e)
         req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
+        // logger.debug("Exception : %s", e)
         return next()
     }
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        patch_patient_map: patch_patient_map,
-        count: patch_patient_map.length,
-    }
-
-    next()
 }
 // Validated
 async function getPatientSensorData(req, res, next) {
@@ -4260,17 +4260,12 @@ async function updatePatientProcedure(req, res, next) {
 }
 
 async function getPatientInventory(req, res, next) {
-    let patients_list = []
-
     let given_pid = req.body.pid
     let tenant_id = req.body.tenantId
     let duration = 3
 
     try {
-        patients_list = await db_get_patient_inventory(req.body)
-        patients_list = JSON.stringify(patients_list)
-        patients_list = JSON.parse(patients_list)
-
+        const patients_list = await db_get_patient_inventory(req.body)
         const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
         const totalCount = await db_patient_count(tenant_id)
 
@@ -4292,7 +4287,6 @@ async function getPatientInventory(req, res, next) {
         logger.debug("Exception : %s", error)
         return next()
     }
-    
     return next()
 }
 
