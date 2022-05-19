@@ -522,9 +522,30 @@ async function db_get_patch_map_detail(params) {
     }
 }
 
+async function db_delete_patch_associated(params) {
+    try {
+        return await Patch_Patient_Map.destroy({
+            where: {
+                pid: params.list[0].pid,
+            },
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
-
-
+async function db_get_patch_associated(params) {
+    try {
+        return await Patch_Patient_Map.findAll({
+            where: {
+                pid: params.list[0].pid,
+            },
+            attributes: ['patch_uuid']
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
 module.exports = {
     db_get_patch_map_list,
@@ -534,5 +555,7 @@ module.exports = {
     clear_command,
     update_keepalive,
     db_create_patch_associate_one,
-    db_get_patch_map_detail
+    db_get_patch_map_detail,
+    db_delete_patch_associated,
+    db_get_patch_associated
 };
