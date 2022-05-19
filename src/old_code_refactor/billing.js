@@ -9,7 +9,9 @@ const {
     db_billing_exist,
     db_billing_pid_exist,
     db_update_billing_information,
-    db_get_patch_data
+    db_get_patch_data,
+    db_search_billing_id,
+    db_updated_task
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -81,9 +83,50 @@ const prepareDataForCreateBilling = (postData) => {
         }
         params = {time_spent: postData.time_spent};
     }
+    if(postData.code == constant.CPT_CODE.CPT_99457){
+        if(!postData.add_task_date || !postData.add_task_staff_name || !postData.add_task_note 
+            || !postData.add_task_id){
+                return false;
+        }
+        params = [{task_id: postData.add_task_id, task_date: postData.add_task_date, 
+            staff_name: postData.add_task_staff_name, task_note: postData.add_task_note}]
+    }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
     postData.params = JSON.stringify(params);
     return postData;
+}
+
+const prepareDataForUpdateBillingTask = (postData, billingData) => {
+    let result = [];
+    const date = new Date();
+    const params = JSON.parse(billingData[0].params);
+    if(postData.task_id){
+        const newData = {
+            task_id: postData.task_id,
+            task_date: postData.task_date,
+            staff_name: postData.staff_name,
+            task_note: postData.task_note,
+            task_time_spend: postData.task_time_spent
+        }
+        result = params.map(item => {
+            if(item.task_id == postData.task_id){
+                return newData
+            } else {
+                return item
+            }
+        })
+    } else {
+        const newData = {
+            task_id: date.getTime(),
+            task_date: postData.task_date,
+            staff_name: postData.staff_name,
+            task_note: postData.task_note,
+            task_time_spend: postData.task_time_spent
+        }
+        params.push(newData);
+        result = params;
+    }
+    return JSON.stringify(result);
 }
 
 async function createBilling(req, res, next) {
@@ -106,7 +149,6 @@ async function createBilling(req, res, next) {
     }
 
     let billing_data= prepareDataForCreateBilling(req.body);
-    console.log(billing_data.bill_date);
     if(!billing_data){
         req.apiRes = BILLING_CODE["4"]
         req.apiRes["error"] = {
@@ -134,6 +176,67 @@ async function createBilling(req, res, next) {
     req.apiRes["response"] = {
         billingData: billing,
         count: billing.length,
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function updateBillingTask(req, res, next) {
+    const t = await sequelizeDB.transaction();
+    let result;
+    const pid = req.body.pid;
+    const billingId = req.body.billing_id;
+    if(!pid || !billingId){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Invalid params",
+        }
+        return next();
+    }
+    const existPid = await db_patient_exist(null, pid);
+    const existBilling = await db_search_billing_id(req.body);
+    if(!existPid){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Patient Id is no longer exist",
+        }
+        return next();
+    }
+
+    if(!existBilling){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Billing is no longer exist",
+        }
+        return next();
+    }
+
+    let billingTaskData= prepareDataForUpdateBillingTask(req.body, existBilling);
+    if(!billingTaskData){
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "Invalid params",
+        }
+        return next();
+    }
+    try {
+        result = await sequelizeDB.transaction(async function (t) {
+            return db_updated_task(billingTaskData, billingId, {
+                transaction: t,
+            })
+        })
+    } catch (err) {
+        logger.debug("Billing list error " + err)
+        req.apiRes = BILLING_CODE["4"]
+        req.apiRes["error"] = {
+            error: "ERROR IN Update THE BILLING",
+        }
+        console.log(err);
+        return next()
+    }
+    req.apiRes = BILLING_CODE["3"] 
+    req.apiRes["response"] = {
+        billingData: result
     }
     res.response(req.apiRes)
     return next()
@@ -246,5 +349,6 @@ module.exports = {
     updateBilling,
     getBilling,
     getBillingData,
-    updateBillingInformation
+    updateBillingInformation,
+    updateBillingTask
 }
