@@ -50,6 +50,7 @@ const getUUID = require("../../lib/system/uuidSystem").getUUID
 const PATIENT_CODE = require("../../lib/constants/AppEnum").PATIENT_CODE
 const PATCH_CODE = require("../../lib/constants/AppEnum").PATCH_CODE
 const LOCATION_CODE = require("../../lib/constants/AppEnum").LOCATION_CODE
+const ASSOCIATE_CODE = require("../../lib/constants/AppEnum").ASSOCIATE_CODE
 const PATCH_PATIENT_MAP_CODE =
     require("../../lib/constants/AppEnum").PATCH_PATIENT_MAP_CODE
 
@@ -94,6 +95,7 @@ const {
     db_get_patch_map_detail,
     db_delete_patch_associated,
     db_get_patch_associated,
+    db_delete_each_device,
 
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
@@ -4269,6 +4271,14 @@ async function getPatientInventory(req, res, next) {
     return next()
 }
 
+async function patientActions(req, res, next) {
+    if(req.body.action === 'unassociate'){
+        return unassociatePatient(req, res, next)
+    }
+
+    return disablePatient(req, res, next)
+}
+
 async function disablePatient(req, res, next) {
     let data
     try {
@@ -4294,6 +4304,23 @@ async function disablePatient(req, res, next) {
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["11"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function unassociatePatient(req, res, next) {
+    try {
+        await db_delete_each_device(req.body)
+        await db_update_patch_register([req.body.patch_uuid])
+        req.apiRes = ASSOCIATE_CODE["1"]
+        req.apiRes["response"] = { unassociate: true }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = ASSOCIATE_CODE["0"]
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
         return next()
@@ -4353,5 +4380,5 @@ module.exports = {
     updatePatientProcedure,
     registerPatientInventory,
     getPatientInventory,
-    disablePatient,
+    patientActions,
 }

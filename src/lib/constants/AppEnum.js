@@ -120,6 +120,22 @@ let TENANT_CODE = {
     },
 }
 
+let ASSOCIATE_CODE = {
+    0: {
+        Code: "UNASSOCIATE_FAILED",
+        HttpStatus: "470",
+        Message: "Unassociate falied",
+        Details: {},
+    },
+    1: {
+        Code: "UNASSOCIATE_SUCCESS",
+        HttpStatus: "200",
+        Message: "Unassociated successful",
+        Details: {},
+    },
+}
+
+
 let PATIENT_CODE = {
     1: {
         Code: "FETCH_PATIENT_INVENTORY_FAILURE",
@@ -1496,5 +1512,6 @@ module.exports = {
     TASK_CODE,
     PASSWORD_CODE,
     PROFILE_CODE,
-    DEVICE_CODE
+    DEVICE_CODE,
+    ASSOCIATE_CODE
 }
