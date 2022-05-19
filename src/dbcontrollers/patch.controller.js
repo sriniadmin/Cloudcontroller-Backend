@@ -707,6 +707,27 @@ async function db_delete_patch(params) {
     return data
 }
 
+async function db_update_patch_register(params) {
+    let promises = []
+    params.forEach(obj => {
+        promises.push(
+            Patches.update(
+                { in_use: 'false' },
+                { where: {patch_uuid: obj}}
+            )
+        )
+    });
+
+    await Promise.all(promises)
+    .then((result) => {
+        return result
+    })
+    .catch((error) => {
+        console.log(error)
+        throw new Error(error)
+    })
+}
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -722,5 +743,6 @@ module.exports = {
     db_check_patch_exist,
     db_get_patch_select_boxes,
     db_delete_patch,
-    db_get_patch_saas
+    db_get_patch_saas,
+    db_update_patch_register
 }
