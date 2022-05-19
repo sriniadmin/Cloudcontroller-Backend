@@ -534,6 +534,18 @@ async function db_delete_patch_associated(params) {
     }
 }
 
+async function db_delete_each_device(params) {
+    try {
+        return await Patch_Patient_Map.destroy({
+            where: {
+                patch_uuid: params.patch_uuid,
+            },
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 async function db_get_patch_associated(params) {
     try {
         return await Patch_Patient_Map.findAll({
@@ -557,5 +569,6 @@ module.exports = {
     db_create_patch_associate_one,
     db_get_patch_map_detail,
     db_delete_patch_associated,
-    db_get_patch_associated
+    db_get_patch_associated,
+    db_delete_each_device
 };
