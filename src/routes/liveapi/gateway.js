@@ -101,7 +101,7 @@ router.post("/push_data", async function (req, res, next) {
         if(req.body.deviceType === 'Temperature'){
 
             //Temperature
-            const point1 = new Point(`${req.body.patientUUID}_Temperature`)
+            const point1 = new Point(`${req.body.patientUUID}temp`)
             .tag('deviceModel', req.body.deviceModel)
             .tag('deviceName', req.body.deviceName)
             .tag('deviceSN', req.body.deviceSN)
@@ -109,7 +109,7 @@ router.post("/push_data", async function (req, res, next) {
             writeApi.writePoint(point1)
 
             //Battery
-            const point2 = new Point(`${req.body.patientUUID}_Temperature_battery`)
+            const point2 = new Point(`${req.body.patientUUID}temp_battery`)
             .tag('deviceModel', req.body.deviceModel)
             .tag('deviceName', req.body.deviceName)
             .tag('deviceSN', req.body.deviceSN)
@@ -123,7 +123,7 @@ router.post("/push_data", async function (req, res, next) {
             else{
                 req.body.flash = 0
             }
-            const point3 = new Point(`${req.body.patientUUID}_Temperature_flash`)
+            const point3 = new Point(`${req.body.patientUUID}temp_flash`)
             .tag('deviceModel', req.body.deviceModel)
             .tag('deviceName', req.body.deviceName)
             .tag('deviceSN', req.body.deviceSN)
@@ -131,7 +131,7 @@ router.post("/push_data", async function (req, res, next) {
             writeApi.writePoint(point3)
 
             //Charging Status
-            const point4 = new Point(`${req.body.patientUUID}_Temperature_charging_status`)
+            const point4 = new Point(`${req.body.patientUUID}temp_charging_status`)
             .tag('deviceModel', req.body.deviceModel)
             .tag('deviceName', req.body.deviceName)
             .tag('deviceSN', req.body.deviceSN)
