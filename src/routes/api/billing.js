@@ -5,6 +5,7 @@ var {
     getBilling,
     updateBilling,
     updateBillingInformation,
+    updateBillingTask
 } = require("../../old_code_refactor/billing")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
@@ -86,6 +87,26 @@ router.get("/", getBilling, apiFinalProcess)
  */
 
 router.post("/", createBilling, apiFinalProcess)
+
+/**
+ * @openapi
+ * /api/billing/task:
+ *   post:
+ *       tags:
+ *         - Billing
+ *       summary: Update task for billing
+ *       requestBody:
+ *         description: Update task for billing 99457 99458
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Billing'
+ *       responses:
+ *         '201':
+ *           description: Billing  Information is added.
+ */
+router.post("/task", updateBillingTask, apiFinalProcess)
 
 /**
  * @openapi

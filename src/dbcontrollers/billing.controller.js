@@ -286,6 +286,51 @@ async function db_billing_exist(pid) {
     return billing_data
 }
 
+async function db_updated_task(params, billing_id) {
+    try {
+        const result = await Billing.update(
+          { params: params },
+          { where: {id: billing_id } }
+        )
+        return result;
+      } catch (err) {
+        throw new Error("Billing  " + billing_id + "not found Err:" + err)
+      }
+}
+
+async function db_search_billing_id(postData) {
+    let billing_data
+    try {
+        billing_data = await Billing.findAll({
+            where: {
+                [Op.and]: [
+                    {
+                        pid: postData.pid
+                    },
+                    {
+                        id: postData.billing_id
+                    },
+                    {
+                        code: postData.code
+                    },
+                    {
+                        bill_date: {
+                            [Op.gte]: moment(postData.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        },
+                        bill_date: {
+                            [Op.lte]: moment(postData.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        },
+                    },
+                ],
+            },
+            raw: true,
+        })
+    } catch (err) {
+        throw new Error("Billing  " + postData.pid + "not found Err:" + err)
+    }
+    return billing_data
+}
+
 async function db_update_billing_information(tenant_id, billing_data, given_pid,transaction) {
     let { pid } = given_pid
     billing_data = JSON.stringify(billing_data)
@@ -322,5 +367,7 @@ module.exports = {
     db_billing_exist,
     db_billing_pid_exist,
     db_update_billing_information,
+    db_search_billing_id,
+    db_updated_task,
     db_get_patch_data
 }
