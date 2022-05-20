@@ -49,7 +49,7 @@ const {
     createPatientProcedure,
     getPatientProcedure,
     updatePatientProcedure,
-    disablePatient
+    patientActions
 } = require("../../business_logic/routes/patient")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse");
 
@@ -1161,7 +1161,7 @@ router.delete("/:pid", deletePatient, apiFinalProcess)
  *               type: uuid
  *            description: The uuid of specific patient
  */
- router.delete("/", disablePatient, apiFinalProcess)
+ router.delete("/", patientActions, apiFinalProcess)
 
 
 /**

@@ -50,6 +50,7 @@ const getUUID = require("../../lib/system/uuidSystem").getUUID
 const PATIENT_CODE = require("../../lib/constants/AppEnum").PATIENT_CODE
 const PATCH_CODE = require("../../lib/constants/AppEnum").PATCH_CODE
 const LOCATION_CODE = require("../../lib/constants/AppEnum").LOCATION_CODE
+const ASSOCIATE_CODE = require("../../lib/constants/AppEnum").ASSOCIATE_CODE
 const PATCH_PATIENT_MAP_CODE =
     require("../../lib/constants/AppEnum").PATCH_PATIENT_MAP_CODE
 
@@ -83,6 +84,7 @@ const {
     db_patch_exist,
     db_check_patch_exist,
     db_get_patch,
+    db_update_patch_register
 } = require("../../dbcontrollers/patch.controller")
 const {
     db_create_patch_associate,
@@ -91,7 +93,9 @@ const {
     db_delete_patch_patient_map,
     db_create_patch_associate_one,
     db_get_patch_map_detail,
-
+    db_delete_patch_associated,
+    db_get_patch_associated,
+    db_delete_each_device,
 
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
@@ -802,29 +806,6 @@ async function deletePatient(req, res, next) {
     req.apiRes = TRANSACTION_CODE["2"]
     req.apiRes["response"] = {}
 
-    return next()
-}
-
-async function disablePatient(req, res, next) {
-    let data
-    try {
-        data = await db_disable_patient(req.body)
-        if(data[0][0] === 1){
-            req.apiRes = PATIENT_CODE["9"]
-            req.apiRes["response"] = { delete: true }
-        }
-        else{
-            req.apiRes = PATIENT_CODE["10"]
-            req.apiRes["response"] = { delete: false }
-        }
-    } catch (error) {
-        console.log(error)
-        req.apiRes = PATIENT_CODE["11"]
-        req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
-    }
-    res.response(req.apiRes)
     return next()
 }
 
@@ -4290,6 +4271,64 @@ async function getPatientInventory(req, res, next) {
     return next()
 }
 
+async function patientActions(req, res, next) {
+    if(req.body.action === 'unassociate'){
+        return unassociatePatient(req, res, next)
+    }
+
+    return disablePatient(req, res, next)
+}
+
+async function disablePatient(req, res, next) {
+    let data
+    try {
+        data = await db_disable_patient(req.body)
+        if(data[0][0] === 1){
+            //chnage process later
+            let list = []
+            const associated_patches = await db_get_patch_associated(req.body)
+            if(associated_patches.length > 0){
+                associated_patches.forEach(obj => {
+                    list.push(obj.dataValues.patch_uuid)
+                });
+                await db_delete_patch_associated(req.body)
+            }
+            await db_update_patch_register(list)
+            req.apiRes = PATIENT_CODE["9"]
+            req.apiRes["response"] = { delete: true }
+        }
+        else{
+            req.apiRes = PATIENT_CODE["10"]
+            req.apiRes["response"] = { delete: false }
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["11"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function unassociatePatient(req, res, next) {
+    try {
+        await db_delete_each_device(req.body)
+        await db_update_patch_register([req.body.patch_uuid])
+        req.apiRes = ASSOCIATE_CODE["1"]
+        req.apiRes["response"] = { unassociate: true }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = ASSOCIATE_CODE["0"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 module.exports = {
     createPatientInBulk,
     // patientInventory,
@@ -4341,5 +4380,5 @@ module.exports = {
     updatePatientProcedure,
     registerPatientInventory,
     getPatientInventory,
-    disablePatient
+    patientActions,
 }
