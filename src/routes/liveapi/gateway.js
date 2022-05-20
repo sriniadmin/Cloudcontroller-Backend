@@ -19,7 +19,9 @@ const { db_get_patch_map_list, clear_command,
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 
-const global_variable = require('../../../globle-config/global-variable');
+// const global_variable = require('../../../globle-config/global-variable');
+const {InfluxDB, Point} = require('@influxdata/influxdb-client')
+
 /**
  * @openapi
  *  components:
@@ -88,60 +90,113 @@ const global_variable = require('../../../globle-config/global-variable');
  */
 
 //TODO: Make it Http1.1
-
 router.post("/push_data", async function (req, res, next) {
-    logger.debug("Kafka received data is ", req.body["patientUUID"])
-    const { Kafka } = require("kafkajs")
-    const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
-    const topic = req.body["patientUUID"]
-    const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
-    logger.debug("Created kakfa handle", req.body)
-    let producer
     try {
-        producer = kafka.producer()
-        logger.debug("Created kakfa handle sending", producer)
-    } catch (error) {
-        logger.debug("Kafka Creation failed", error)
-    }
+        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
+        const org = 'live247'
+        const bucket = 'emr_dev'
 
-    var sendMessage = async () => {
-        // try {
-        await producer.connect()
-        await producer.send({
-            topic: topic,
-            messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
-        })
-        await producer.disconnect()
+        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const writeApi = client.getWriteApi(org, bucket)
+        if(req.body.deviceType === 'Temperature'){
 
+            //Temperature
+            const point1 = new Point(`${req.body.patientUUID}_Temperature`)
+            .tag('deviceModel', req.body.deviceModel)
+            .tag('deviceName', req.body.deviceName)
+            .tag('deviceSN', req.body.deviceSN)
+            .floatField('temp', req.body.temp)
+            writeApi.writePoint(point1)
 
-        //Passing data to UI via socket.io
-        const data = {
-            time: new Date(),
-            originalUrl: req.originalUrl,
-            body: req.body
+            //Battery
+            const point2 = new Point(`${req.body.patientUUID}_Temperature_battery`)
+            .tag('deviceModel', req.body.deviceModel)
+            .tag('deviceName', req.body.deviceName)
+            .tag('deviceSN', req.body.deviceSN)
+            .floatField('battery', req.body.battery)
+            writeApi.writePoint(point2)
 
+            //Flash
+            if(req.body.flash === false){
+                req.body.flash = 1
+            }
+            else{
+                req.body.flash = 0
+            }
+            const point3 = new Point(`${req.body.patientUUID}_Temperature_flash`)
+            .tag('deviceModel', req.body.deviceModel)
+            .tag('deviceName', req.body.deviceName)
+            .tag('deviceSN', req.body.deviceSN)
+            .floatField('flash', req.body.flash)
+            writeApi.writePoint(point3)
+
+            //Charging Status
+            const point4 = new Point(`${req.body.patientUUID}_Temperature_charging_status`)
+            .tag('deviceModel', req.body.deviceModel)
+            .tag('deviceName', req.body.deviceName)
+            .tag('deviceSN', req.body.deviceSN)
+            .floatField('chargingStatus', req.body.chargingStatus)
+            writeApi.writePoint(point4)
         }
-        if(global_variable.socket){
-            global_variable.socket.emit('SENSOR_LOG', data)
-        }
-
-        // }
-        // catch(error) {
-        //   logger.debug("Error in Sending message in Ka",error)
-        //   await producer.disconnect()
-        // }
-    }
-    logger.debug("Kakfa Send message")
-    try {
-        sendMessage()
+        return res.status(200).json({ pushData: "Success" })
     } catch (error) {
-        logger.debug("Error in Sending message in Ka", error)
-        await producer.disconnect()
+        return res.status(500).json({ ERROR: error })
     }
-    logger.debug("Kakfa Sent Message")
-    return res.status(200).json({ pushData: "Success" })
 })
+
+// router.post("/push_data", async function (req, res, next) {
+//     logger.debug("Kafka received data is ", req.body["patientUUID"])
+//     const { Kafka } = require("kafkajs")
+//     const clientId = "my-app"
+//     const brokers = [process.env.KAFKA_BROKER + ":9092"]
+//     const topic = req.body["patientUUID"]
+//     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
+//     logger.debug("Created kakfa handle", req.body)
+//     let producer
+//     try {
+//         producer = kafka.producer()
+//         logger.debug("Created kakfa handle sending", producer)
+//     } catch (error) {
+//         logger.debug("Kafka Creation failed", error)
+//     }
+
+//     var sendMessage = async () => {
+//         // try {
+//         await producer.connect()
+//         await producer.send({
+//             topic: topic,
+//             messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
+//         })
+//         await producer.disconnect()
+
+
+//         //Passing data to UI via socket.io
+//         const data = {
+//             time: new Date(),
+//             originalUrl: req.originalUrl,
+//             body: req.body
+
+//         }
+//         if(global_variable.socket){
+//             global_variable.socket.emit('SENSOR_LOG', data)
+//         }
+
+//         // }
+//         // catch(error) {
+//         //   logger.debug("Error in Sending message in Ka",error)
+//         //   await producer.disconnect()
+//         // }
+//     }
+//     logger.debug("Kakfa Send message")
+//     try {
+//         sendMessage()
+//     } catch (error) {
+//         logger.debug("Error in Sending message in Ka", error)
+//         await producer.disconnect()
+//     }
+//     logger.debug("Kakfa Sent Message")
+//     return res.status(200).json({ pushData: "Success" })
+// })
 
 /**
  * @openapi
