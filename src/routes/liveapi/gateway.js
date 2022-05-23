@@ -70,119 +70,7 @@ const {InfluxDB, Point} = require('@influxdata/influxdb-client')
  *         default: ""
  */
 
-/**
- * @openapi
- *  /liveapi/gateway/push_data:
- *   post:
- *       tags:
- *         - Gateway
- *       summary: Receive data from gateway - like watch, mobile , band etc
- *       requestBody:
- *         description: Receive data from gateway - like watch, mobile , band etc
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/gateway_config'
- *       responses:
- *         '201':
- *           description: User  Information is added.
- */
 
-//TODO: Make it Http1.1
-router.post("/push_data", async function (req, res, next) {
-    try {
-        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
-        const org = 'live247'
-        const bucket = 'emr_dev'
-
-        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
-        const writeApi = client.getWriteApi(org, bucket)
-
-        //Passing data to UI via socket.io
-        if(global_variable.socket){
-            const data = {
-                time: new Date(),
-                originalUrl: req.originalUrl,
-                body: req.body
-    
-            }
-            global_variable.socket.emit('SENSOR_LOG', data)
-        }
-
-        //Checking required params
-        const g_params = ['patientUUID', 'deviceType']
-            let g_message = 'Missing or Invalid '
-            let g_flg = false
-
-            g_params.forEach(obj => {
-                if(!req.body[obj]){
-                    g_flg = true
-                    g_message += `${obj} `
-                }
-            });
-
-            if(g_flg){
-                return res.status(470).json({ Message: g_message })
-            }
-
-        //Sensor Temperature
-        if('temperature' === (req.body.deviceType).toLowerCase()){
-            const params = ['deviceId', 'value', 'battery']
-            let message = 'Missing or Invalid '
-            let flg = false
-
-            params.forEach(obj => {
-                if(!req.body[obj]){
-                    flg = true
-                    message += `${obj} `
-                }
-            });
-
-            if(flg){
-                return res.status(470).json({ Message: message })
-            }
-
-            //Temperature
-            const point1 = new Point(`${req.body.patientUUID}_temp`)
-            .tag('deviceModel', 'Temperature')
-            .tag('deviceSN', req.body.deviceId)
-            .floatField('temp', req.body.value)
-            writeApi.writePoint(point1)
-
-            //Battery
-            const point2 = new Point(`${req.body.patientUUID}_temp_battery`)
-            .tag('deviceModel', 'Temperature')
-            .tag('deviceSN', req.body.deviceId)
-            .floatField('battery', req.body.battery)
-            writeApi.writePoint(point2)
-
-            //Flash
-            if(req.body.flash === false){
-                req.body.flash = 1
-            }
-            else{
-                req.body.flash = 0
-            }
-            const point3 = new Point(`${req.body.patientUUID}_temp_flash`)
-            .tag('deviceModel', 'Temperature')
-            .tag('deviceSN', req.body.deviceId)
-            .floatField('flash', req.body.flash)
-            writeApi.writePoint(point3)
-
-            // //Charging Status
-            // const point4 = new Point(`${req.body.patientUUID}_temp_charging_status`)
-            // .tag('deviceModel', req.body.deviceModel)
-            // .tag('deviceName', req.body.deviceName)
-            // .tag('deviceSN', req.body.deviceSN)
-            // .floatField('chargingStatus', req.body.chargingStatus)
-            // writeApi.writePoint(point4)
-        }
-        return res.status(200).json({ pushData: "Success" })
-    } catch (error) {
-        return res.status(500).json({ ERROR: error })
-    }
-})
 
 // router.post("/push_data", async function (req, res, next) {
 //     logger.debug("Kafka received data is ", req.body["patientUUID"])
@@ -691,5 +579,200 @@ router.post("/gateway_register", async function (req, res, next) {
             })
         })
 })
+
+
+
+/**
+ * @openapi
+ *  /liveapi/gateway/push_data:
+ *   post:
+ *       tags:
+ *         - Gateway
+ *       summary: Receive data from gateway - like watch, mobile , band etc
+ *       requestBody:
+ *         description: Receive data from gateway - like watch, mobile , band etc
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/gateway_config'
+ *       responses:
+ *         '201':
+ *           description: User  Information is added.
+ */
+
+//TODO: Make it Http1.1
+router.post("/push_data", async function (req, res, next) {
+    try {
+        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
+        const org = 'live247'
+        const bucket = 'emr_dev'
+
+        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const writeApi = client.getWriteApi(org, bucket)
+
+        //Passing data to UI via socket.io
+        if(global_variable.socket){
+            const data = {
+                time: new Date(),
+                originalUrl: req.originalUrl,
+                body: req.body
+    
+            }
+            global_variable.socket.emit('SENSOR_LOG', data)
+        }
+
+        //Checking required params
+        const g_list = ['patientUUID', 'deviceType']
+
+            const g_active = checkParams({list:g_list, data: req.body})
+            if(true === g_active.flg){
+                return res.status(470).json({ Message: g_active.message })
+            }
+
+        //Sensor Temperature
+        if('temperature' === (req.body.deviceType).toLowerCase()){
+            const list = ['deviceId', 'value', 'battery']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            temperature(writeApi, req.body)
+        }
+        else if('bodyfatscale' === (req.body.deviceType).toLowerCase()){
+            const list = ['weight']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            bodyFatScale(writeApi, req.body)
+        }
+        else if('urionbp' === (req.body.deviceType).toLowerCase()){
+            const list = ['bpd', 'bps']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            urionBP(writeApi, req.body)
+        }
+        else if('bp' === (req.body.deviceType).toLowerCase()){
+            const list = ['dia', 'sys']
+
+            const active = checkParams({list:list, data: req.body, type: 'rakesh'})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            bp(writeApi, req.body)
+        }
+        return res.status(200).json({ pushData: "Success" })
+        
+    } catch (error) {
+        return res.status(500).json({ ERROR: error })
+    }
+})
+
+function checkParams(params) {
+    let message = 'Missing or Invalid '
+    let flg = false
+    let checkOjb = params.data
+
+    if(params.type === 'rakesh'){
+        if(!params.data.battery){
+            flg = true
+            message += 'battery '
+        }
+        checkOjb = params.data.data.extras
+    }
+
+    params.list.forEach(obj => {
+        if(!checkOjb[obj]){
+            flg = true
+            message += `${obj} `
+        }
+    });
+
+    return {
+        flg: flg,
+        message: message
+    }
+}
+
+
+function temperature(writeApi, data) {
+    //Temperature
+    const point1 = new Point(`${data.patientUUID}_temp`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('temp', data.value)
+    writeApi.writePoint(point1)
+
+    //Battery
+    const point2 = new Point(`${data.patientUUID}_temp_battery`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('battery', data.battery)
+    writeApi.writePoint(point2)
+
+    //Flash
+    if(data.flash === false){
+        data.flash = 1
+    }
+    else{
+        data.flash = 0
+    }
+    const point3 = new Point(`${data.patientUUID}_temp_flash`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('flash', data.flash)
+    writeApi.writePoint(point3)
+}
+
+function bodyFatScale(writeApi, data) {
+
+    //Weight
+    const point1 = new Point(`${data.patientUUID}_weight`)
+    .tag('deviceModel', 'Weight')
+    .floatField('weight', data.weight)
+    writeApi.writePoint(point1)
+}
+
+function urionBP(writeApi, data) {
+
+    //bpd
+    const point1 = new Point(`${data.patientUUID}_alphamed_bpd`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bpd', data.bpd)
+    writeApi.writePoint(point1)
+
+    //bps
+    const point2 = new Point(`${data.patientUUID}_alphamed_bps`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bps', data.bps)
+    writeApi.writePoint(point2)
+}
+
+function bp(writeApi, data) {
+
+    //bpd
+    const point1 = new Point(`${data.patientUUID}_ihealth_bpd`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bpd', data.data.extras.dia)
+    writeApi.writePoint(point1)
+
+    //bps
+    const point2 = new Point(`${data.patientUUID}_ihealth_bps`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bps', data.data.extras.sys)
+    writeApi.writePoint(point2)
+
+    //battery
+    const point3 = new Point(`${data.patientUUID}_ihealth_battery`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('battery', data.battery)
+    writeApi.writePoint(point3)
+}
 
 module.exports = router
