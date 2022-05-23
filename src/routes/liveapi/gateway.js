@@ -19,7 +19,7 @@ const { db_get_patch_map_list, clear_command,
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 
-// const global_variable = require('../../../globle-config/global-variable');
+const global_variable = require('../../../globle-config/global-variable');
 const {InfluxDB, Point} = require('@influxdata/influxdb-client')
 
 /**
@@ -98,6 +98,17 @@ router.post("/push_data", async function (req, res, next) {
 
         const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
         const writeApi = client.getWriteApi(org, bucket)
+
+        //Passing data to UI via socket.io
+        if(global_variable.socket){
+            const data = {
+                time: new Date(),
+                originalUrl: req.originalUrl,
+                body: req.body
+    
+            }
+            global_variable.socket.emit('SENSOR_LOG', data)
+        }
 
         //Checking required params
         const g_params = ['patientUUID', 'deviceType']
