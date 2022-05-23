@@ -98,21 +98,51 @@ router.post("/push_data", async function (req, res, next) {
 
         const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
         const writeApi = client.getWriteApi(org, bucket)
-        if(req.body.deviceType === 'Temperature'){
+
+        //Checking required params
+        const g_params = ['patientUUID', 'deviceType']
+            let g_message = 'Missing or Invalid '
+            let g_flg = false
+
+            g_params.forEach(obj => {
+                if(!req.body[obj]){
+                    g_flg = true
+                    g_message += `${obj} `
+                }
+            });
+
+            if(g_flg){
+                return res.status(470).json({ Message: g_message })
+            }
+
+        //Sensor Temperature
+        if('temperature' === (req.body.deviceType).toLowerCase()){
+            const params = ['deviceId', 'value', 'battery']
+            let message = 'Missing or Invalid '
+            let flg = false
+
+            params.forEach(obj => {
+                if(!req.body[obj]){
+                    flg = true
+                    message += `${obj} `
+                }
+            });
+
+            if(flg){
+                return res.status(470).json({ Message: message })
+            }
 
             //Temperature
             const point1 = new Point(`${req.body.patientUUID}_temp`)
-            .tag('deviceModel', req.body.deviceModel)
-            .tag('deviceName', req.body.deviceName)
-            .tag('deviceSN', req.body.deviceSN)
-            .floatField('temp', req.body.temp)
+            .tag('deviceModel', 'Temperature')
+            .tag('deviceSN', req.body.deviceId)
+            .floatField('temp', req.body.value)
             writeApi.writePoint(point1)
 
             //Battery
             const point2 = new Point(`${req.body.patientUUID}_temp_battery`)
-            .tag('deviceModel', req.body.deviceModel)
-            .tag('deviceName', req.body.deviceName)
-            .tag('deviceSN', req.body.deviceSN)
+            .tag('deviceModel', 'Temperature')
+            .tag('deviceSN', req.body.deviceId)
             .floatField('battery', req.body.battery)
             writeApi.writePoint(point2)
 
@@ -124,19 +154,18 @@ router.post("/push_data", async function (req, res, next) {
                 req.body.flash = 0
             }
             const point3 = new Point(`${req.body.patientUUID}_temp_flash`)
-            .tag('deviceModel', req.body.deviceModel)
-            .tag('deviceName', req.body.deviceName)
-            .tag('deviceSN', req.body.deviceSN)
+            .tag('deviceModel', 'Temperature')
+            .tag('deviceSN', req.body.deviceId)
             .floatField('flash', req.body.flash)
             writeApi.writePoint(point3)
 
-            //Charging Status
-            const point4 = new Point(`${req.body.patientUUID}_temp_charging_status`)
-            .tag('deviceModel', req.body.deviceModel)
-            .tag('deviceName', req.body.deviceName)
-            .tag('deviceSN', req.body.deviceSN)
-            .floatField('chargingStatus', req.body.chargingStatus)
-            writeApi.writePoint(point4)
+            // //Charging Status
+            // const point4 = new Point(`${req.body.patientUUID}_temp_charging_status`)
+            // .tag('deviceModel', req.body.deviceModel)
+            // .tag('deviceName', req.body.deviceName)
+            // .tag('deviceSN', req.body.deviceSN)
+            // .floatField('chargingStatus', req.body.chargingStatus)
+            // writeApi.writePoint(point4)
         }
         return res.status(200).json({ pushData: "Success" })
     } catch (error) {
