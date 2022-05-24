@@ -689,11 +689,29 @@ router.post("/push_data", async function (req, res, next) {
         else if('bp' === (req.body.deviceType).toLowerCase()){
             const list = ['dia', 'sys']
 
-            const active = checkParams({list:list, data: req.body, type: 'rakesh'})
+            const active = checkParams({list:list, data: req.body, type: 'rk'})
             if(true === active.flg){
                 return res.status(470).json({ Message: active.message })
             }
             bp(writeApi, req.body)
+        }
+        else if('checkme_o2' === (req.body.deviceType).toLowerCase()){
+            const list = ['spo2', 'battery']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            checkme_O2(writeApi, req.body)
+        }
+        else if('vv330' === (req.body.deviceType).toLowerCase()){
+            const list = ['gwBattery']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            vv330(writeApi, req.body)
         }
         return res.status(200).json({ pushData: "Success" })
         
@@ -707,7 +725,7 @@ function checkParams(params) {
     let flg = false
     let checkOjb = params.data
 
-    if(params.type === 'rakesh'){
+    if(params.type === 'rk'){
         if(!params.data.battery){
             flg = true
             message += 'battery '
@@ -800,6 +818,48 @@ function bp(writeApi, data) {
     const point3 = new Point(`${data.patientUUID}_ihealth_battery`)
     .tag('deviceModel', 'Blood Pressure')
     .floatField('battery', data.battery)
+    writeApi.writePoint(point3)
+}
+
+function checkme_O2(writeApi, data) {
+
+    //Spo2
+    const point1 = new Point(`${data.patientUUID}_spo2`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('spo2', data.spo2)
+    writeApi.writePoint(point1)
+
+    //battery
+    const point3 = new Point(`${data.patientUUID}_spo2_battery`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('battery', data.battery)
+    writeApi.writePoint(point3)
+}
+
+function vv330(writeApi, data) {
+
+    //Spo2
+    const point1 = new Point(`${data.patientUUID}_ecg`)
+    .tag('deviceModel', 'Ecg')
+    .floatField('ecg', data.spo2)
+    writeApi.writePoint(point1)
+
+    //HR
+    const point2 = new Point(`${data.patientUUID}_ecg_hr`)
+    .tag('deviceModel', 'Ecg')
+    .floatField('hr', data.extras.HR)
+    writeApi.writePoint(point2)
+
+    //RR
+    const point4 = new Point(`${data.patientUUID}_ecg_rr`)
+    .tag('deviceModel', 'Ecg')
+    .floatField('rr', data.extras.RR)
+    writeApi.writePoint(point4)
+
+    //battery
+    const point3 = new Point(`${data.patientUUID}_ecg_battery`)
+    .tag('deviceModel', 'Ecg')
+    .floatField('battery', data.gwBattery)
     writeApi.writePoint(point3)
 }
 
