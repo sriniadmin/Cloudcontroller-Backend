@@ -559,6 +559,17 @@ async function db_get_patch_associated(params) {
     }
 }
 
+async function db_get_pid_associated(params) {
+    try {
+        return await Patch_Patient_Map.findOne({
+            attributes: ['pid'],
+            where: { patch_uuid: params },
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_patch_map_list,
     db_create_patch_associate,
@@ -570,5 +581,6 @@ module.exports = {
     db_get_patch_map_detail,
     db_delete_patch_associated,
     db_get_patch_associated,
-    db_delete_each_device
+    db_delete_each_device,
+    db_get_pid_associated
 };

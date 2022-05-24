@@ -728,6 +728,17 @@ async function db_update_patch_register(params) {
     })
 }
 
+async function db_get_device_id(params) {
+    try {
+        return await Patches.findOne({
+            attributes: ['patch_uuid'],
+            where: {patch_serial: params},
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -744,5 +755,6 @@ module.exports = {
     db_get_patch_select_boxes,
     db_delete_patch,
     db_get_patch_saas,
-    db_update_patch_register
+    db_update_patch_register,
+    db_get_device_id,
 }

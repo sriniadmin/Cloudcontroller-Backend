@@ -8,13 +8,16 @@ const klogger = log4js.getLogger('liveapi');
 const rlogger = log4js.getLogger('liveapiReg');
 
 const patient_controller = require("../../dbcontrollers/patients.controller")
+const { db_get_device_id } = require("../../dbcontrollers/patch.controller")
 const redisClient = require("../../external_services/redis/cache_service/redis_client")
 const { otpverify } = require("../../../src/business_logic/routes/patient")
 const db_patient_exist = patient_controller.db_patient_exist
 const db_check_patient_exist = patient_controller.db_check_patient_exist
 const { db_patch_exist } = require("../../dbcontrollers/patch.controller")
-const { db_get_patch_map_list, clear_command,
-    update_keepalive } =
+const { db_get_patch_map_list, 
+    clear_command,
+    update_keepalive,
+    db_get_pid_associated } =
     require("../../dbcontrollers/patch_patient.controller")
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
@@ -499,20 +502,45 @@ router.post("/gateway_register", async function (req, res, next) {
             return next()
         }
     } else if (watch_imei) {
-        let params={}
-        params['sn'] = watch_imei
-        otpVal = await db_get_patch_map_list(tenant_id,"",params)
-        rlogger.debug("THE IMEIVAL PID IS", otpVal)
-        if (!otpVal) {
-            logger.debug("THE IMEI DOES NOT MATCH")
-            res.status(470).json({ error: "Please provide the valid IMEI" });
-            return next()
+
+        let obj = await db_get_device_id(watch_imei)
+        if(!obj){
+            return res.status(470).json({
+                result: 'IMEI IS NOT FOUND',
+                response: {},
+                error: { errMessage: 'IMEI IS NOT FOUND' },
+                privilege: {},
+            })
         }
-        if(otpVal.length > 0) {
-            otpVal = otpVal[0]["pid"]
+
+        let data = await db_get_pid_associated(obj.dataValues.patch_uuid)
+        if(!data){
+            return res.status(470).json({
+                result: 'THER IS NO DEVICE ASSOCIATED FOR THIS IMEI',
+                response: {},
+                error: { errMessage: 'THER IS NO DEVICE ASSOCIATED FOR THIS IMEI' },
+                privilege: {},
+            })
         }
+        return res.status(200).json({
+            result: 'SUCCESSFUL',
+            response: {patientUUID: data.dataValues.pid},
+            privilege: {},
+        })
+        // let params={}
+        // params['sn'] = watch_imei
+        // otpVal = await db_get_patch_map_list(tenant_id,"",params)
+        // rlogger.debug("THE IMEIVAL PID IS", otpVal)
+        // if (!otpVal) {
+        //     logger.debug("THE IMEI DOES NOT MATCH")
+        //     res.status(470).json({ error: "Please provide the valid IMEI" });
+        //     return next()
+        // }
+        // if(otpVal.length > 0) {
+        //     otpVal = otpVal[0]["pid"]
+        // }
             
-        rlogger.debug("THE IMEIVAL PID IS", otpVal)
+        // rlogger.debug("THE IMEIVAL PID IS", otpVal)
     } else {
         // This is when the newConfig is sent to Gateway as part of keepalive
         // The gateway would kill itself and send the oldPid back as part of register message
