@@ -83,7 +83,7 @@ const prepareDataForCreateBilling = (postData) => {
         }
         params = {time_spent: postData.time_spent};
     }
-    if(postData.code == constant.CPT_CODE.CPT_99457){
+    if(postData.code == constant.CPT_CODE.CPT_99457 || postData.code == constant.CPT_CODE.CPT_99458){
         if(!postData.add_task_date || !postData.add_task_staff_name || !postData.add_task_note 
             || !postData.add_task_id){
                 return false;
