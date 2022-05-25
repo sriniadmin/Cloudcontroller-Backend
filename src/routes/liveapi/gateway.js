@@ -838,12 +838,6 @@ function checkme_O2(writeApi, data) {
 
 function vv330(writeApi, data) {
 
-    //Spo2
-    const point1 = new Point(`${data.patientUUID}_ecg`)
-    .tag('deviceModel', 'Ecg')
-    .floatField('ecg', data.spo2)
-    writeApi.writePoint(point1)
-
     //HR
     const point2 = new Point(`${data.patientUUID}_ecg_hr`)
     .tag('deviceModel', 'Ecg')
