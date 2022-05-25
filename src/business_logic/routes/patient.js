@@ -1475,9 +1475,9 @@ async function createPatientPatchMap(req, res, next) {
                         list.push(obj)
                     }
                 });
-                list.push(req.body.list[0].type_device)
-                await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
             }
+            list.push(req.body.list[0].type_device)
+            await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
 
             
             return await db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
