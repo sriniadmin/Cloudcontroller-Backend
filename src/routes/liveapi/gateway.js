@@ -513,8 +513,8 @@ router.post("/gateway_register", async function (req, res, next) {
             })
         }
 
-        let data = await db_get_pid_associated(obj.dataValues.patch_uuid)
-        if(!data){
+        let pid = await db_get_pid_associated(obj.dataValues.patch_uuid)
+        if(!pid){
             return res.status(470).json({
                 result: 'THER IS NO DEVICE ASSOCIATED FOR THIS IMEI',
                 response: {},
@@ -522,10 +522,27 @@ router.post("/gateway_register", async function (req, res, next) {
                 privilege: {},
             })
         }
+
+        const data = await db_get_patch_map_list(tenant_id, {
+            limit: 100,
+            offset: 0,
+            pid: pid.dataValues.pid
+        })
+
+        let device_list = []
+        for (index = 0; index < data.length; index++) {
+            let temp_device = {}
+            temp_device["type"] = data[index].patches[0]["patch_type"]
+            temp_device["serial_no"] = data[index].patches[0]["patch_serial"]
+            temp_device["mac_address"] = data[index].patches[0]["patch_mac"]
+            temp_device["config"] = data[index].config
+            device_list.push(temp_device)
+        }
         return res.status(200).json({
             result: 'SUCCESSFUL',
-            response: {patientUUID: data.dataValues.pid},
-            privilege: {},
+            device_count: device_list.length,
+            devices: device_list,
+            patientUUID: pid.dataValues.pid,
         })
         // let params={}
         // params['sn'] = watch_imei
