@@ -972,7 +972,11 @@ module.exports = function (sequelize, DataTypes) {
             disabled: {
                 type: DataTypes.TINYINT,
                 allowNull: false
-            }
+            },
+            associated_list: {
+                type: DataTypes.STRING(255),
+                allowNull: false,
+            },
         },
         {
             sequelize,
