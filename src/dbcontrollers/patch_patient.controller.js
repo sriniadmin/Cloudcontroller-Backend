@@ -65,7 +65,7 @@ async function db_get_patch_map_list(tenant_id, params) {
                     "not found Err:" +
                     err
                 );
-                throw new Error("Patch list fetch error -  tenant check");
+                throw new Error(err);
             });
 
         return patch_patient_map_list;
