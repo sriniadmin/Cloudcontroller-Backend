@@ -1,7 +1,7 @@
 //This handles patch inventory
 var express = require("express")
 var router = express.Router()
-var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial, getSelectBoxPatch, deletePatch, getPathSaas } = require("../../old_code_refactor/internalUser")
+var { getPatchInventory,createPatch,updatePatchUuid,updatePatch, checkPatchSerial, getSelectBoxPatch, deletePatch, getPathSaas, createDevice } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 /**
@@ -107,7 +107,7 @@ router.get("/patchinventory", getSelectBoxPatch,apiFinalProcess)
  *           description: Patch Information is added.
  */
 
-router.post("/", createPatch,apiFinalProcess)
+router.post("/", createDevice,apiFinalProcess)
 
 /**
  * @openapi

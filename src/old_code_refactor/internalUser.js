@@ -119,7 +119,8 @@ const {
     db_get_patch,
     db_get_patch_select_boxes,
     db_delete_patch,
-    db_get_patch_saas
+    db_get_patch_saas,
+    db_create_device
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -2936,6 +2937,31 @@ async function getPathSaas(req, res, next) {
     return next()
 }
 
+
+async function createDevice(req, res, next) {
+    try {
+        uuidDict = {
+            uuidType: UUID_CONST["patch"],
+            tenantID: tenant_id,
+        }
+
+        req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+        
+        const data = await db_create_device(req)
+        req.apiRes = PATCH_CODE["3"]
+        req.apiRes["response"] = { data: data }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATCH_CODE["4"]
+        req.apiRes["error"] = { error: error }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
 module.exports = {
     getUserInventory,
     getSelfUser,
@@ -2993,5 +3019,6 @@ module.exports = {
     getSelectBoxPatch,
     deletePatch,
     getDeviceType,
-    getPathSaas
+    getPathSaas,
+    createDevice
 }
