@@ -747,7 +747,7 @@ async function db_create_device(params) {
                 // patch_name: patch_data[i]["patch_name"],
                 patch_uuid: params.body.data[0]["patch_uuid"],
                 patch_status: 'Inactive',
-                patch_group_id: params.body.data[0]["patch_group_id"],
+                patch_group_id: params.body.data[0]["patch_uuid"],
                 // specialty: patch_data[i]["specialty"],
                 patch_mac: params.body.data[0]["patch_mac"],
                 // patch_bluetooth: patch_data[i]["patch_bluetooth"],
