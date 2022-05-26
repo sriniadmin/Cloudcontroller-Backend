@@ -71,7 +71,7 @@ const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 const db_disable_patient = patient_controller.db_disable_patient
 
-const { db_get_patient_details, db_get_patient_inventory } = patient_controller
+const { db_get_patient_details, db_get_patient_inventory, db_update_patient_associated_list } = patient_controller
 
 const {
     db_get_ews_list,
@@ -1384,31 +1384,31 @@ async function createPatientPatchMap(req, res, next) {
     let patient_exist
     let result
     const t = await sequelizeDB.transaction()
-    let patientInfo
-    let patchInfo
+    // let patientInfo
+    // // let patchInfo
 
-    //alert setup
-    try {
-        patientInfo = await db_patient_info(given_pid)
-    } catch (err) {
-        logger.debug('ERROR : ', err.message)
-    }
+    // //alert setup
+    // try {
+    //     patientInfo = await db_patient_info(given_pid)
+    // } catch (err) {
+    //     logger.debug('ERROR : ', err.message)
+    // }
 
-    try {
-        patchInfo = await db_get_patch(tenant_id, req.body.list[0]['patch_uuid'])
-        patchInfo = JSON.parse(JSON.stringify(patchInfo))['patch_name']
-    } catch (err) {
-        logger.debug('ERROR : ', err.message)
-    }
+    // try {
+    //     patchInfo = await db_get_patch(tenant_id, req.body.list[0]['patch_uuid'])
+    //     patchInfo = JSON.parse(JSON.stringify(patchInfo))['patch_name']
+    // } catch (err) {
+    //     logger.debug('ERROR : ', err.message)
+    // }
 
-    let { fname, lname } = JSON.parse(JSON.stringify(patientInfo, null, 2))
+    // let { fname, lname } = JSON.parse(JSON.stringify(patientInfo, null, 2))
 
-    let alertEventId = uuid()
+    // let alertEventId = uuid()
 
-    let createPatientPatchAlert = alertEnum['1']
-    createPatientPatchAlert['event'] = `create patient patch map id:${alertEventId}`
-    createPatientPatchAlert['text'] = `${patchInfo} patch associated for ${fname} ${lname}`
-    createPatientPatchAlert['service'] = [`${req.userTenant}`]
+    // let createPatientPatchAlert = alertEnum['1']
+    // createPatientPatchAlert['event'] = `create patient patch map id:${alertEventId}`
+    // createPatientPatchAlert['text'] = `${patchInfo} patch associated for ${fname} ${lname}`
+    // createPatientPatchAlert['service'] = [`${req.userTenant}`]
 
     //JSON SCHEMA VALIDATION
     // let schema_status = schemaValidator.validate_schema(?
@@ -1458,7 +1458,7 @@ async function createPatientPatchMap(req, res, next) {
 
 
     try {
-        result = await sequelizeDB.transaction(function (t) {
+        result = await sequelizeDB.transaction( async function (t) {
             // logger.debug(
             //     "THE GIVEN PID IS",
             //     given_pid,
@@ -1467,7 +1467,20 @@ async function createPatientPatchMap(req, res, next) {
             // )
             if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
 
-            return db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
+            let list = []
+            let associated_list = req.body.associated_list
+            if(associated_list.length > 0){
+                (associated_list).forEach(obj => {
+                    if(obj !== req.body.list[0].type_device){
+                        list.push(obj)
+                    }
+                });
+            }
+            list.push(req.body.list[0].type_device)
+            await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
+
+            
+            return await db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
                 transaction: t,
             })
         })
@@ -1490,22 +1503,22 @@ async function createPatientPatchMap(req, res, next) {
 
     // TODO - Validate the first time patient patch is associated or re-boarded into the system
     // the CREATE is sent to kafka
-    msg = {
-        UuidPatient: given_pid,
-        Method: "CREATE",
-        UuidTenant: "tenantb653407c-aefe-4c7b-afb0-05149343de80",
-        Thresholds: AlertThresholdsDict,
-        FrequencySetting: 1800,
-    }
-    await patientKafkaRegister(msg)
+    // msg = {
+    //     UuidPatient: given_pid,
+    //     Method: "CREATE",
+    //     UuidTenant: "tenantb653407c-aefe-4c7b-afb0-05149343de80",
+    //     Thresholds: AlertThresholdsDict,
+    //     FrequencySetting: 1800,
+    // }
+    // await patientKafkaRegister(msg)
 
-    try {
-        let response = await alerter(createPatientPatchAlert)
-        logger.debug(`alertResponse : ${response}`)
-    }
-    catch (err) {
-        logger.debug(`Alert ERROR : ${err.message}`)
-    }
+    // try {
+    //     let response = await alerter(createPatientPatchAlert)
+    //     logger.debug(`alertResponse : ${response}`)
+    // }
+    // catch (err) {
+    //     logger.debug(`Alert ERROR : ${err.message}`)
+    // }
 
     return next()
 }
@@ -4314,6 +4327,17 @@ async function disablePatient(req, res, next) {
 
 async function unassociatePatient(req, res, next) {
     try {
+        let list = []
+        let associated_list = req.body.associated_list
+        if(associated_list.length > 0){
+            (associated_list).forEach(obj => {
+                if(obj !== req.body.type_device){
+                    list.push(obj)
+                }
+            });
+            await db_update_patient_associated_list({pid: req.body.pid, associated_list: JSON.stringify(list)})
+        }
+
         await db_delete_each_device(req.body)
         await db_update_patch_register([req.body.patch_uuid])
         req.apiRes = ASSOCIATE_CODE["1"]

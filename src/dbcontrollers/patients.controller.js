@@ -673,6 +673,22 @@ async function db_check_patient_exist(params) {
     }
 }
 
+async function db_update_patient_associated_list(params) {
+    try {
+        return await Patients_Data.update(
+            { associated_list: params.associated_list },
+            {
+                where:{
+                    pid: params.pid
+                }
+            }
+        )
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
 module.exports = {
     db_get_patient_list,
     db_get_patient_list_new,
@@ -687,5 +703,6 @@ module.exports = {
     db_get_patient_details,
     db_get_patient_inventory,
     db_disable_patient,
-    db_check_patient_exist
+    db_check_patient_exist,
+    db_update_patient_associated_list
 }
