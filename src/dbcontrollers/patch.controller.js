@@ -739,6 +739,31 @@ async function db_get_device_id(params) {
     }
 }
 
+async function db_create_device(params) {
+    try {
+        return await Patches.create(
+            {
+                patch_type: params.body.data[0]["patch_type"],
+                // patch_name: patch_data[i]["patch_name"],
+                patch_uuid: params.body.data[0]["patch_uuid"],
+                patch_status: 'Inactive',
+                patch_group_id: params.body.data[0]["patch_uuid"],
+                // specialty: patch_data[i]["specialty"],
+                patch_mac: params.body.data[0]["patch_mac"],
+                // patch_bluetooth: patch_data[i]["patch_bluetooth"],
+                // patch_sensor_id: patch_data[i]["patch_sensor_id"],
+                patch_serial: params.body.data[0]["patch_serial"],
+                group_type: 'Device',
+                in_use: 'false',
+                tenant_id: params.body.tenantId,
+                // pid: patch_data[i]["pid"],
+            },
+        )
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -757,4 +782,5 @@ module.exports = {
     db_get_patch_saas,
     db_update_patch_register,
     db_get_device_id,
+    db_create_device
 }
