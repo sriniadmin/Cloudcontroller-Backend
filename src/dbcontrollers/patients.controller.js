@@ -382,6 +382,7 @@ async function db_get_patient_inventory(params) {
         disabled: 1
     }
     if(params.name){
+        params.name = (params.name).toLowerCase()
         condition = {
             tenant_id: params.tenantId,
             disabled: 1,
