@@ -382,11 +382,15 @@ async function db_get_patient_inventory(params) {
         disabled: 1
     }
     if(params.name){
+        params.name = (params.name).toLowerCase()
         condition = {
             tenant_id: params.tenantId,
             disabled: 1,
             [Op.or]: [
-                {fname: {[Op.like]: params.name}}, {lname: {[Op.like]: params.name}}
+                {fname: {[Op.like]: `%${params.name}%`}}, 
+                {lname: {[Op.like]: `%${params.name}%`}}, 
+                {med_record: {[Op.like]: `%${params.name}%`}},
+                {phone_contact: {[Op.like]: `%${params.name}%`}}
             ]
         }
     }
