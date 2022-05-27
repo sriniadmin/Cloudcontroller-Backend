@@ -237,52 +237,53 @@ function parseDiscover(disData, devType) {
 
 
 router.post("/gateway_keepalive", async function (req, res, next) {
-    klogger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
-    klogger.debug("Gateway Keepalive received data is ", req.body)
-    let resp = {
-    }
-    // let resp = { Keepalive: "Success" }
-    let pid = req.body['patientUUID']
-    let keepaliveHistory = {}
-    let discoverHistory = {}
-    let connectedGw = []
-    if(!req.body['connectedDevices'] || !req.body['patientUUID']){
-        return res.status(470).json({
-            status: '407',
-            messages: 'connectedDevices, patientUUID are required'
-        })
-    }
-    deviceListFromGateway = req.body['connectedDevices']
-    let softkill = false
-    // try{
-    //     if (deviceListFromGateway) {
-    //         deviceListFromGateway.forEach(patch => {
-    //             if (patch['type'] == 'ds' && patch['connected'] == 'false') {
-    //                 patch_serial = patch['serial_no']
-    //                 // ble_scan_time = Date.parse(req.body['bleLastScanTime']) //Epoch time
-    //                 // const dateToday = new Date()
-    //                 // currEpoch = Date.parse(dateToday)
-    //                 // if ( currEpoch-ble_scan_time > )
-    //                 // 1643217183#SWAN__01:B6:EC:BB:0C:C9__RSSI:-62
-    //                 ble_devices = req.body['discovered_ble']
-    //                 if(ble_devices.includes(patch_serial)) {
-    //                     if (new Date().getMinutes() % 5 == 0) {
-    //                         softkill = True
-    //                     }
-    //                  } else {
-    //                     if (new Date().getMinutes() % 4 == 0) {
-    //                         softkill = True
-    //                     }
-    //                  }
-    //         }
-    //     })
-    //  } }
-    // catch (error){
-    //     klogger.debug("DS - softkill failed -- workaround failed")
-    // }
-    
-	let    deviceDiscoveredListFromGateway = {}
     try {
+        // klogger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
+        // klogger.debug("Gateway Keepalive received data is ", req.body)
+        let resp = {
+        }
+        // let resp = { Keepalive: "Success" }
+        let pid = req.body['patientUUID']
+        let keepaliveHistory = {}
+        let discoverHistory = {}
+        let connectedGw = []
+        if (!req.body['connectedDevices'] || !req.body['patientUUID']) {
+            return res.status(470).json({
+                status: '407',
+                messages: 'connectedDevices, patientUUID are required'
+            })
+        }
+        deviceListFromGateway = req.body['connectedDevices']
+        let softkill = false
+        // try{
+        //     if (deviceListFromGateway) {
+        //         deviceListFromGateway.forEach(patch => {
+        //             if (patch['type'] == 'ds' && patch['connected'] == 'false') {
+        //                 patch_serial = patch['serial_no']
+        //                 // ble_scan_time = Date.parse(req.body['bleLastScanTime']) //Epoch time
+        //                 // const dateToday = new Date()
+        //                 // currEpoch = Date.parse(dateToday)
+        //                 // if ( currEpoch-ble_scan_time > )
+        //                 // 1643217183#SWAN__01:B6:EC:BB:0C:C9__RSSI:-62
+        //                 ble_devices = req.body['discovered_ble']
+        //                 if(ble_devices.includes(patch_serial)) {
+        //                     if (new Date().getMinutes() % 5 == 0) {
+        //                         softkill = True
+        //                     }
+        //                  } else {
+        //                     if (new Date().getMinutes() % 4 == 0) {
+        //                         softkill = True
+        //                     }
+        //                  }
+        //         }
+        //     })
+        //  } }
+        // catch (error){
+        //     klogger.debug("DS - softkill failed -- workaround failed")
+        // }
+
+        let deviceDiscoveredListFromGateway = {}
+        // try {
         if (req.body.hasOwnProperty("discovered")) {
             alpha = parseDiscover(req.body['discovered'], "alpha")
             deviceDiscoveredListFromGateway["ALPHA"] = alpha
@@ -295,98 +296,98 @@ router.post("/gateway_keepalive", async function (req, res, next) {
             vivaDisc = parseDiscover(req.body['discovered_viva'], "VivaLnk")
             deviceDiscoveredListFromGateway["VIVA"] = vivaDisc
         }
-        
-        
+
+
         connectedGw = parseConnected(deviceListFromGateway)
         klogger.debug("discovered device", deviceDiscoveredListFromGateway)
-    } catch ( error) {
-        console.log(error)
-        klogger.debug("discovered device", req.body['discovered'], req.body['discovered_ble'], req.body['discovered_viva'], error )
-    }
-    let promises = []
-    let tenant_id 
-   
-    //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
-    // updated with the battery details etc - Better to come up with the JSON model for this.
+        // } catch ( error) {
+        //     console.log(error)
+        // klogger.debug("discovered device", req.body['discovered'], req.body['discovered_ble'], req.body['discovered_viva'], error )
+        // }
+        let promises = []
+        let tenant_id
 
-    await db_check_patient_exist(pid)
-        .then((patientResp) => {
-            klogger.debug("The patient info is : ", patientResp[pid])
-            tenant_id = patientResp['tenant_id']
-        })
+        //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
+        // updated with the battery details etc - Better to come up with the JSON model for this.
 
-    if ( (typeof deviceListFromGateway !=='string') && (deviceListFromGateway.length > 0)) {
-        for (let i = 0; i < deviceListFromGateway.length; i++) {
-            sn_no = deviceListFromGateway[i]['serial_no']
-            klogger.debug("SN of keepalive : ", sn_no)
-            promises.push(
-                db_get_patch_map_list(tenant_id, "", {
-                    sn: sn_no
-                })
-            )
-            // get the values of the keepalive and config change status and command from gateway device
-            // Update the threads, version etc  from the Keepalive message.
-        }
-        await Promise.all(promises).then(async (patch_patient_list) => {
-            klogger.debug(
-                "THE  PATCH PATIENT LIST IS",
-                patch_patient_list.length
-            )
-            let command, keepaliveTime
-            for (let i = 0; i < patch_patient_list.length; i++) {
+        await db_check_patient_exist(pid)
+            .then((patientResp) => {
+                klogger.debug("The patient info is : ", patientResp[pid])
+                tenant_id = patientResp['tenant_id']
+            })
 
-                if (patch_patient_list[i].length == 0) {
-                    klogger.debug(
-                        "THE  PATCH serial LIST IS Empty", i,
-                        patch_patient_list[i][0]
-                    )
-                    continue
-                }
-                keepaliveHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].keepaliveHistory
-                discoverHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].discoverDevices
-                if (patch_patient_list[i][0].keepaliveTime !== undefined) {
-                    keepaliveTime = patch_patient_list[i][0].keepaliveTime
-                    resp['KeepaliveTime'] = keepaliveTime
-                }
-                if (patch_patient_list[i][0].command !== undefined) {
-                    command = patch_patient_list[i][0].command
-                    resp['Command'] = command
-                }
-                if (softkill !== undefined) {
-                    resp['Command'] = 'softkill'
-                }
+        if ((typeof deviceListFromGateway !== 'string') && (deviceListFromGateway.length > 0)) {
+            for (let i = 0; i < deviceListFromGateway.length; i++) {
+                sn_no = deviceListFromGateway[i]['serial_no']
+                klogger.debug("SN of keepalive : ", sn_no)
+                promises.push(
+                    db_get_patch_map_list(tenant_id, "", {
+                        sn: sn_no
+                    })
+                )
+                // get the values of the keepalive and config change status and command from gateway device
+                // Update the threads, version etc  from the Keepalive message.
             }
-        })
+            await Promise.all(promises).then(async (patch_patient_list) => {
+                klogger.debug(
+                    "THE  PATCH PATIENT LIST IS",
+                    patch_patient_list.length
+                )
+                let command, keepaliveTime
+                for (let i = 0; i < patch_patient_list.length; i++) {
 
-        klogger.debug("The response for keepalive is", resp, keepaliveHistory.length)
-        // clear the command from the patch_patient_map table for that specific gateway device
-        promises = []
-        for (let i = 0; i < deviceListFromGateway.length; i++) {
-            sn_no = deviceListFromGateway[i]['serial_no']
-            klogger.debug("Clearing the commands", sn_no)
-            promises.push(
-                clear_command(tenant_id, {
-                    pid: pid
-                })
-            )
-        }
-        await Promise.all(promises).then(async (clear_command_list) => {
-            klogger.debug("The commands are cleared : ", clear_command_list)
+                    if (patch_patient_list[i].length == 0) {
+                        klogger.debug(
+                            "THE  PATCH serial LIST IS Empty", i,
+                            patch_patient_list[i][0]
+                        )
+                        continue
+                    }
+                    keepaliveHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].keepaliveHistory
+                    discoverHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].discoverDevices
+                    if (patch_patient_list[i][0].keepaliveTime !== undefined) {
+                        keepaliveTime = patch_patient_list[i][0].keepaliveTime
+                        resp['KeepaliveTime'] = keepaliveTime
+                    }
+                    if (patch_patient_list[i][0].command !== undefined) {
+                        command = patch_patient_list[i][0].command
+                        resp['Command'] = command
+                    }
+                    if (softkill !== undefined) {
+                        resp['Command'] = 'softkill'
+                    }
+                }
+            })
 
-        })
+            klogger.debug("The response for keepalive is", resp, keepaliveHistory.length)
+            // clear the command from the patch_patient_map table for that specific gateway device
+            promises = []
+            for (let i = 0; i < deviceListFromGateway.length; i++) {
+                sn_no = deviceListFromGateway[i]['serial_no']
+                klogger.debug("Clearing the commands", sn_no)
+                promises.push(
+                    clear_command(tenant_id, {
+                        pid: pid
+                    })
+                )
+            }
+            await Promise.all(promises).then(async (clear_command_list) => {
+                klogger.debug("The commands are cleared : ", clear_command_list)
 
-        promises = []
-        try {
+            })
+
+            promises = []
+            // try {
             for (let i = 0; i < deviceListFromGateway.length; i++) {
                 sn_no = deviceListFromGateway[i]['serial_no']
                 typeDevice = deviceListFromGateway[i]['type']
                 klogger.debug("Updaing keepalive data the commands", sn_no, typeDevice)
                 if (typeDevice == 'gateway') {
                     let dateNow = Date()
-    
+
                     let keepaliveGw = []
                     let discoverGw = []
-    
+
                     let discoverData = {}
                     klogger.debug("Gateway selected commands", sn_no, typeDevice, dateNow)
                     if (keepaliveHistory[sn_no]) {
@@ -398,21 +399,21 @@ router.post("/gateway_keepalive", async function (req, res, next) {
                                 klogger("Resetting the Discoveries to Empty", err)
                                 discoverGw = []
                             }
-    
+
                         }
-    
+
                     }
                     klogger.debug("keepalive Gw output", discoverGw)
                     // klogger.debug("keepalive Gw output",keepaliveGw)
                     // let keys = []
                     // for (var key in keepaliveGw) keys.push(Object.keys(keepaliveGw[key]))
                     // klogger.debug("keepalive data  time ", keys)
-    
+
                     keepaliveGw.splice(0, 0, { [dateNow]: req.body });
                     keepaliveGw = keepaliveGw.slice(0, 40)
                     if (Object.getOwnPropertyNames(deviceDiscoveredListFromGateway).length > 0) {
                         deviceDiscoveredListFromGateway["GATEWAY"] = sn_no
-    
+
                         if (discoverGw && discoverGw.length > 0) {
                             discoverGw.splice(0, 0, { [dateNow]: deviceDiscoveredListFromGateway });
                             discoverGw = discoverGw.slice(0, 3)
@@ -420,18 +421,18 @@ router.post("/gateway_keepalive", async function (req, res, next) {
                             discoverGw = []
                             discoverGw.push({ [dateNow]: deviceDiscoveredListFromGateway })
                         }
-    
+
                         klogger.debug("Updating Gateway discovered devices", discoverGw)
                     }
                     discoverData["cloudstatus"] = dateNow
-    
+
                     let devicesKeep = {
                         "discover": discoverGw,
                         "connected": connectedGw
                     }
                     discoverData["devices"] = devicesKeep
                     // discoverData["devices"].push(devicesKeep)
-    
+
                     promises.push(
                         update_keepalive(tenant_id, {
                             pid: pid,
@@ -441,24 +442,28 @@ router.post("/gateway_keepalive", async function (req, res, next) {
                         })
                     )
                 }
-    
+
             }
             await Promise.all(promises).then(async (keepalive_list) => {
                 klogger.debug("The keepalive data is updated : ", keepalive_list)
-    
+
             })
-        } catch (error) {
-            console.log(error)
+            // } catch (error) {
+            //     console.log(error)
+            // }
         }
+        else {
+            resp.response = 'Invalid data of connectedDevices'
+        }
+        // the response from the keepalive should be stored in keepalive_history - as last 50 entries only
+
+        // klogger.debug("The keepalive response is", resp)
+        // resp
+        return res.status(200).json(resp)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json('ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)
     }
-    else{
-        resp.response = 'Invalid data of connectedDevices'
-    }
-    // the response from the keepalive should be stored in keepalive_history - as last 50 entries only
-    
-    klogger.debug("The keepalive response is", resp)
-    resp
-       return res.status(200).json(resp)
 })
 
 
@@ -486,25 +491,26 @@ router.post("/gateway_keepalive", async function (req, res, next) {
 
 
 router.post("/gateway_register", async function (req, res, next) {
-    rlogger.debug("gateway register req info ", req.body, req.headers)
+    try {
+        // rlogger.debug("gateway register req info ", req.body, req.headers)
     let tenant_id = req.body.tenant_id
     watch_OTP = req.body["userOTP"]
     watch_imei = req.body["IMEI"]
     oldPid = req.body["pid"]
-    rlogger.debug("Patient OTP is" ,req.body, watch_OTP, typeof watch_OTP, oldPid, watch_imei)
+    // rlogger.debug("Patient OTP is" ,req.body, watch_OTP, typeof watch_OTP, oldPid, watch_imei)
     let otpVal
-    if(watch_OTP) {
+    if (watch_OTP) {
         otpVal = await otpverify(watch_OTP)
         // rlogger.debug("THE OTPVAL PID IS", otpVal)
         if (!otpVal) {
-            rlogger.debug("THE OTP DOES NOT MATCH")
+            // rlogger.debug("THE OTP DOES NOT MATCH")
             res.status(470).json({ error: "Please provide the valid OTP" });
             return next()
         }
     } else if (watch_imei) {
 
         let obj = await db_get_device_id(watch_imei)
-        if(!obj){
+        if (!obj) {
             return res.status(470).json({
                 result: 'IMEI IS NOT FOUND',
                 response: {},
@@ -514,7 +520,7 @@ router.post("/gateway_register", async function (req, res, next) {
         }
 
         let pid = await db_get_pid_associated(obj.dataValues.patch_uuid)
-        if(!pid){
+        if (!pid) {
             return res.status(470).json({
                 result: 'THER IS NO DEVICE ASSOCIATED FOR THIS IMEI',
                 response: {},
@@ -556,7 +562,7 @@ router.post("/gateway_register", async function (req, res, next) {
         // if(otpVal.length > 0) {
         //     otpVal = otpVal[0]["pid"]
         // }
-            
+
         // rlogger.debug("THE IMEIVAL PID IS", otpVal)
     } else {
         // This is when the newConfig is sent to Gateway as part of keepalive
@@ -566,7 +572,7 @@ router.post("/gateway_register", async function (req, res, next) {
     }
     db_patient_exist(tenant_id, otpVal)
         .then(async (patients) => {
-            rlogger.debug("Success: Patient list is " + JSON.stringify(patients))
+            // rlogger.debug("Success: Patient list is " + JSON.stringify(patients))
             tenant_id = patients.tenant_id
             let promises = []
             promises.push(
@@ -609,20 +615,25 @@ router.post("/gateway_register", async function (req, res, next) {
                         device_count: patch_patient_list[0].length,
                         devices: device_list,
                         patientUUID: patients["pid"],
-                        tenant: tenant_id,                        
+                        tenant: tenant_id,
                     })
                 })
             })
         })
         .catch((err) => {
-            rlogger.debug("Patient list error " + err)
+            // rlogger.debug("Patient list error " + err)
             return res.status(PATIENT_CODE["1"].HttpStatus).json({
                 result: PATIENT_CODE["1"].Code,
                 response: {},
-                error: { errMessage: PATIENT_CODE["1"].Message },
+                error: { errMessage: PATIENT_CODE["1"].Message, err },
                 privilege: {},
             })
         })
+    } catch (error) {
+        return res.status(500).json({
+            error: { errMessage: error },
+        })
+    }
 })
 
 
@@ -858,13 +869,13 @@ function vv330(writeApi, data) {
     //HR
     const point2 = new Point(`${data.patientUUID}_ecg_hr`)
     .tag('deviceModel', 'Ecg')
-    .floatField('hr', data.extras.HR)
+    .floatField('hr', data.data.extras.HR)
     writeApi.writePoint(point2)
 
     //RR
     const point4 = new Point(`${data.patientUUID}_ecg_rr`)
     .tag('deviceModel', 'Ecg')
-    .floatField('rr', data.extras.RR)
+    .floatField('rr', data.data.extras.RR)
     writeApi.writePoint(point4)
 
     //battery

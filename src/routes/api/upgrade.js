@@ -284,21 +284,21 @@ router.get("/gateway", function (req, res, next) {
 
 
 upgradeGatewayPost = async function (req, res, next) {
-    // tenant_id = req.userTenantId
-    // tenantuuid = req.body.tenantuuid
-    tenant_id = req.body.tenant_id
-    // logger.debug("Upgrade gateway Version POST")
-    // let upgradeJson = req.body
-    // let upgradeJson = {
-    //     "versionName": "999.0.0",
-    //     "versionCode": "998",
-    //     "apkUrl": "https://github.com//download/v3.0.1/rn-update-apk-example-3.0.1.apk",
-    //     "forceUpdate": false
-    // }
-    var upgrade_data = req.body
-    let upgradeInfo
-    let uuidDict = { uuidType: UUID_CONST["user"], tenantID: tenant_id }
     try {
+        // tenant_id = req.userTenantId
+        // tenantuuid = req.body.tenantuuid
+        tenant_id = req.body.tenant_id
+        // logger.debug("Upgrade gateway Version POST")
+        // let upgradeJson = req.body
+        // let upgradeJson = {
+        //     "versionName": "999.0.0",
+        //     "versionCode": "998",
+        //     "apkUrl": "https://github.com//download/v3.0.1/rn-update-apk-example-3.0.1.apk",
+        //     "forceUpdate": false
+        // }
+        var upgrade_data = req.body
+        let upgradeInfo
+        let uuidDict = { uuidType: UUID_CONST["user"], tenantID: tenant_id }
         upgradeInfo = await sequelizeDB.transaction(async function (t) {
             await getUUID(uuidDict, { transaction: t }).then((uuid_result) => {
                 logger.debug("The uuid result is", uuid_result)
