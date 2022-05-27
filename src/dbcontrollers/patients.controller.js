@@ -387,10 +387,10 @@ async function db_get_patient_inventory(params) {
             tenant_id: params.tenantId,
             disabled: 1,
             [Op.or]: [
-                {fname: {[Op.like]: params.name}}, 
-                {lname: {[Op.like]: params.name}}, 
-                {med_record: {[Op.like]: params.name}},
-                {phone_contact: {[Op.like]: params.name}}
+                {fname: {[Op.like]: `%${params.name}%`}}, 
+                {lname: {[Op.like]: `%${params.name}%`}}, 
+                {med_record: {[Op.like]: `%${params.name}%`}},
+                {phone_contact: {[Op.like]: `%${params.name}%`}}
             ]
         }
     }
