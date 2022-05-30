@@ -382,6 +382,7 @@ async function db_get_patient_inventory(params) {
         disabled: 1
     }
     if(params.name){
+        offset = 0
         params.name = (params.name).toLowerCase()
         const strings = params.name.split(" ")
         if(strings.length === 2){
