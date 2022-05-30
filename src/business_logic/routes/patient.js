@@ -4261,10 +4261,10 @@ async function getPatientInventory(req, res, next) {
     try {
         const patients_list = await db_get_patient_inventory(req.body)
         const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
-        const totalCount = await db_patient_count(tenant_id)
+        // const totalCount = await db_patient_count(tenant_id)
 
         let data = []
-        for (const obj of patients_list) {
+        for (const obj of patients_list.data) {
             obj["baselineResult"] = baseLineDict["baselineResult"]
             const patient = await genPatientRespData([obj])
             data.push(patient[0])
@@ -4273,7 +4273,7 @@ async function getPatientInventory(req, res, next) {
         req.apiRes["response"] = {
             patients: data,
             count: data.length, 
-            patientTotalCount: totalCount
+            patientTotalCount: patients_list.count
         }
     } catch (error) {
         console.log(error)
