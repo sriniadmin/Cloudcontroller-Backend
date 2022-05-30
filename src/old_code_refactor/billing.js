@@ -21,6 +21,7 @@ const {
 const { UUID_CONST, BILLING_CODE } = require("../lib/constants/AppEnum")
 const getUUID = require("../lib/system/uuidSystem").getUUID
 const { db_update_task } = require("../dbcontrollers/task.controller")
+const {CPT_CODE} = require("../utils/constants");
 
 async function getBilling(req, res, next) {
     let tenant_id = req.userTenantId
@@ -116,7 +117,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
                 task_date: postData.task_date,
                 staff_name: postData.staff_name,
                 task_note: postData.task_note,
-                task_time_spend: postData.task_time_spent
+                task_time_spend: postData.task_time_spend
             }
             result = params.map(item => {
                 if(item.task_id == postData.task_id){
@@ -131,7 +132,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
                 task_date: postData.task_date,
                 staff_name: postData.staff_name,
                 task_note: postData.task_note,
-                task_time_spend: postData.task_time_spent
+                task_time_spend: postData.task_time_spend
             }
             params.push(newData);
             result = params;
