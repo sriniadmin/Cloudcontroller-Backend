@@ -382,16 +382,28 @@ async function db_get_patient_inventory(params) {
         disabled: 1
     }
     if(params.name){
+        offset = 0
         params.name = (params.name).toLowerCase()
-        condition = {
-            tenant_id: params.tenantId,
-            disabled: 1,
-            [Op.or]: [
-                {fname: {[Op.like]: `%${params.name}%`}}, 
-                {lname: {[Op.like]: `%${params.name}%`}}, 
-                {med_record: {[Op.like]: `%${params.name}%`}},
-                {phone_contact: {[Op.like]: `%${params.name}%`}}
-            ]
+        const strings = params.name.split(" ")
+        if(strings.length === 2){
+            condition = {
+                tenant_id: params.tenantId,
+                disabled: 1,
+                fname: {[Op.like]: `%${strings[0]}%`},
+                lname: {[Op.like]: `%${strings[1]}%`}
+            }
+        }
+        else{
+            condition = {
+                tenant_id: params.tenantId,
+                disabled: 1,
+                [Op.or]: [
+                    {fname: {[Op.like]: `%${params.name}%`}}, 
+                    {lname: {[Op.like]: `%${params.name}%`}}, 
+                    {med_record: {[Op.like]: `%${params.name}%`}},
+                    {phone_contact: {[Op.like]: `%${params.name}%`}}
+                ]
+            }
         }
     }
     try {
@@ -404,7 +416,14 @@ async function db_get_patient_inventory(params) {
             offset: offset,
             raw: false,
         });
-        return data
+        const count = await Patients_Data.findAll({
+            where: condition,
+            order: [
+                ['date', 'DESC']
+            ],
+            raw: false,
+        });
+        return {data: data, count: count.length}
     } catch (error) {
         throw new Error(error)
     }
