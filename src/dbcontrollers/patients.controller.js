@@ -53,6 +53,114 @@ models.notes.hasMany(models.users, {
     as: "pracuuid",
 })
 
+const EDIT_PATIENT = function (params) {
+    return {
+        title: params.title || null,
+        language: params.language || null,
+        financial: params.financial || null,
+        fname: params.fname || null,
+        lname: params.lname || null,
+        mname: params.mname || null,
+        DOB: params.DOB || null,
+        street: params.street || null,
+        postal_code: params.postal_code || null,
+        city: params.city || null,
+        state: params.state || null,
+        country_code: params.country_code || null,
+        idtype: params.idtype || null,
+        idnumber: params.idnumber || null,
+        occupation: params.occupation || null,
+        phone_home: params.phone_home || null,
+        phone_biz: params.phone_biz || null,
+        phone_contact: params.phone_contact || null,
+        phone_cell: params.phone_cell || null,
+        contact_relationship: params.contact_relationship || null,
+        admission_date: params.admission_date || null,
+        sex: params.sex || null,
+        referrer: params.referrer || null,
+        referrerID: params.referrerID || null,
+        providerID: params.providerID || null,
+        ref_providerID: params.ref_providerID || null,
+        email: params.email || null,
+        email_direct: params.email_direct || null,
+        ethnoracial: params.ethnoracial || null,
+        race: params.race || null,
+        ethnicity: params.ethnicity || null,
+        religion: params.religion || null,
+        interpretter: params.interpretter || null,
+        migrantseasonal: params.migrantseasonal || null,
+        family_size: params.family_size || null,
+        monthly_income: params.monthly_income || null,
+        billing_note: params.billing_note || null,
+        homeless: params.homeless || null,
+        financial_review: params.financial_review || null,
+        pubpid: params.pubpid || null,
+        genericname1: params.genericname1 || null,
+        genericval1: params.genericval1 || null,
+        genericname2: params.genericname2 || null,
+        genericval2: params.genericval2 || null,
+        hipaa_mail: params.hipaa_mail || null,
+        hipaa_voice: params.hipaa_voice || null,
+        hipaa_notice: params.hipaa_notice || null,
+        hipaa_message: params.hipaa_message || null,
+        squad: params.squad || null,
+        referral_source: params.referral_source || null,
+        usertext1: params.usertext1 || null,
+        usertext2: params.usertext2 || null,
+        usertext3: params.usertext3 || null,
+        usertext4: params.usertext4 || null,
+        usertext5: params.usertext5 || null,
+        usertext6: params.usertext6 || null,
+        usertext7: params.usertext7 || null,
+        usertext8: params.usertext8 || null,
+        userlist1: params.userlist1 || null,
+        userlist2: params.userlist2 || null,
+        userlist3: params.userlist3 || null,
+        userlist4: params.userlist4 || null,
+        userlist5: params.userlist5 || null,
+        userlist6: params.userlist6 || null,
+        userlist7: params.userlist7 || null,
+        regdate: params.regdate || null,
+        contrastart: params.contrastart || null,
+        ad_reviewed: params.ad_reviewed || null,
+        vfc: params.vfc || null,
+        mothersname: params.mothersname || null,
+        guardiansname: params.guardiansname || null,
+        allow_imm_reg_use: params.allow_imm_reg_use || null,
+        allow_imm_info_share: params.allow_imm_info_share || null,
+        allow_health_info_ex: params.allow_health_info_ex || null,
+        allow_patient_portal: params.allow_patient_portal || null,
+        deceased_date: params.deceased_date || null,
+        deceased_reason: params.deceased_reason || null,
+        soap_import_status: params.soap_import_status || null,
+        cmsportal_login: params.cmsportal_login || null,
+        care_team: params.care_team || null,
+        county: params.county || null,
+        industry: params.industry || null,
+        imm_reg_status: params.imm_reg_status || null,
+        imm_reg_stat_effdate: params.imm_reg_stat_effdate || null,
+        publicity_code: params.publicity_code || null,
+        publ_code_eff_date: params.publ_code_eff_date || null,
+        protect_indicator: params.protect_indicator || null,
+        prot_indi_effdate: params.prot_indi_effdate || null,
+        guardianrelationship: params.guardianrelationship || null,
+        guardiansex: params.guardiansex || null,
+        guardianaddress: params.guardianaddress || null,
+        guardiancity: params.guardiancity || null,
+        guardianstate: params.guardianstate || null,
+        guardianpostalcode: params.guardianpostalcode || null,
+        guardiancountry: params.guardiancountry || null,
+        guardianphone: params.guardianphone || null,
+        guardianworkphone: params.guardianworkphone || null,
+        guardianemail: params.guardianemail || null,
+        location_uuid: params.location_uuid || null,
+        bed_uuid: params.bed_uuid || null,
+        vital_uuid: params.vital_uuid || null,
+        med_record: params.med_record || null,
+        discharge_date: params.discharge_date || null
+    }
+}
+
 
 
 var Patient = function (patientobj) {
@@ -641,19 +749,17 @@ async function db_delete_patient(given_pid, transaction) {
         })
 }
 
-async function db_med_record_exist(med_record) {
-    let patient_data
+async function db_med_record_exist(params) {
     try {
-        patient_data = await Patients_Data.count({
+        return await Patients_Data.count({
             where: {
-                med_record: med_record,
+                med_record: params,
             },
             raw: true,
         })
     } catch (err) {
-        throw new Error("Patient  " + med_record + "not found Err:" + err)
+        throw new Error("Patient  " + params + "not found Err:" + err)
     }
-    return patient_data
 }
 
 async function db_disable_patient(params) {
@@ -662,7 +768,7 @@ async function db_disable_patient(params) {
     params.list.forEach(obj => {
         promises.push(
             Patients_Data.update(
-                { disabled: 0 },
+                { disabled: 0, med_record: null },
                 {
                     where:{ 
                         tenant_id: params.tenantId,
@@ -712,6 +818,38 @@ async function db_update_patient_associated_list(params) {
     }
 }
 
+async function db_edit_patient(params) {
+    try {
+        return await Patients_Data.update(
+            EDIT_PATIENT(params),
+            {
+                where:{
+                    pid: params.pid
+                }
+            }
+        )
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
+async function db_add_new_patient(params) {
+    try {
+        let data = EDIT_PATIENT(params)
+        data.pid = params.pid
+        data.tenant_id = params.tenantId
+        data.disabled = 1
+        data.status = "active"
+        return await Patients_Data.create(
+            data
+        )
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
 module.exports = {
     db_get_patient_list,
     db_get_patient_list_new,
@@ -727,5 +865,7 @@ module.exports = {
     db_get_patient_inventory,
     db_disable_patient,
     db_check_patient_exist,
-    db_update_patient_associated_list
+    db_update_patient_associated_list,
+    db_edit_patient,
+    db_add_new_patient
 }
