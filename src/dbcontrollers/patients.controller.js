@@ -838,7 +838,7 @@ async function db_add_new_patient(params) {
     try {
         let data = EDIT_PATIENT(params)
         data.pid = params.pid
-        data.tenant_id = params.tenantId
+        data.tenant_id = params.tenant_id
         data.disabled = 1
         data.status = "active"
         return await Patients_Data.create(
