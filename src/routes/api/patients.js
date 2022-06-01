@@ -49,7 +49,9 @@ const {
     createPatientProcedure,
     getPatientProcedure,
     updatePatientProcedure,
-    patientActions
+    patientActions,
+    editPatient,
+    addNewPatient
 } = require("../../business_logic/routes/patient")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse");
 
@@ -121,7 +123,7 @@ router.get("/:pid", getPatientDetail, apiFinalProcess)
  *         '201':
  *           description: Patient Demographic Information is added.
  */
-router.post("/", createPatient, apiFinalProcess)
+router.post("/", addNewPatient, apiFinalProcess)
 
 /**
  * @openapi
@@ -172,7 +174,7 @@ router.post("/bulkAdd", createPatientInBulk, apiFinalProcess)
  *               type: uuid
  *            description: The uuid of specific patient
  */
-router.post("/:pid", updatePatient, apiFinalProcess)
+router.post("/:pid", editPatient, apiFinalProcess)
 
 
 /**
