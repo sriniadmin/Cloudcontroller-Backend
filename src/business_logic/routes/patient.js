@@ -4295,9 +4295,8 @@ async function patientActions(req, res, next) {
 }
 
 async function disablePatient(req, res, next) {
-    let data
     try {
-        data = await db_disable_patient(req.body)
+        const data = await db_disable_patient(req.body)
         if(data[0][0] === 1){
             //chnage process later
             let list = []
@@ -4357,7 +4356,7 @@ async function unassociatePatient(req, res, next) {
 
 async function editPatient(req, res, next) {
     try {
-        await db_edit_patient(req.body)
+        await db_edit_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["7"]
         req.apiRes["response"] = req.body
     } catch (error) {
