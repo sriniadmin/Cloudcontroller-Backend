@@ -768,7 +768,7 @@ async function db_disable_patient(params) {
     params.list.forEach(obj => {
         promises.push(
             Patients_Data.update(
-                { disabled: 0, med_record: null },
+                { disabled: 0, med_record: 'DISABLED' },
                 {
                     where:{ 
                         tenant_id: params.tenantId,
