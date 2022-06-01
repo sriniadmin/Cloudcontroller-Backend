@@ -4373,12 +4373,12 @@ async function editPatient(req, res, next) {
 
 async function addNewPatient(req, res, next) {
     try {
-        const medical_record = await db_med_record_exist(req.body.med_record)
+        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
         if (medical_record) {
             req.apiRes = PATIENT_CODE["6"]
             req.apiRes["error"] = {
                 isExist: true,
-                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.med_record,
+        error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
             res.response(req.apiRes)
             return next()
@@ -4388,9 +4388,10 @@ async function addNewPatient(req, res, next) {
             uuidType: UUID_CONST["patient"],
             tenantID: req.body.tenantId,
         }
-        req.body.pid = await getUUID(uuidDict, { transaction: await sequelizeDB.transaction() })
+        req.body.demographic_map.tenant_id = req.body.tenantId
+        req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: await sequelizeDB.transaction() })
 
-        await db_add_new_patient(req.body)
+        await db_add_new_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["3"]
         req.apiRes["response"] = { patient_data: req.body }
     } catch (error) {
