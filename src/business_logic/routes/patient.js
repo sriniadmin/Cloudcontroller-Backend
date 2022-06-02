@@ -2597,11 +2597,10 @@ async function getPatientPractitioner(req, res, next) {
 
 // Validated
 async function createPatientVitalThreshold(req, res, next) {
-    let vital_threshold_data = req.body
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
+    // let vital_threshold_data = req.body
+    // let given_pid = vital_threshold_data.pid
+    // let tenant_id = vital_threshold_data.tenant_uuid
+    // let patient_exist
     let result
     const t = await sequelizeDB.transaction()
     //JSON SCHEMA VALIDATION
@@ -2617,23 +2616,23 @@ async function createPatientVitalThreshold(req, res, next) {
         return next()
     }
 
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
+    // try {
+    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
+    //     if (!validate_patient_exist(patient_exist, req)) return next()
+    // } catch (error) {
+    //     logger.debug("Exception : %s PID %s", error, given_pid)
+    //     logger.debug("The error in catch is ", error)
+    //     req.apiRes = PATIENT_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         errMessage: "Patient - ",
+    //     }
+    //     return next()
+    // }
     try {
         result = await sequelizeDB.transaction(async function (t) {
-            vital_threshold_data["tenant_uuid"] = tenant_id
-            vital_threshold_data["pid"] = given_pid
-            return db_create_vital_threshold(tenant_id, vital_threshold_data, {
+            // vital_threshold_data["tenant_uuid"] = tenant_id
+            // vital_threshold_data["pid"] = given_pid
+            return db_create_vital_threshold(tenant_id, req.body, {
                 transaction: t,
             })
         })

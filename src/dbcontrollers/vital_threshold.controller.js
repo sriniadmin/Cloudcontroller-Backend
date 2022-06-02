@@ -54,8 +54,8 @@ async function db_create_vital_threshold(
     vital_threshold_data,
     transaction
 ) {
-    vital_threshold_data = JSON.stringify(vital_threshold_data)
-    vital_threshold_data = JSON.parse(vital_threshold_data)
+    // vital_threshold_data = JSON.stringify(vital_threshold_data)
+    // vital_threshold_data = JSON.parse(vital_threshold_data)
     let trans = null
     if (typeof transaction !== "undefined") {
         logger.debug("Transacation is not undefined")
