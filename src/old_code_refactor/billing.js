@@ -97,9 +97,7 @@ const prepareDataForCreateBilling = (postData) => {
         if(!postData.staff_name || !postData.date || !postData.time_spent || !postData.task_id){
             return false;
         }
-        params = [{task_id: postData.task_id, temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+        params = [{task_id: postData.task_id, date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0}];
     }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
@@ -145,9 +143,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
     if(billingData[0].code == CPT_CODE.CPT_99091){
         if(postData.task_id){
             const newData = {
-                task_id: postData.task_id, temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+                task_id: postData.task_id, date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
             }
             result = params.map(item => {
@@ -159,9 +155,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
             })
         } else {
             const newData = {
-                task_id: date.getTime(), temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+                task_id: date.getTime(), date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
             }
             params.push(newData);
