@@ -70,6 +70,8 @@ const db_med_record_exist = patient_controller.db_med_record_exist
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 const db_disable_patient = patient_controller.db_disable_patient
+const db_edit_patient = patient_controller.db_edit_patient
+const db_add_new_patient = patient_controller.db_add_new_patient
 
 const { db_get_patient_details, db_get_patient_inventory, db_update_patient_associated_list } = patient_controller
 
@@ -4293,9 +4295,8 @@ async function patientActions(req, res, next) {
 }
 
 async function disablePatient(req, res, next) {
-    let data
     try {
-        data = await db_disable_patient(req.body)
+        const data = await db_disable_patient(req.body)
         if(data[0][0] === 1){
             //chnage process later
             let list = []
@@ -4353,6 +4354,57 @@ async function unassociatePatient(req, res, next) {
     return next()
 }
 
+async function editPatient(req, res, next) {
+    try {
+        await db_edit_patient(req.body.demographic_map)
+        req.apiRes = PATIENT_CODE["7"]
+        req.apiRes["response"] = req.body
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["8"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function addNewPatient(req, res, next) {
+    try {
+        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
+        if (medical_record) {
+            req.apiRes = PATIENT_CODE["6"]
+            req.apiRes["error"] = {
+                isExist: true,
+        error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+
+        let uuidDict = {
+            uuidType: UUID_CONST["patient"],
+            tenantID: req.body.tenantId,
+        }
+        req.body.demographic_map.tenant_id = req.body.tenantId
+        req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: await sequelizeDB.transaction() })
+
+        await db_add_new_patient(req.body.demographic_map)
+        req.apiRes = PATIENT_CODE["3"]
+        req.apiRes["response"] = { patient_data: req.body }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["4"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
 module.exports = {
     createPatientInBulk,
     // patientInventory,
@@ -4405,4 +4457,6 @@ module.exports = {
     registerPatientInventory,
     getPatientInventory,
     patientActions,
+    editPatient,
+    addNewPatient
 }

@@ -73,6 +73,7 @@ async function getBillingData(req,next) {
     }
 }
 const prepareDataForCreateBilling = (postData) => {
+    try{
     const listAllCodeSupport = Object.values(constant.CPT_CODE);
     let params = {};
     if(!listAllCodeSupport.includes(Number(postData.code))){
@@ -93,16 +94,17 @@ const prepareDataForCreateBilling = (postData) => {
             staff_name: postData.add_task_staff_name, task_note: postData.add_task_note, task_time_spend: postData.task_time_spend}]
     }
     if(postData.code == constant.CPT_CODE.CPT_99091){
-        if(!postData.staff_name || !postData.date || !postData.time_spent || !postData.id){
+        if(!postData.staff_name || !postData.date || !postData.time_spent || !postData.task_id){
             return false;
         }
-        params = [{id: postData.id, temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+        params = [{task_id: postData.task_id, date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0}];
     }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
     postData.params = JSON.stringify(params);
+} catch(err){
+    console.log(err);
+}
     return postData;
 }
 
@@ -139,11 +141,9 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         }
     }
     if(billingData[0].code == CPT_CODE.CPT_99091){
-        if(postData.id){
+        if(postData.task_id){
             const newData = {
-                id: postData.id, temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+                task_id: postData.task_id, date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
             }
             result = params.map(item => {
@@ -155,9 +155,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
             })
         } else {
             const newData = {
-                id: date.getTime(), temperature: postData.temperature || '', spo2: postData.spo2 || '', 
-        heart_rate: postData.heart_rate || '', blood_pressure: postData.blood_pressure || '',  
-        respiration_rate: postData.respiration_rate || '', date: postData.date || '', 
+                task_id: date.getTime(), date: postData.date || '', 
         staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
             }
             params.push(newData);
