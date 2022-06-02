@@ -903,6 +903,8 @@ function vv330(writeApi, data) {
 async function CheckingThreshold(params) {
     let list = await threshold_list
 
+    console.log('------------threshold_list------------', list.length)
+
     const sensor_type = {
         temperature: {
             key: 'TEMPERATURE',
@@ -1016,6 +1018,7 @@ async function CheckingThreshold(params) {
                         status: status
                     })
                 }
+                console.log('------------ADDED_NORMAL------------', list.length)
                 return 0
             }
         }
