@@ -318,11 +318,14 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
         // updated with the battery details etc - Better to come up with the JSON model for this.
 
-        await db_check_patient_exist(pid)
-            .then((patientResp) => {
-                klogger.debug("The patient info is : ", patientResp[pid])
-                tenant_id = patientResp['tenant_id']
+        const exist = await db_check_patient_exist(pid)
+        if(!exist){
+            return res.status(470).json({
+                status: '407',
+                messages: 'patientUUID not exit'
             })
+        }
+        tenant_id = patientResp['tenant_id']
 
         if ((typeof deviceListFromGateway !== 'string') && (deviceListFromGateway.length > 0)) {
             for (let i = 0; i < deviceListFromGateway.length; i++) {
