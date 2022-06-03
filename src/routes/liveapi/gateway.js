@@ -325,7 +325,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
                 messages: 'patientUUID not exit'
             })
         }
-        tenant_id = patientResp['tenant_id']
+        tenant_id = exist['tenant_id']
 
         if ((typeof deviceListFromGateway !== 'string') && (deviceListFromGateway.length > 0)) {
             for (let i = 0; i < deviceListFromGateway.length; i++) {
