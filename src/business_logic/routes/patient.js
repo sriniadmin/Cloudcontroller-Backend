@@ -2874,45 +2874,45 @@ async function reportGenerator(req) {
 }
 
 // Validated
-async function getPatientVitalThreashold(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    let vitalth
-    req.query.pid = req.params.pid
-    try {
-        vitalth = await db_get_vital_threshold_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = VITAL_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE VITALS",
-        }
-        return next()
-    }
-    req.apiRes = VITAL_CODE["2"]
-    req.apiRes["response"] = {
-        vitalth: vitalth,
-        count: vitalth.length,
-    }
-    return next()
-}
+// async function getPatientVitalThreashold(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     let vitalth
+//     req.query.pid = req.params.pid
+//     try {
+//         vitalth = await db_get_vital_threshold_list(
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = VITAL_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE VITALS",
+//         }
+//         return next()
+//     }
+//     req.apiRes = VITAL_CODE["2"]
+//     req.apiRes["response"] = {
+//         vitalth: vitalth,
+//         count: vitalth.length,
+//     }
+//     return next()
+// }
 
 
 
@@ -4400,6 +4400,25 @@ async function addNewPatient(req, res, next) {
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
         return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getPatientVitalThreashold(req, res, next) {
+    try {
+        const data = await db_get_vital_threshold_list(req.params)
+        req.apiRes = VITAL_CODE["2"]
+        req.apiRes["response"] = {
+            vitalth: data,
+            count: data.length,
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = VITAL_CODE["1"]
+        req.apiRes["error"] = {
+            error: error,
+        }
     }
     res.response(req.apiRes)
     return next()
