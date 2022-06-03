@@ -2648,6 +2648,8 @@ async function createPatientVitalThreshold(req, res, next) {
         patient_data: respResult,
         count: respResult.length,
     }
+    global_variable.threshold_list = db_threshold_by_patient()
+    console.log(global_variable.threshold_list)
     return next()
 }
 
@@ -4388,7 +4390,7 @@ async function addNewPatient(req, res, next) {
         }
         req.body.demographic_map.tenant_id = req.body.tenantId
         req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: await sequelizeDB.transaction() })
-        req.body.demographic_map.associated_list = '[]'
+        req.body.demographic_map.associated_list = "[]"
         await db_add_new_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["3"]
         req.apiRes["response"] = { patient_data: req.body }
