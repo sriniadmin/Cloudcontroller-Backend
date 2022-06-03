@@ -5,7 +5,8 @@ var {
     getBilling,
     updateBilling,
     updateBillingInformation,
-    updateBillingTask
+    updateBillingTask,
+    getBillingTotalSummary
 } = require("../../old_code_refactor/billing")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
@@ -66,6 +67,45 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 
 router.get("/", getBilling, apiFinalProcess)
+
+/**
+ * @openapi
+ * /api/billing/total-summary:
+ *   get:
+ *       tags:
+ *         - Billing
+ *       summary: Get Billing Report Summary
+ *       responses:
+ *         '201':
+ *           description: Billing  Information is provided.
+ *       parameters:
+ *          - in: query
+ *            name: bill_date
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: The uuid of specific billing patient
+ *          - in: query
+ *            name: limit
+ *            default: 10
+ *            schema:
+ *               type: integer
+ *            description: The number of items to return
+ *          - in: query
+ *            name: offset
+ *            default: 0
+ *            schema:
+ *               type: integer
+ *            description: The number of items to skip before starting to collect the result set
+ *          - in: query
+ *            name: filter
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: Search the billing
+ */
+
+router.get("/total-summary", getBillingTotalSummary, apiFinalProcess)
 
 /**
  * @openapi

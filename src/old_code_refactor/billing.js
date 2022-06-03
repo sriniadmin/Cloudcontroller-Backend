@@ -9,9 +9,10 @@ const {
     db_billing_exist,
     db_billing_pid_exist,
     db_update_billing_information,
+    db_get_billing_report_summary,
     db_get_patch_data,
     db_search_billing_id,
-    db_updated_task
+    db_updated_task,
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -52,26 +53,48 @@ async function getBilling(req, res, next) {
 
 async function getBillingData(req,next) {
     let tenant_id = req.userTenantId
-    logger.debug("tenant ID is ", tenant_id, req.query)
     let billing
-    logger.debug("the req query for the billing is", req.query)
     try {
         billing = await db_get_billing_report(tenant_id, req.query)
-        logger.debug("the billing get data is", billing)
     } catch (err) {
-        logger.debug("Billing list error " + err)
         req.apiRes = BILLING_CODE["1"]
         req.apiRes["error"] = {
             error: "ERROR IN FETCHING BILLING INVENTORY",
         }
         return next()
     }
-    logger.debug("Billing list is " + billing)
     return {
         billingData: billing,
         count: billing.length,
     }
 }
+
+async function getBillingTotalSummary(req, res, next) {
+    let billing;
+    try {
+        billing = await db_get_billing_report_summary(req.query)
+    } catch (err) {
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    if(!billing){
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    req.apiRes = BILLING_CODE["2"]
+    req.apiRes["response"] = {
+        billingData: billing
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 const prepareDataForCreateBilling = (postData) => {
     try{
     const listAllCodeSupport = Object.values(constant.CPT_CODE);
@@ -386,5 +409,6 @@ module.exports = {
     getBilling,
     getBillingData,
     updateBillingInformation,
+    getBillingTotalSummary,
     updateBillingTask
 }
