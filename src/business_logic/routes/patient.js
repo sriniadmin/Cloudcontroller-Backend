@@ -1458,7 +1458,7 @@ async function createPatientPatchMap(req, res, next) {
     //      patch_map[i]["keepaliveTime"] = "30"
     // }
 
-
+    let list = []
     try {
         result = await sequelizeDB.transaction( async function (t) {
             // logger.debug(
@@ -1469,7 +1469,7 @@ async function createPatientPatchMap(req, res, next) {
             // )
             if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
 
-            let list = []
+            
             let associated_list = req.body.associated_list
             if(associated_list.length > 0){
                 (associated_list).forEach(obj => {
@@ -1496,6 +1496,7 @@ async function createPatientPatchMap(req, res, next) {
         return next()
     }
     respResult = dbOutput_JSON(result)
+    req.body.associated_list = JSON.stringify(list)
     respResult = req.body
     req.apiRes = PATCH_CODE["3"]
     req.apiRes["response"] = {
