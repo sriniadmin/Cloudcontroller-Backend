@@ -903,8 +903,6 @@ function vv330(writeApi, data) {
 async function CheckingThreshold(params) {
     let list = await global_variable.threshold_list
 
-    console.log(list.length)
-
     const sensor_type = {
         temperature: {
             key: 'TEMPERATURE',
