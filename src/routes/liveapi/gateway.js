@@ -29,9 +29,9 @@ const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 const global_variable = require('../../../globle-config/global-variable');
 const {InfluxDB, Point} = require('@influxdata/influxdb-client')
 
-const threshold_list = db_threshold_by_patient()
+global_variable.threshold_list = db_threshold_by_patient()
 
-console.log('THRESHOLD LIST: ', threshold_list)
+console.log('THRESHOLD LIST: ', global_variable.threshold_list)
 
 /**
  * @openapi
@@ -901,9 +901,9 @@ function vv330(writeApi, data) {
 }
 
 async function CheckingThreshold(params) {
-    let list = await threshold_list
+    let list = await global_variable.threshold_list
 
-    console.log('------------threshold_list------------', list.length)
+    console.log(list.length)
 
     const sensor_type = {
         temperature: {
@@ -1018,7 +1018,6 @@ async function CheckingThreshold(params) {
                         status: status
                     })
                 }
-                console.log('------------ADDED_NORMAL------------', list.length)
                 return 0
             }
         }

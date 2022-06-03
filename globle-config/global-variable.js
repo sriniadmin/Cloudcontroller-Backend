@@ -1,5 +1,7 @@
 let socket
+let threshold_list
 
 module.exports={
-    socket
+    socket,
+    threshold_list
 }
