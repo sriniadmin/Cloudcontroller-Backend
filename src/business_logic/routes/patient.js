@@ -98,7 +98,7 @@ const {
     db_delete_patch_associated,
     db_get_patch_associated,
     db_delete_each_device,
-
+    db_threshold_by_patient,
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
 
