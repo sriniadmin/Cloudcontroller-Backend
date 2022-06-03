@@ -117,11 +117,12 @@ const prepareDataForCreateBilling = (postData) => {
             staff_name: postData.add_task_staff_name, task_note: postData.add_task_note, task_time_spend: postData.task_time_spend}]
     }
     if(postData.code == constant.CPT_CODE.CPT_99091){
-        if(!postData.staff_name || !postData.date || !postData.time_spent || !postData.task_id){
+        console.log(postData);
+        if(!postData.staff_name || !postData.date || !postData.task_time_spend || !postData.task_id){
             return false;
         }
         params = [{task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0}];
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0}];
     }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
     postData.params = JSON.stringify(params);
@@ -167,7 +168,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         if(postData.task_id){
             const newData = {
                 task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
             }
             result = params.map(item => {
                 if(item.id == postData.id){
@@ -179,7 +180,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         } else {
             const newData = {
                 task_id: date.getTime(), date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
             }
             params.push(newData);
             result = params;
