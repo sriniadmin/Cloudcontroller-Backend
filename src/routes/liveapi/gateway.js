@@ -925,7 +925,7 @@ async function CheckingThreshold(params) {
             max: 'max_temp',
             min: 'min_temp'
         },
-        bodyFatScale: {
+        bodyfatscale: {
             key: 'DIGITAL SCALE',
             value: 'weight',
             max: 'weight_max',
