@@ -736,7 +736,7 @@ router.post("/push_data", async function (req, res, next) {
             bp(writeApi, req.body)
         }
         else if('checkme_o2' === (req.body.deviceType).toLowerCase()){
-            const list = ['spo2', 'battery']
+            const list = ['spo2', 'battery', 'pi', 'pr']
 
             const active = checkParams({list:list, data: req.body})
             if(true === active.flg){
