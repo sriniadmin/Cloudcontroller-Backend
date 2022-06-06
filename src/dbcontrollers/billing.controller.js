@@ -32,6 +32,14 @@ models.patch_patient_map.hasMany(models.patch, {
 
 async function db_get_patch_data(params){
     let result = [];
+    let pids = null;
+    try{
+    if(typeof params.pid == 'string'){
+        pids = [params.pid];
+    } else {
+        pids = params.pid
+    }
+
     if(params.pid){
         result = await PatchPatientMap.findAll({
             include: [
@@ -42,7 +50,9 @@ async function db_get_patch_data(params){
             where: {
                 [Op.and]:[
                     {
-                        pid: params.pid,
+                        pid: {
+                            [Op.in]: pids
+                        }
                     },
                 ],
             },
@@ -50,6 +60,9 @@ async function db_get_patch_data(params){
             logging: console.log
         })
     }
+} catch(err){
+    console.log(err);
+}
     return result;
 }
 async function db_get_billing_report(tenant_id, params) {
