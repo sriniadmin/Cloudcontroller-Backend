@@ -8,6 +8,8 @@ const uuidAPIKey = require("uuid-apikey");
 const Tenants = models.tenant;
 const Patches = models.patch
 const Patch_Patient_Map = models.patch_patient_map;
+const Vital_Threshold = models.vital_threshold
+const Patient_Data = models.patient_data
 // const Patch_Patient_Map = models.patch_patient_map
 var PatchPatientMap = function (patch_patient_map_obj) {
     // Basic Details
@@ -569,6 +571,26 @@ async function db_get_pid_associated(params) {
         throw new Error(error)
     }
 }
+Patient_Data.hasMany(Vital_Threshold, {
+    foreignKey: "pid",
+    sourceKey: "pid"
+})
+
+async function db_threshold_by_patient(params) {
+    try {
+        return await Patient_Data.findAll({
+            include: [
+                {
+                    model: Vital_Threshold,
+                    where: {}
+                }
+            ]
+            // order: [['id', 'ASC']],
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
 module.exports = {
     db_get_patch_map_list,
@@ -582,5 +604,6 @@ module.exports = {
     db_delete_patch_associated,
     db_get_patch_associated,
     db_delete_each_device,
-    db_get_pid_associated
+    db_get_pid_associated,
+    db_threshold_by_patient
 };

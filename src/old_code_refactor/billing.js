@@ -9,9 +9,10 @@ const {
     db_billing_exist,
     db_billing_pid_exist,
     db_update_billing_information,
+    db_get_billing_report_summary,
     db_get_patch_data,
     db_search_billing_id,
-    db_updated_task
+    db_updated_task,
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -52,26 +53,57 @@ async function getBilling(req, res, next) {
 
 async function getBillingData(req,next) {
     let tenant_id = req.userTenantId
-    logger.debug("tenant ID is ", tenant_id, req.query)
     let billing
-    logger.debug("the req query for the billing is", req.query)
     try {
         billing = await db_get_billing_report(tenant_id, req.query)
-        logger.debug("the billing get data is", billing)
     } catch (err) {
-        logger.debug("Billing list error " + err)
         req.apiRes = BILLING_CODE["1"]
         req.apiRes["error"] = {
             error: "ERROR IN FETCHING BILLING INVENTORY",
         }
         return next()
     }
-    logger.debug("Billing list is " + billing)
     return {
         billingData: billing,
         count: billing.length,
     }
 }
+
+async function getBillingTotalSummary(req, res, next) {
+    let billing;
+    let patchData = [];
+    try {
+        billing = await db_get_billing_report_summary(req.query)
+        let listPids = [];
+        billing.map(item => {
+            if(!listPids.includes(item.pid)){
+                listPids.push(item.pid)
+            }
+        })
+        patchData = await db_get_patch_data({pid: listPids});
+    } catch (err) {
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    if(!billing){
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    req.apiRes = BILLING_CODE["2"]
+    req.apiRes["response"] = {
+        billingData: billing,
+        patchData: patchData
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
 const prepareDataForCreateBilling = (postData) => {
     try{
     const listAllCodeSupport = Object.values(constant.CPT_CODE);
@@ -94,11 +126,12 @@ const prepareDataForCreateBilling = (postData) => {
             staff_name: postData.add_task_staff_name, task_note: postData.add_task_note, task_time_spend: postData.task_time_spend}]
     }
     if(postData.code == constant.CPT_CODE.CPT_99091){
-        if(!postData.staff_name || !postData.date || !postData.time_spent || !postData.task_id){
+        console.log(postData);
+        if(!postData.staff_name || !postData.date || !postData.task_time_spend || !postData.task_id){
             return false;
         }
         params = [{task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0}];
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0}];
     }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
     postData.params = JSON.stringify(params);
@@ -144,7 +177,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         if(postData.task_id){
             const newData = {
                 task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
             }
             result = params.map(item => {
                 if(item.id == postData.id){
@@ -156,7 +189,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         } else {
             const newData = {
                 task_id: date.getTime(), date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', time_spent: postData.time_spent || 0
+        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
             }
             params.push(newData);
             result = params;
@@ -386,5 +419,6 @@ module.exports = {
     getBilling,
     getBillingData,
     updateBillingInformation,
+    getBillingTotalSummary,
     updateBillingTask
 }

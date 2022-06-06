@@ -135,6 +135,21 @@ let ASSOCIATE_CODE = {
     },
 }
 
+let ALERT_CODE = {
+    1: {
+        Code: "FETCH_ALERT_DATA_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in fetching the alert data information",
+        Details: {},
+    },
+    0: {
+        Code: "FETCH_ALERT_DATA_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in fetching the alert data information",
+        Details: {},
+    }
+}
+
 
 let PATIENT_CODE = {
     1: {
@@ -1513,5 +1528,6 @@ module.exports = {
     PASSWORD_CODE,
     PROFILE_CODE,
     DEVICE_CODE,
-    ASSOCIATE_CODE
+    ASSOCIATE_CODE,
+    ALERT_CODE
 }

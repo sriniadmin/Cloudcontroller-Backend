@@ -98,7 +98,7 @@ const {
     db_delete_patch_associated,
     db_get_patch_associated,
     db_delete_each_device,
-
+    db_threshold_by_patient,
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
 
@@ -1458,7 +1458,7 @@ async function createPatientPatchMap(req, res, next) {
     //      patch_map[i]["keepaliveTime"] = "30"
     // }
 
-
+    let list = []
     try {
         result = await sequelizeDB.transaction( async function (t) {
             // logger.debug(
@@ -1469,7 +1469,7 @@ async function createPatientPatchMap(req, res, next) {
             // )
             if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
 
-            let list = []
+            
             let associated_list = req.body.associated_list
             if(associated_list.length > 0){
                 (associated_list).forEach(obj => {
@@ -1496,6 +1496,7 @@ async function createPatientPatchMap(req, res, next) {
         return next()
     }
     respResult = dbOutput_JSON(result)
+    req.body.associated_list = JSON.stringify(list)
     respResult = req.body
     req.apiRes = PATCH_CODE["3"]
     req.apiRes["response"] = {
@@ -2597,11 +2598,10 @@ async function getPatientPractitioner(req, res, next) {
 
 // Validated
 async function createPatientVitalThreshold(req, res, next) {
-    let vital_threshold_data = req.body
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
+    // let vital_threshold_data = req.body
+    // let given_pid = vital_threshold_data.pid
+    // let tenant_id = vital_threshold_data.tenant_uuid
+    // let patient_exist
     let result
     const t = await sequelizeDB.transaction()
     //JSON SCHEMA VALIDATION
@@ -2617,23 +2617,23 @@ async function createPatientVitalThreshold(req, res, next) {
         return next()
     }
 
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
+    // try {
+    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
+    //     if (!validate_patient_exist(patient_exist, req)) return next()
+    // } catch (error) {
+    //     logger.debug("Exception : %s PID %s", error, given_pid)
+    //     logger.debug("The error in catch is ", error)
+    //     req.apiRes = PATIENT_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         errMessage: "Patient - ",
+    //     }
+    //     return next()
+    // }
     try {
         result = await sequelizeDB.transaction(async function (t) {
-            vital_threshold_data["tenant_uuid"] = tenant_id
-            vital_threshold_data["pid"] = given_pid
-            return db_create_vital_threshold(tenant_id, vital_threshold_data, {
+            // vital_threshold_data["tenant_uuid"] = tenant_id
+            // vital_threshold_data["pid"] = given_pid
+            return db_create_vital_threshold(tenant_id, req.body, {
                 transaction: t,
             })
         })
@@ -2649,6 +2649,8 @@ async function createPatientVitalThreshold(req, res, next) {
         patient_data: respResult,
         count: respResult.length,
     }
+    global_variable.threshold_list = db_threshold_by_patient()
+    console.log(global_variable.threshold_list)
     return next()
 }
 
@@ -2873,45 +2875,45 @@ async function reportGenerator(req) {
 }
 
 // Validated
-async function getPatientVitalThreashold(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    let vitalth
-    req.query.pid = req.params.pid
-    try {
-        vitalth = await db_get_vital_threshold_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = VITAL_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE VITALS",
-        }
-        return next()
-    }
-    req.apiRes = VITAL_CODE["2"]
-    req.apiRes["response"] = {
-        vitalth: vitalth,
-        count: vitalth.length,
-    }
-    return next()
-}
+// async function getPatientVitalThreashold(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     let vitalth
+//     req.query.pid = req.params.pid
+//     try {
+//         vitalth = await db_get_vital_threshold_list(
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = VITAL_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE VITALS",
+//         }
+//         return next()
+//     }
+//     req.apiRes = VITAL_CODE["2"]
+//     req.apiRes["response"] = {
+//         vitalth: vitalth,
+//         count: vitalth.length,
+//     }
+//     return next()
+// }
 
 
 
@@ -4389,7 +4391,7 @@ async function addNewPatient(req, res, next) {
         }
         req.body.demographic_map.tenant_id = req.body.tenantId
         req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: await sequelizeDB.transaction() })
-
+        req.body.demographic_map.associated_list = "[]"
         await db_add_new_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["3"]
         req.apiRes["response"] = { patient_data: req.body }
@@ -4399,6 +4401,25 @@ async function addNewPatient(req, res, next) {
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
         return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getPatientVitalThreashold(req, res, next) {
+    try {
+        const data = await db_get_vital_threshold_list(req.params)
+        req.apiRes = VITAL_CODE["2"]
+        req.apiRes["response"] = {
+            vitalth: data,
+            count: data.length,
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = VITAL_CODE["1"]
+        req.apiRes["error"] = {
+            error: error,
+        }
     }
     res.response(req.apiRes)
     return next()

@@ -32,6 +32,14 @@ models.patch_patient_map.hasMany(models.patch, {
 
 async function db_get_patch_data(params){
     let result = [];
+    let pids = null;
+    try{
+    if(typeof params.pid == 'string'){
+        pids = [params.pid];
+    } else {
+        pids = params.pid
+    }
+
     if(params.pid){
         result = await PatchPatientMap.findAll({
             include: [
@@ -42,7 +50,9 @@ async function db_get_patch_data(params){
             where: {
                 [Op.and]:[
                     {
-                        pid: params.pid,
+                        pid: {
+                            [Op.in]: pids
+                        }
                     },
                 ],
             },
@@ -50,6 +60,9 @@ async function db_get_patch_data(params){
             logging: console.log
         })
     }
+} catch(err){
+    console.log(err);
+}
     return result;
 }
 async function db_get_billing_report(tenant_id, params) {
@@ -331,6 +344,45 @@ async function db_search_billing_id(postData) {
     return billing_data
 }
 
+async function db_get_billing_report_summary(params) {
+    try{
+    let { limit, offset } = params
+    let billing;
+    console.log(moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss'));
+    console.log(moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss'));
+    if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
+        billing = await Billing.findAll({
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            include: [
+                {
+                    model:models.patient_data,
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
+                }
+               
+            ],
+            where: {
+                bill_date: {
+                    [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                },
+                [Op.and]: [{
+                    bill_date: {
+                        [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                    }
+                }
+                ]
+            
+            },
+            raw: false,
+            logging: console.log
+        })
+        return billing
+    }catch(err){
+        console.log(err);
+        return false;
+    }
+}
+
 async function db_update_billing_information(tenant_id, billing_data, given_pid,transaction) {
     let { pid } = given_pid
     billing_data = JSON.stringify(billing_data)
@@ -369,5 +421,6 @@ module.exports = {
     db_update_billing_information,
     db_search_billing_id,
     db_updated_task,
+    db_get_billing_report_summary,
     db_get_patch_data
 }

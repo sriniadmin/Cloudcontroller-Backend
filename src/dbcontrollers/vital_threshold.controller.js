@@ -17,45 +17,13 @@ var Vital_threshold = function (vital_thresholdobj) {
             (this.maxrr = vital_thresholdobj.maxrr)
 }
 
-async function db_get_vital_threshold_list(tenant_uuid, username, params) {
-    let vital_threshold_list
-    let { limit, offset, filter, pid } = params
-    let whereStatement = {
-        tenant_uuid: tenant_uuid,
-        pid: pid,
-    }
-    await VitalThreshold.findAll({
-        limit: parseInt(limit),
-        // offset:parseInt(offset),
-        order: Sequelize.literal("createdAt DESC"),
-        raw: true,
-        where: whereStatement,
-    })
-        .then((vital_threshold_data) => {
-            logger.debug("Vital threshold list is" + vital_threshold_data)
-            vital_threshold_list = vital_threshold_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Vital_threshold list fetch error " +
-                tenant_uuid +
-                "not found Err:" +
-                err
-            )
-            throw new Error("Vital_threshold list fetch error -  tenant check")
-        })
-
-    return vital_threshold_list
-
-}
-
 async function db_create_vital_threshold(
     tenant_id,
     vital_threshold_data,
     transaction
 ) {
-    vital_threshold_data = JSON.stringify(vital_threshold_data)
-    vital_threshold_data = JSON.parse(vital_threshold_data)
+    // vital_threshold_data = JSON.stringify(vital_threshold_data)
+    // vital_threshold_data = JSON.parse(vital_threshold_data)
     let trans = null
     if (typeof transaction !== "undefined") {
         logger.debug("Transacation is not undefined")
@@ -147,6 +115,20 @@ async function db_delete_vital_threshold(given_pid, transaction) {
                 given_pid
             )
         })
+}
+
+
+async function db_get_vital_threshold_list(params) {
+    try {
+        return await VitalThreshold.findAll({
+            where: {
+                pid: params.pid
+            },
+            order: [["updatedAt", "DESC"]]
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
 }
 
 module.exports = {

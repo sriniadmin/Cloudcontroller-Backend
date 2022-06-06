@@ -8,6 +8,9 @@ const klogger = log4js.getLogger('liveapi');
 const rlogger = log4js.getLogger('liveapiReg');
 
 const patient_controller = require("../../dbcontrollers/patients.controller")
+const {
+    db_add_alert_data
+} = require("../../dbcontrollers/alert_data.controller")
 const { db_get_device_id } = require("../../dbcontrollers/patch.controller")
 const redisClient = require("../../external_services/redis/cache_service/redis_client")
 const { otpverify } = require("../../../src/business_logic/routes/patient")
@@ -17,13 +20,18 @@ const { db_patch_exist } = require("../../dbcontrollers/patch.controller")
 const { db_get_patch_map_list, 
     clear_command,
     update_keepalive,
-    db_get_pid_associated } =
-    require("../../dbcontrollers/patch_patient.controller")
+    db_get_pid_associated,
+    db_threshold_by_patient
+} = require("../../dbcontrollers/patch_patient.controller")
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 
 const global_variable = require('../../../globle-config/global-variable');
 const {InfluxDB, Point} = require('@influxdata/influxdb-client')
+
+global_variable.threshold_list = db_threshold_by_patient()
+
+console.log('THRESHOLD LIST: ', global_variable.threshold_list)
 
 /**
  * @openapi
@@ -310,11 +318,14 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
         // updated with the battery details etc - Better to come up with the JSON model for this.
 
-        await db_check_patient_exist(pid)
-            .then((patientResp) => {
-                klogger.debug("The patient info is : ", patientResp[pid])
-                tenant_id = patientResp['tenant_id']
+        const exist = await db_check_patient_exist(pid)
+        if(!exist){
+            return res.status(470).json({
+                status: '407',
+                messages: 'patientUUID not exit'
             })
+        }
+        tenant_id = exist['tenant_id']
 
         if ((typeof deviceListFromGateway !== 'string') && (deviceListFromGateway.length > 0)) {
             for (let i = 0; i < deviceListFromGateway.length; i++) {
@@ -660,6 +671,7 @@ router.post("/gateway_register", async function (req, res, next) {
 //TODO: Make it Http1.1
 router.post("/push_data", async function (req, res, next) {
     try {
+        //Receiving sensor data
         const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
         const org = 'live247'
         const bucket = 'emr_dev'
@@ -724,7 +736,7 @@ router.post("/push_data", async function (req, res, next) {
             bp(writeApi, req.body)
         }
         else if('checkme_o2' === (req.body.deviceType).toLowerCase()){
-            const list = ['spo2', 'battery']
+            const list = ['spo2', 'battery', 'pi', 'pr']
 
             const active = checkParams({list:list, data: req.body})
             if(true === active.flg){
@@ -741,8 +753,14 @@ router.post("/push_data", async function (req, res, next) {
             }
             vv330(writeApi, req.body)
         }
-        return res.status(200).json({ pushData: "Success" })
-        
+        else {
+            return res.status(470).json({ Message: 'Device types is not supported' })
+        }
+        res.status(200).json({ pushData: "Success" })
+        // res.status(200).json({ pushData: await threshold_list })
+
+        //Get list to check threshold before other
+        return CheckingThreshold(req.body)
     } catch (error) {
         return res.status(500).json({ ERROR: error })
     }
@@ -857,11 +875,23 @@ function checkme_O2(writeApi, data) {
     .floatField('spo2', data.spo2)
     writeApi.writePoint(point1)
 
+    //pi
+    const point2 = new Point(`${data.patientUUID}_pi`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('pi', data.pi)
+    writeApi.writePoint(point2)
+
+    //pr
+    const point3 = new Point(`${data.patientUUID}_pr`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('pr', data.pr)
+    writeApi.writePoint(point3)
+
     //battery
-    const point3 = new Point(`${data.patientUUID}_spo2_battery`)
+    const point4 = new Point(`${data.patientUUID}_spo2_battery`)
     .tag('deviceModel', 'Spo2')
     .floatField('battery', data.battery)
-    writeApi.writePoint(point3)
+    writeApi.writePoint(point4)
 }
 
 function vv330(writeApi, data) {
@@ -883,6 +913,128 @@ function vv330(writeApi, data) {
     .tag('deviceModel', 'Ecg')
     .floatField('battery', data.gwBattery)
     writeApi.writePoint(point3)
+}
+
+async function CheckingThreshold(params) {
+    let list = await global_variable.threshold_list
+
+    const sensor_type = {
+        temperature: {
+            key: 'TEMPERATURE',
+            value: 'value',
+            max: 'max_temp',
+            min: 'min_temp'
+        },
+        bodyfatscale: {
+            key: 'DIGITAL SCALE',
+            value: 'weight',
+            max: 'weight_max',
+            min: 'weight_min'
+        },
+        urionbp: {
+            type: 'rk',
+            key: 'BP SENSOR',
+            value: 'bps',
+            value_plus: 'bpd',
+            max: 'bps_max',
+            min: 'bps_min',
+            max_plus: 'bpd_max',
+            min_plus: 'bpd_min'
+        },
+        bp: {
+            type: 'rk',
+            key: 'BP SENSOR',
+            value: 'sys',
+            value_plus: 'dia',
+            max: 'bps_max',
+            min: 'bps_min',
+            max_plus: 'bpd_max',
+            min_plus: 'bpd_min'
+        },
+        checkme_o2: {
+            key: 'SPO2',
+            value: 'spo2',
+            max: 'max_spo2',
+            min: 'min_spo2'
+        },
+        vv330: {
+            type: 'rk',
+            key: 'ECG',
+            value: 'HR',
+            value_plus: 'RR',
+            max: 'max_hr',
+            min: 'min_hr',
+            max_plus: 'max_rr',
+            min_plus: 'min_rr'
+        },
+    }
+
+    for (const obj of list) {
+        if(obj.pid === params.patientUUID){
+            const Threshold = obj.vital_thresholds[obj.vital_thresholds.length-1]
+            const sensor = sensor_type[params.deviceType.toLowerCase()]
+
+            if(!sensor) return 0
+            let json_rk = params
+            if(('bp' === params.deviceType.toLowerCase()) || ('vv330' === params.deviceType.toLowerCase())){
+                json_rk = params.data.extras
+            }
+            if('rk' === sensor.type){
+                if((json_rk[sensor.value] > Threshold[sensor.max]) || (json_rk[sensor.value] < Threshold[sensor.min])){
+                    let status = 'high'
+                    if(json_rk[sensor.value] < Threshold[sensor.min]){
+                        status = 'low'
+                    }
+                    await db_add_alert_data({
+                        pid: obj.pid,
+                        device_type: sensor.key,
+                        value: json_rk[sensor.value],
+                        value_of: sensor.value,
+                        threshold_id: Threshold.id,
+                        min: Threshold[sensor.min],
+                        max: Threshold[sensor.max],
+                        status: status
+                    })
+                }
+                if((json_rk[sensor.value_plus] > Threshold[sensor.max_plus]) || (json_rk[sensor.value_plus] < Threshold[sensor.min_plus])){
+                    let status = 'high'
+                    if(json_rk[sensor.value_plus] < Threshold[sensor.min_plus]){
+                        status = 'low'
+                    }
+                    await db_add_alert_data({
+                        pid: obj.pid,
+                        device_type: sensor.key,
+                        value: json_rk[sensor.value_plus],
+                        value_of: sensor.value_plus,
+                        threshold_id: Threshold.id,
+                        min: Threshold[sensor.min_plus],
+                        max: Threshold[sensor.max_plus],
+                        status: status
+                    })
+                }
+                return 0
+            }
+            else{
+                if((params[sensor.value] > Threshold[sensor.max]) || (params[sensor.value] < Threshold[sensor.min])){
+                    let status = 'high'
+                    if(params[sensor.value] < Threshold[sensor.min]){
+                        status = 'low'
+                    }
+                    await db_add_alert_data({
+                        pid: obj.pid,
+                        device_type: sensor.key,
+                        value: params[sensor.value],
+                        value_of: sensor.value,
+                        threshold_id: Threshold.id,
+                        min: Threshold[sensor.min],
+                        max: Threshold[sensor.max],
+                        status: status
+                    })
+                }
+                return 0
+            }
+        }
+    }
 }
 
 module.exports = router
