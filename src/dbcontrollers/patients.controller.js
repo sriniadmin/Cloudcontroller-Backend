@@ -501,13 +501,23 @@ async function db_get_patient_inventory(params) {
                 lname: {[Op.like]: `%${strings[1]}%`}
             }
         }
+        else if(strings.length === 3){
+            condition = {
+                tenant_id: params.tenantId,
+                disabled: 1,
+                fname: {[Op.like]: `%${strings[0]}%`},
+                mname: {[Op.like]: `%${strings[1]}%`},
+                lname: {[Op.like]: `%${strings[2]}%`}
+            }
+        }
         else{
             condition = {
                 tenant_id: params.tenantId,
                 disabled: 1,
                 [Op.or]: [
                     {fname: {[Op.like]: `%${params.name}%`}}, 
-                    {lname: {[Op.like]: `%${params.name}%`}}, 
+                    {lname: {[Op.like]: `%${params.name}%`}},
+                    {mname: {[Op.like]: `%${params.name}%`}}, 
                     {med_record: {[Op.like]: `%${params.name}%`}},
                     {phone_contact: {[Op.like]: `%${params.name}%`}}
                 ]
