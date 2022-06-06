@@ -71,8 +71,16 @@ async function getBillingData(req,next) {
 
 async function getBillingTotalSummary(req, res, next) {
     let billing;
+    let patchData = [];
     try {
         billing = await db_get_billing_report_summary(req.query)
+        let listPids = [];
+        billing.map(item => {
+            if(!listPids.includes(item.pid)){
+                listPids.push(item.pid)
+            }
+        })
+        patchData = await db_get_patch_data({pid: listPids});
     } catch (err) {
         req.apiRes = BILLING_CODE["1"]
         req.apiRes["error"] = {
@@ -89,7 +97,8 @@ async function getBillingTotalSummary(req, res, next) {
     }
     req.apiRes = BILLING_CODE["2"]
     req.apiRes["response"] = {
-        billingData: billing
+        billingData: billing,
+        patchData: patchData
     }
     res.response(req.apiRes)
     return next()
