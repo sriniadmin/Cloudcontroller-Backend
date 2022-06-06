@@ -875,11 +875,23 @@ function checkme_O2(writeApi, data) {
     .floatField('spo2', data.spo2)
     writeApi.writePoint(point1)
 
+    //pi
+    const point2 = new Point(`${data.patientUUID}_pi`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('pi', data.pi)
+    writeApi.writePoint(point2)
+
+    //pr
+    const point3 = new Point(`${data.patientUUID}_pr`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('pr', data.pr)
+    writeApi.writePoint(point3)
+
     //battery
-    const point3 = new Point(`${data.patientUUID}_spo2_battery`)
+    const point4 = new Point(`${data.patientUUID}_spo2_battery`)
     .tag('deviceModel', 'Spo2')
     .floatField('battery', data.battery)
-    writeApi.writePoint(point3)
+    writeApi.writePoint(point4)
 }
 
 function vv330(writeApi, data) {
@@ -913,12 +925,12 @@ async function CheckingThreshold(params) {
             max: 'max_temp',
             min: 'min_temp'
         },
-        // bodyFatScale: {
-        //     key: 'DIGITAL SCALE',
-        //     value: 'weight',
-        //     max: 15,
-        //     min: 4
-        // },
+        bodyFatScale: {
+            key: 'DIGITAL SCALE',
+            value: 'weight',
+            max: 'weight_max',
+            min: 'weight_min'
+        },
         urionbp: {
             type: 'rk',
             key: 'BP SENSOR',
