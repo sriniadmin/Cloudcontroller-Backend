@@ -756,6 +756,27 @@ router.post("/push_data", async function (req, res, next) {
         else {
             return res.status(470).json({ Message: 'Device types is not supported' })
         }
+
+        if(global_variable.socket){
+
+            const data = {
+                pi: req.body.pi || 0,
+                pr: req.body.pr || 0,
+                spo2: req.body.spo2 || 0,
+                temp: req.body.value || 0
+            }
+            
+            let extras = req.body.data
+            if(extras && extras.extras){
+                data.hr = extras.extras.HR || 0,
+                data.rr = extras.extras.RR || 0
+            }
+            else{
+                data.hr = 0,
+                data.rr = 0
+            }
+            global_variable.socket.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
+        }
         res.status(200).json({ pushData: "Success" })
         // res.status(200).json({ pushData: await threshold_list })
 
