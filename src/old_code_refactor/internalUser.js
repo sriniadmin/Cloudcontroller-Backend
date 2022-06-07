@@ -121,7 +121,8 @@ const {
     db_delete_patch,
     db_get_patch_saas,
     db_create_device,
-    db_check_duplicate_device
+    db_check_duplicate_device,
+    db_get_device
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -920,8 +921,8 @@ async function getPatchInventory(req, res, next) {
         request = req.query
         tenant_id = req.query.tenantId
     }
-    logger.debug("THE QUERY IS", req.query)
-    logger.debug("THE PARAMS ARE", req.params)
+    // logger.debug("THE QUERY IS", req.query)
+    // logger.debug("THE PARAMS ARE", req.params)
     let patches
     let filtered_patches = []
     let totalCount = 0
@@ -2918,22 +2919,24 @@ async function getDeviceType(req, res, next) {
 }
 
 async function getPathSaas(req, res, next) {
-    let data
     try {
-        data = await db_get_patch_saas(req.query)
+        const data = await db_get_patch_saas(req.query)
+
+        if((data === null) || (data.length===0)){
+            req.apiRes = PATCH_CODE["13"]
+        }
+        else{
+            req.apiRes = PATCH_CODE["2"]
+        }
+        req.apiRes["response"] = {
+            patch: data,
+            count: data.length
+        }
     } catch (error) {
         console.log(error)
+        req.apiRes["response"] = {error: error}
     }
-    if((data === null) || (data.length===0)){
-        req.apiRes = PATCH_CODE["13"]
-    }
-    else{
-        req.apiRes = PATCH_CODE["2"]
-    }
-    req.apiRes["response"] = {
-        patch: data,
-        count: data.length
-    }
+    
     res.response(req.apiRes)
     return next()
 }
@@ -2970,6 +2973,28 @@ async function createDevice(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getDevice(req, res, next) {
+    try {
+        const data = await db_get_device(req.body)
+
+        req.apiRes = PATCH_CODE["2"]
+        req.apiRes["response"] = {
+            patches: data,
+            count: data.length,
+            patchTotalCount: data.length,
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATCH_CODE["1"]
+    }
+
     res.response(req.apiRes)
     return next()
 }
@@ -3033,5 +3058,6 @@ module.exports = {
     deletePatch,
     getDeviceType,
     getPathSaas,
-    createDevice
+    createDevice,
+    getDevice
 }

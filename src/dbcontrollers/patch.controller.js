@@ -788,6 +788,59 @@ async function db_check_duplicate_device(params) {
     }
 }
 
+async function db_get_device(params) {
+    let limit = params.limit
+    let offset = (params.offset - 1) * limit
+    let condition = {
+        tenant_id: params.tenantId
+    }
+    if (params.search) {
+        offset = 0
+        params.search = (params.search).toLowerCase()
+        condition = {
+            tenant_id: params.tenantId,
+            [Op.or]: [
+                { patch_mac: { [Op.like]: `%${params.search}%` } },
+                { patch_serial: { [Op.like]: `%${params.search}%` } }
+            ]
+        }
+    }
+    try {
+        return await Patches.findAll({
+            include: [
+                {
+                    model: models.patch_patient_map,
+                    include:[
+                        {
+                            model:models.patient_data,
+                            attributes:['fname','lname','pid']
+                        }
+                    ],
+                    required: false,
+                    where: {
+                        tenant_id: params.tenantId
+                    },
+                },
+                {
+                    model: models.patch,
+                    required: true,
+                    as: "AssociatedPatch",
+                },
+    
+            ],
+            limit: limit,
+            offset: offset,
+            required: false,
+            order: [["date", "DESC"]],
+            raw: false,
+            where: condition
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -807,5 +860,6 @@ module.exports = {
     db_update_patch_register,
     db_get_device_id,
     db_create_device,
-    db_check_duplicate_device
+    db_check_duplicate_device,
+    db_get_device
 }
