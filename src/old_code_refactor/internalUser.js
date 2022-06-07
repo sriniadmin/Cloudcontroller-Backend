@@ -2960,7 +2960,7 @@ async function createDevice(req, res, next) {
 
         req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
         
-        // const data = await db_create_device(req)
+        const data = await db_create_device(req)
         req.apiRes = PATCH_CODE["3"]
         req.apiRes["response"] = { data: data }
     } catch (error) {
