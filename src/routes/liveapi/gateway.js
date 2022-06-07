@@ -470,8 +470,8 @@ router.post("/gateway_keepalive", async function (req, res, next) {
 
         // // klogger.debug("The keepalive response is", resp)
         // // resp
-        resp['Command'] = 'softkill'
-        return res.status(200).json(resp)
+        // resp['Command'] = 'softkill'
+        return res.status(200).json({Command: 'softkill'})
     } catch (error) {
         console.log(error)
         return res.status(500).json('ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)
