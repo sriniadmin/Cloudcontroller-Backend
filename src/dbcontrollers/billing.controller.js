@@ -346,12 +346,11 @@ async function db_search_billing_id(postData) {
 
 async function db_get_billing_report_summary(params) {
     try{
-    let { limit, offset } = params
+    let { limit, offset, filter = null } = params
     let billing;
-    console.log(moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss'));
-    console.log(moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss'));
     if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
-        billing = await Billing.findAll({
+    if(!filter){
+    billing = await Billing.findAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
             include: [
@@ -371,12 +370,45 @@ async function db_get_billing_report_summary(params) {
                     }
                 }
                 ]
-            
             },
             raw: false,
             logging: console.log
         })
         return billing
+    } else {
+        billing = await Billing.findAll({
+            limit: parseInt(limit),
+            offset: parseInt(offset),
+            include: [
+                {
+                    model:models.patient_data,
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
+                }
+               
+            ],
+            where: {
+                bill_date: {
+                    [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                },
+                [Op.and]: [{
+                    bill_date: {
+                        [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                    }
+                }
+                ],
+                [Op.and]: [
+                    Sequelize.where(
+                        Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
+                        { [Op.like]: `%${filter}%` }
+                    )
+                ]
+            },
+            
+            raw: false,
+            logging: console.log
+        })
+        return billing
+    }
     }catch(err){
         console.log(err);
         return false;
