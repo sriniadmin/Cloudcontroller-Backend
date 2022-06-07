@@ -151,7 +151,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
                 task_id: postData.task_id,
                 task_date: postData.task_date,
                 staff_name: postData.staff_name,
-                task_note: postData.task_note,
+                task_note: postData.add_task_note,
                 task_time_spend: postData.task_time_spend
             }
             result = params.map(item => {
@@ -166,7 +166,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
                 task_id: date.getTime(),
                 task_date: postData.task_date,
                 staff_name: postData.staff_name,
-                task_note: postData.task_note,
+                task_note: postData.add_task_note,
                 task_time_spend: postData.task_time_spend
             }
             params.push(newData);
