@@ -764,6 +764,30 @@ async function db_create_device(params) {
     }
 }
 
+async function db_check_duplicate_device(params) {
+    try {
+        let condition = {}
+        if(params.patch_type === 'gateway'){
+            condition = {
+                patch_type: params.patch_type,
+                patch_serial: params.patch_serial
+            }
+        }
+        else {
+            condition = {
+                patch_type: params.patch_type,
+                patch_mac: params.patch_mac
+            }
+        }
+        return await Patches.findOne({
+            where: condition,
+            raw: true,
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -782,5 +806,6 @@ module.exports = {
     db_get_patch_saas,
     db_update_patch_register,
     db_get_device_id,
-    db_create_device
+    db_create_device,
+    db_check_duplicate_device
 }
