@@ -120,7 +120,8 @@ const {
     db_get_patch_select_boxes,
     db_delete_patch,
     db_get_patch_saas,
-    db_create_device
+    db_create_device,
+    db_check_duplicate_device
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -2944,10 +2945,22 @@ async function createDevice(req, res, next) {
             uuidType: UUID_CONST["patch"],
             tenantID: tenant_id,
         }
+        const result = await db_check_duplicate_device(req.body.data[0])
+
+        if(result && (req.body.data[0].patch_type === 'gateway')){
+            req.apiRes = PATCH_CODE["14"]
+            res.response(req.apiRes)
+            return next()
+        }
+        else if(result){
+            req.apiRes = PATCH_CODE["15"]
+            res.response(req.apiRes)
+            return next()
+        }
 
         req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
         
-        const data = await db_create_device(req)
+        // const data = await db_create_device(req)
         req.apiRes = PATCH_CODE["3"]
         req.apiRes["response"] = { data: data }
     } catch (error) {
