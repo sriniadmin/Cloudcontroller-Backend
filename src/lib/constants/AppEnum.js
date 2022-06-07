@@ -360,6 +360,16 @@ let PATCH_CODE = {
         HttpStatus: "470",
         Message: "Failure in fetching, serial number does not exist",
     },
+    14: {
+        Code: "SERIAL_NUMBER_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Serial number is already exist",
+    },
+    15: {
+        Code: "MAC_ADDRESS_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Mac address is already exist",
+    }
 }
 
 let VITAL_CODE = {
