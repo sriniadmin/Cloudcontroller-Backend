@@ -116,6 +116,7 @@ async function db_get_billing_report(tenant_id, params) {
                 ],
             },
             raw: false,
+            
         })
 
         return billing
@@ -143,9 +144,12 @@ async function db_get_billing_report(tenant_id, params) {
                         bill_date: {
                             [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
                         },
-                        bill_date: {
-                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
-                        },
+                        [Op.and]:[{
+                            bill_date: {
+                                [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            }
+                            }
+                        ]
                     },
                     {
                         pid: {
@@ -154,7 +158,8 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: false
+            raw: false,
+            logging: console.log
         })
 
         return billing
@@ -330,13 +335,17 @@ async function db_search_billing_id(postData) {
                         bill_date: {
                             [Op.gte]: moment(postData.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
                         },
-                        bill_date: {
-                            [Op.lte]: moment(postData.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
-                        },
+                        [Op.and]:[{
+                            bill_date: {
+                                [Op.lte]: moment(postData.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            }
+                            }
+                        ]
                     },
                 ],
             },
             raw: true,
+            logging: console.log
         })
     } catch (err) {
         throw new Error("Billing  " + postData.pid + "not found Err:" + err)
