@@ -131,7 +131,7 @@ const prepareDataForCreateBilling = (postData) => {
             return false;
         }
         params = [{task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0}];
+        staff_name: postData.staff_name || '', task_note: postData.task_note || '', task_time_spend: postData.task_time_spend || 0}];
     }
     if(postData.bill_date) postData.bill_date = new Date(postData.bill_date);
     postData.params = JSON.stringify(params);
@@ -177,10 +177,10 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         if(postData.task_id){
             const newData = {
                 task_id: postData.task_id, date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
+        staff_name: postData.staff_name || '', task_note: postData.task_note || '', task_time_spend: postData.task_time_spend || 0
             }
             result = params.map(item => {
-                if(item.id == postData.id){
+                if(item.task_id == postData.task_id){
                     return newData
                 } else {
                     return item
@@ -189,7 +189,7 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
         } else {
             const newData = {
                 task_id: date.getTime(), date: postData.date || '', 
-        staff_name: postData.staff_name || '', note: postData.note || '', task_time_spend: postData.task_time_spend || 0
+        staff_name: postData.staff_name || '', task_note: postData.task_note || '', task_time_spend: postData.task_time_spend || 0
             }
             params.push(newData);
             result = params;
