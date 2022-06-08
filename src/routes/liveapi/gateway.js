@@ -688,8 +688,8 @@ router.post("/push_data", async function (req, res, next) {
                 body: req.body
     
             }
-            global_variable.socket.emit('SENSOR_LOG', data)
-        }
+            global_variable.io.emit('SENSOR_LOG', data)
+        } 
 
         //Checking required params
         const g_list = ['patientUUID', 'deviceType']
@@ -760,23 +760,18 @@ router.post("/push_data", async function (req, res, next) {
 
         if(global_variable.socket){
 
-            const data = {
-                pi: req.body.pi || 0,
-                pr: req.body.pr || 0,
-                spo2: req.body.spo2 || 0,
-                temp: req.body.value || 0
-            }
-            
+            const data = {}
+
+            if(req.body.pi) data.pi = req.body.pi
+            if(req.body.pr) data.pr = req.body.pr
+            if(req.body.spo2) data.spo2 = req.body.spo2
+            if(req.body.value) data.temp = req.body.value
+
             let extras = req.body.data
-            if(extras && extras.extras){
-                data.hr = extras.extras.HR || 0,
-                data.rr = extras.extras.RR || 0
-            }
-            else{
-                data.hr = 0,
-                data.rr = 0
-            }
-            global_variable.socket.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
+            if(extras && extras.extras && extras.extras.HR) data.hr = extras.extras.HR
+            if(extras && extras.extras && extras.extras.RR) data.rr = extras.extras.RR
+
+            global_variable.io.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
         }
         res.status(200).json({ pushData: "Success" })
         // res.status(200).json({ pushData: await threshold_list })
