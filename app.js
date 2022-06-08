@@ -205,6 +205,7 @@ global.global_variable = require('./globle-config/global-variable')
 
 io.on('connection', (socket) => {
     global_variable.socket = socket
+    global_variable.io = io
 });
 
 server.listen(7124);
