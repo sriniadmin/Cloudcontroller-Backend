@@ -970,7 +970,7 @@ async function patientKafkaRegister(msg) {
     logger.debug("Kafka Test")
     const { Kafka } = require("kafkajs")
     const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
+    const brokers = [process.env.KAFKA_BROKER_HOST + ":" +process.env.KAFKA_BROKER_PORT]
     // const topic = req.body["patientUUID"]
     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
     logger.debug("Created kakfa handle", kafka)
@@ -2056,7 +2056,7 @@ async function createPatientVital(req, res, next) {
     // TODO: Make it Modular code as library reusable for any other purpose
     const { Kafka } = require("kafkajs")
     const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
+    const brokers = [process.env.KAFKA_BROKER_HOST + ":" +process.env.KAFKA_BROKER_PORT]
     const topic = given_pid
     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
     logger.debug("Created kakfa handle", kafka)

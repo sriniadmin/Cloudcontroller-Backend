@@ -427,7 +427,7 @@ ADD `floor_description` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `ward_
 ADD `building_description` longtext COLLATE 'utf8_general_ci' NOT NULL AFTER `floor_description`;
 
 
-docker run --restart=always -it --add-host kafka:0.0.0.0 -d -p 9000:9000 -e KAFKA_BROKERCONNECT=your_local_IP:9092 -e JVM_OPTS="-Xms32M -Xmx64M" -e SERVER_SERVLET_CONTEXTPATH="/" obsidiandynamics/kafdrop
+docker run --restart=always -it --add-host kafka:0.0.0.0 -d -p 9000:9000 -e KAFKA_BROKER_HOSTCONNECT=your_local_IP:9092 -e JVM_OPTS="-Xms32M -Xmx64M" -e SERVER_SERVLET_CONTEXTPATH="/" obsidiandynamics/kafdrop
 
 
 vi editor - variable const sql to const sql_1 , 2 , 3
