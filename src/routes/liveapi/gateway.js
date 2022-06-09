@@ -471,6 +471,23 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         // // klogger.debug("The keepalive response is", resp)
         // // resp
         // resp['Command'] = 'softkill'
+        if(!req.body.keep_alive_time){
+            return res.status(470).json({Message: 'keep_alive_time is missing'})
+        }
+        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
+        const org = 'live247'
+        const bucket = 'emr_dev'
+        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const writeApi = client.getWriteApi(org, bucket)
+        req.body.log_type = "_____________________________KEEP-ALIVE-LOG_____________________________"
+        global_variable.io.emit(`SENSOR_LOG}`, req.body)
+
+        const point1 = new Point(`${data.patientUUID}_gateway_keep_alive_time`)
+        .tag('deviceModel', 'Blood Pressure')
+        .floatField('keep_alive_time', req.body.keep_alive_time)
+        writeApi.writePoint(point1)
+
+
         return res.status(200).json({Command: 'softkill'})
     } catch (error) {
         console.log(error)
