@@ -480,9 +480,13 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
         const writeApi = client.getWriteApi(org, bucket)
         req.body.log_type = "_____________________________KEEP-ALIVE-LOG_____________________________"
-        global_variable.io.emit(`SENSOR_LOG}`, req.body)
 
-        const point1 = new Point(`${data.patientUUID}_gateway_keep_alive_time`)
+        if(global_variable.socket){
+            console.log("_____________________________KEEP-ALIVE-LOG_____________________________")
+            global_variable.io.emit(`SENSOR_LOG`, req.body)
+        }
+
+        const point1 = new Point(`${req.body.patientUUID}_gateway_keep_alive_time`)
         .tag('deviceModel', 'Blood Pressure')
         .floatField('keep_alive_time', req.body.keep_alive_time)
         writeApi.writePoint(point1)
