@@ -482,8 +482,13 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         req.body.log_type = "_____________________________KEEP-ALIVE-LOG_____________________________"
 
         if(global_variable.socket){
-            console.log("_____________________________KEEP-ALIVE-LOG_____________________________")
-            global_variable.io.emit(`SENSOR_LOG`, JSON.stringify(req.body))
+            const data = {
+                time: new Date(),
+                originalUrl: req.originalUrl,
+                body: req.body
+    
+            }
+            global_variable.io.emit(`SENSOR_LOG`, data)
         }
 
         const point1 = new Point(`${req.body.patientUUID}_gateway_keep_alive_time`)
