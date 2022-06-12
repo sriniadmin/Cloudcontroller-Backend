@@ -50,6 +50,7 @@ const getUUID = require("../../lib/system/uuidSystem").getUUID
 const PATIENT_CODE = require("../../lib/constants/AppEnum").PATIENT_CODE
 const PATCH_CODE = require("../../lib/constants/AppEnum").PATCH_CODE
 const LOCATION_CODE = require("../../lib/constants/AppEnum").LOCATION_CODE
+const ASSOCIATE_CODE = require("../../lib/constants/AppEnum").ASSOCIATE_CODE
 const PATCH_PATIENT_MAP_CODE =
     require("../../lib/constants/AppEnum").PATCH_PATIENT_MAP_CODE
 
@@ -83,6 +84,7 @@ const {
     db_patch_exist,
     db_check_patch_exist,
     db_get_patch,
+    db_update_patch_register
 } = require("../../dbcontrollers/patch.controller")
 const {
     db_create_patch_associate,
@@ -90,6 +92,10 @@ const {
     db_get_patch_map_list,
     db_delete_patch_patient_map,
     db_create_patch_associate_one,
+    db_get_patch_map_detail,
+    db_delete_patch_associated,
+    db_get_patch_associated,
+    db_delete_each_device,
 
     clear_command,
 } = require("../../dbcontrollers/patch_patient.controller")
@@ -803,29 +809,6 @@ async function deletePatient(req, res, next) {
     return next()
 }
 
-async function disablePatient(req, res, next) {
-    let data
-    try {
-        data = await db_disable_patient(req.body)
-        if(data[0][0] === 1){
-            req.apiRes = PATIENT_CODE["9"]
-            req.apiRes["response"] = { delete: true }
-        }
-        else{
-            req.apiRes = PATIENT_CODE["10"]
-            req.apiRes["response"] = { delete: false }
-        }
-    } catch (error) {
-        console.log(error)
-        req.apiRes = PATIENT_CODE["11"]
-        req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 // Validated
 async function getUserPatientMap(req, res, next) {
     logger.debug("User info is ", req.userEmail, req.userRole, req.params)
@@ -1257,7 +1240,7 @@ async function createPatient(req, res, next) {
         Thresholds: AlertThresholdsDict,
         FrequencySetting: 1800,
     }
-    await patientKafkaRegister(msg)
+    patientKafkaRegister(msg)
     logger.debug("THE REDIS RESPONSE  IS", demographic_map["pid"])
     try {
         redisResponse = updateRedisCache(
@@ -1595,38 +1578,36 @@ async function getPatientPatch(req, res, next) {
     let username = req.userName
     let given_pid = req.params.pid
     let tenant_id = req.userTenantId
-    let patient_exist, patch_patient_map
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
+    // let patient_exist, patch_patient_map
+    // try {
+    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
+    //     if (!validate_patient_exist(patient_exist, req)) return next()
+    // } catch (error) {
+    //     logger.debug("Exception : %s PID %s", error, given_pid)
+    //     logger.debug("The error in catch is ", error)
+    //     req.apiRes = PATIENT_CODE["1"]
+    //     req.apiRes["error"] = {
+    //         errMessage: "Patient - ",
+    //     }
+    //     return next()
+    // }
     req.query.pid = req.params.pid
     try {
-        patch_patient_map = await db_get_patch_map_list(
-            tenant_id,
-            username,
-            req.query
-        )
+        // patch_patient_map = await db_get_patch_map_list(req)
+        patch_patient_map = await db_get_patch_map_detail(req)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            patch_patient_map: patch_patient_map,
+            count: patch_patient_map.length,
+        }
+
+        next()
     } catch (e) {
+        console.log(e)
         req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
+        // logger.debug("Exception : %s", e)
         return next()
     }
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        patch_patient_map: patch_patient_map,
-        count: patch_patient_map.length,
-    }
-
-    next()
 }
 // Validated
 async function getPatientSensorData(req, res, next) {
@@ -4260,17 +4241,12 @@ async function updatePatientProcedure(req, res, next) {
 }
 
 async function getPatientInventory(req, res, next) {
-    let patients_list = []
-
     let given_pid = req.body.pid
     let tenant_id = req.body.tenantId
     let duration = 3
 
     try {
-        patients_list = await db_get_patient_inventory(req.body)
-        patients_list = JSON.stringify(patients_list)
-        patients_list = JSON.parse(patients_list)
-
+        const patients_list = await db_get_patient_inventory(req.body)
         const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
         const totalCount = await db_patient_count(tenant_id)
 
@@ -4289,10 +4265,67 @@ async function getPatientInventory(req, res, next) {
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
+        logger.debug("Exception : %s", error)
         return next()
     }
-    
+    return next()
+}
+
+async function patientActions(req, res, next) {
+    if(req.body.action === 'unassociate'){
+        return unassociatePatient(req, res, next)
+    }
+
+    return disablePatient(req, res, next)
+}
+
+async function disablePatient(req, res, next) {
+    let data
+    try {
+        data = await db_disable_patient(req.body)
+        if(data[0][0] === 1){
+            //chnage process later
+            let list = []
+            const associated_patches = await db_get_patch_associated(req.body)
+            if(associated_patches.length > 0){
+                associated_patches.forEach(obj => {
+                    list.push(obj.dataValues.patch_uuid)
+                });
+                await db_delete_patch_associated(req.body)
+            }
+            await db_update_patch_register(list)
+            req.apiRes = PATIENT_CODE["9"]
+            req.apiRes["response"] = { delete: true }
+        }
+        else{
+            req.apiRes = PATIENT_CODE["10"]
+            req.apiRes["response"] = { delete: false }
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["11"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function unassociatePatient(req, res, next) {
+    try {
+        await db_delete_each_device(req.body)
+        await db_update_patch_register([req.body.patch_uuid])
+        req.apiRes = ASSOCIATE_CODE["1"]
+        req.apiRes["response"] = { unassociate: true }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = ASSOCIATE_CODE["0"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+    res.response(req.apiRes)
     return next()
 }
 
@@ -4347,5 +4380,5 @@ module.exports = {
     updatePatientProcedure,
     registerPatientInventory,
     getPatientInventory,
-    disablePatient
+    patientActions,
 }

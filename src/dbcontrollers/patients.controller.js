@@ -375,19 +375,35 @@ async function db_patient_exist(
 }
 
 async function db_get_patient_inventory(params) {
-    const data = await Patients_Data.findAll({
-        limit: parseInt(params.limit),
-        offset: parseInt(params.offset),
-        where: {
+    let limit = params.limit
+    let offset = (params.offset-1) * limit
+    let condition = {
+        tenant_id: params.tenantId,
+        disabled: 1
+    }
+    if(params.name){
+        condition = {
             tenant_id: params.tenantId,
-            disabled: 1
-        },
-        order: [
-            ['date', 'DESC']
-        ],
-        raw: false,
-    });
-    return data
+            disabled: 1,
+            [Op.or]: [
+                {fname: {[Op.like]: params.name}}, {lname: {[Op.like]: params.name}}
+            ]
+        }
+    }
+    try {
+        const data = await Patients_Data.findAll({
+            where: condition,
+            order: [
+                ['date', 'DESC']
+            ],
+            limit: limit,
+            offset: offset,
+            raw: false,
+        });
+        return data
+    } catch (error) {
+        throw new Error(error)
+    }
 }
 
 async function db_get_patient_details(params) {

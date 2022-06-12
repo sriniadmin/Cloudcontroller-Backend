@@ -19,6 +19,9 @@ const { db_get_patch_map_list, clear_command,
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
 
+const global_variable = require('../../../globle-config/global-variable');
+const {InfluxDB, Point} = require('@influxdata/influxdb-client')
+
 /**
  * @openapi
  *  components:
@@ -67,68 +70,61 @@ const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
  *         default: ""
  */
 
-/**
- * @openapi
- *  /liveapi/gateway/push_data:
- *   post:
- *       tags:
- *         - Gateway
- *       summary: Receive data from gateway - like watch, mobile , band etc
- *       requestBody:
- *         description: Receive data from gateway - like watch, mobile , band etc
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/gateway_config'
- *       responses:
- *         '201':
- *           description: User  Information is added.
- */
 
-//TODO: Make it Http1.1
 
-router.post("/push_data", async function (req, res, next) {
-    logger.debug("Kafka received data is ", req.body["patientUUID"])
-    const { Kafka } = require("kafkajs")
-    const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
-    const topic = req.body["patientUUID"]
-    const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
-    logger.debug("Created kakfa handle", req.body)
-    let producer
-    try {
-        producer = kafka.producer()
-        logger.debug("Created kakfa handle sending", producer)
-    } catch (error) {
-        logger.debug("Kafka Creation failed", error)
-    }
+// router.post("/push_data", async function (req, res, next) {
+//     logger.debug("Kafka received data is ", req.body["patientUUID"])
+//     const { Kafka } = require("kafkajs")
+//     const clientId = "my-app"
+//     const brokers = [process.env.KAFKA_BROKER + ":9092"]
+//     const topic = req.body["patientUUID"]
+//     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
+//     logger.debug("Created kakfa handle", req.body)
+//     let producer
+//     try {
+//         producer = kafka.producer()
+//         logger.debug("Created kakfa handle sending", producer)
+//     } catch (error) {
+//         logger.debug("Kafka Creation failed", error)
+//     }
 
-    var sendMessage = async () => {
-        // try {
-        await producer.connect()
-        await producer.send({
-            topic: topic,
-            messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
-        })
-        await producer.disconnect()
+//     var sendMessage = async () => {
+//         // try {
+//         await producer.connect()
+//         await producer.send({
+//             topic: topic,
+//             messages: [{ key: "spo2", value: JSON.stringify(req.body) }],
+//         })
+//         await producer.disconnect()
 
-        // }
-        // catch(error) {
-        //   logger.debug("Error in Sending message in Ka",error)
-        //   await producer.disconnect()
-        // }
-    }
-    logger.debug("Kakfa Send message")
-    try {
-        sendMessage()
-    } catch (error) {
-        logger.debug("Error in Sending message in Ka", error)
-        await producer.disconnect()
-    }
-    logger.debug("Kakfa Sent Message")
-    return res.status(200).json({ pushData: "Success" })
-})
+
+//         //Passing data to UI via socket.io
+//         const data = {
+//             time: new Date(),
+//             originalUrl: req.originalUrl,
+//             body: req.body
+
+//         }
+//         if(global_variable.socket){
+//             global_variable.socket.emit('SENSOR_LOG', data)
+//         }
+
+//         // }
+//         // catch(error) {
+//         //   logger.debug("Error in Sending message in Ka",error)
+//         //   await producer.disconnect()
+//         // }
+//     }
+//     logger.debug("Kakfa Send message")
+//     try {
+//         sendMessage()
+//     } catch (error) {
+//         logger.debug("Error in Sending message in Ka", error)
+//         await producer.disconnect()
+//     }
+//     logger.debug("Kakfa Sent Message")
+//     return res.status(200).json({ pushData: "Success" })
+// })
 
 /**
  * @openapi
@@ -583,5 +579,200 @@ router.post("/gateway_register", async function (req, res, next) {
             })
         })
 })
+
+
+
+/**
+ * @openapi
+ *  /liveapi/gateway/push_data:
+ *   post:
+ *       tags:
+ *         - Gateway
+ *       summary: Receive data from gateway - like watch, mobile , band etc
+ *       requestBody:
+ *         description: Receive data from gateway - like watch, mobile , band etc
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/gateway_config'
+ *       responses:
+ *         '201':
+ *           description: User  Information is added.
+ */
+
+//TODO: Make it Http1.1
+router.post("/push_data", async function (req, res, next) {
+    try {
+        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
+        const org = 'live247'
+        const bucket = 'emr_dev'
+
+        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const writeApi = client.getWriteApi(org, bucket)
+
+        //Passing data to UI via socket.io
+        if(global_variable.socket){
+            const data = {
+                time: new Date(),
+                originalUrl: req.originalUrl,
+                body: req.body
+    
+            }
+            global_variable.socket.emit('SENSOR_LOG', data)
+        }
+
+        //Checking required params
+        const g_list = ['patientUUID', 'deviceType']
+
+            const g_active = checkParams({list:g_list, data: req.body})
+            if(true === g_active.flg){
+                return res.status(470).json({ Message: g_active.message })
+            }
+
+        //Sensor Temperature
+        if('temperature' === (req.body.deviceType).toLowerCase()){
+            const list = ['deviceId', 'value', 'battery']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            temperature(writeApi, req.body)
+        }
+        else if('bodyfatscale' === (req.body.deviceType).toLowerCase()){
+            const list = ['weight']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            bodyFatScale(writeApi, req.body)
+        }
+        else if('urionbp' === (req.body.deviceType).toLowerCase()){
+            const list = ['bpd', 'bps']
+
+            const active = checkParams({list:list, data: req.body})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            urionBP(writeApi, req.body)
+        }
+        else if('bp' === (req.body.deviceType).toLowerCase()){
+            const list = ['dia', 'sys']
+
+            const active = checkParams({list:list, data: req.body, type: 'rakesh'})
+            if(true === active.flg){
+                return res.status(470).json({ Message: active.message })
+            }
+            bp(writeApi, req.body)
+        }
+        return res.status(200).json({ pushData: "Success" })
+        
+    } catch (error) {
+        return res.status(500).json({ ERROR: error })
+    }
+})
+
+function checkParams(params) {
+    let message = 'Missing or Invalid '
+    let flg = false
+    let checkOjb = params.data
+
+    if(params.type === 'rakesh'){
+        if(!params.data.battery){
+            flg = true
+            message += 'battery '
+        }
+        checkOjb = params.data.data.extras
+    }
+
+    params.list.forEach(obj => {
+        if(!checkOjb[obj]){
+            flg = true
+            message += `${obj} `
+        }
+    });
+
+    return {
+        flg: flg,
+        message: message
+    }
+}
+
+
+function temperature(writeApi, data) {
+    //Temperature
+    const point1 = new Point(`${data.patientUUID}_temp`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('temp', data.value)
+    writeApi.writePoint(point1)
+
+    //Battery
+    const point2 = new Point(`${data.patientUUID}_temp_battery`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('battery', data.battery)
+    writeApi.writePoint(point2)
+
+    //Flash
+    if(data.flash === false){
+        data.flash = 1
+    }
+    else{
+        data.flash = 0
+    }
+    const point3 = new Point(`${data.patientUUID}_temp_flash`)
+    .tag('deviceModel', 'Temperature')
+    .tag('deviceSN', data.deviceId)
+    .floatField('flash', data.flash)
+    writeApi.writePoint(point3)
+}
+
+function bodyFatScale(writeApi, data) {
+
+    //Weight
+    const point1 = new Point(`${data.patientUUID}_weight`)
+    .tag('deviceModel', 'Weight')
+    .floatField('weight', data.weight)
+    writeApi.writePoint(point1)
+}
+
+function urionBP(writeApi, data) {
+
+    //bpd
+    const point1 = new Point(`${data.patientUUID}_alphamed_bpd`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bpd', data.bpd)
+    writeApi.writePoint(point1)
+
+    //bps
+    const point2 = new Point(`${data.patientUUID}_alphamed_bps`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bps', data.bps)
+    writeApi.writePoint(point2)
+}
+
+function bp(writeApi, data) {
+
+    //bpd
+    const point1 = new Point(`${data.patientUUID}_ihealth_bpd`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bpd', data.data.extras.dia)
+    writeApi.writePoint(point1)
+
+    //bps
+    const point2 = new Point(`${data.patientUUID}_ihealth_bps`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('bps', data.data.extras.sys)
+    writeApi.writePoint(point2)
+
+    //battery
+    const point3 = new Point(`${data.patientUUID}_ihealth_battery`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('battery', data.battery)
+    writeApi.writePoint(point3)
+}
 
 module.exports = router
