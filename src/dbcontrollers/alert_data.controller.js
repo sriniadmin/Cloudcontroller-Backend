@@ -20,7 +20,9 @@ async function db_get_alert_data(params) {
         }
         return await ALERT_DATA.findAll({
             where: condition,
-            order: [["time", "DESC"]]
+            order: [["time", "DESC"]],
+            limit: limit,
+            offset: offset,
         })
     } catch (error) {
         console.log(error)

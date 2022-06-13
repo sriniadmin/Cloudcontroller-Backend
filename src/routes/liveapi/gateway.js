@@ -479,7 +479,6 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         const bucket = 'emr_dev'
         const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
         const writeApi = client.getWriteApi(org, bucket)
-        req.body.log_type = "_____________________________KEEP-ALIVE-LOG_____________________________"
 
         if(global_variable.socket){
             const data = {
@@ -488,7 +487,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
                 body: req.body
     
             }
-            global_variable.io.emit(`SENSOR_LOG`, data)
+            global_variable.io.emit(`SENSOR_LOG_KEEP_ALIVE`, data)
         }
 
         const point1 = new Point(`${req.body.patientUUID}_gateway_keep_alive_time`)
@@ -714,11 +713,11 @@ router.post("/push_data", async function (req, res, next) {
                 body: req.body
     
             }
-            global_variable.io.emit('SENSOR_LOG', data)
+            global_variable.io.emit('SENSOR_LOG_DATA', data)
         } 
 
         //Checking required params
-        const g_list = ['patientUUID', 'deviceType']
+        const g_list = ['patientUUID', 'deviceType', 'timestamp']
 
             const g_active = checkParams({list:g_list, data: req.body})
             if(true === g_active.flg){
