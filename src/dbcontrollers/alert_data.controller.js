@@ -5,7 +5,10 @@ const ALERT_DATA = models.alert_data
 
 async function db_get_alert_data(params) {
     try {
-        let limit = params.limit
+        let limit = parseInt(params.limit)
+        if (parseInt(params.offset) === 0){
+            params.offset = 1
+        }
         let offset = (params.offset - 1) * limit
         let condition = {
             pid: params.pid
@@ -20,9 +23,9 @@ async function db_get_alert_data(params) {
         }
         return await ALERT_DATA.findAll({
             where: condition,
-            order: [["time", "DESC"]],
             limit: limit,
             offset: offset,
+            order: [["time", "DESC"]]
         })
     } catch (error) {
         console.log(error)
