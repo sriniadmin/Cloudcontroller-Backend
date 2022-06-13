@@ -42,7 +42,21 @@ async function db_add_alert_data(params) {
     }
 }
 
+async function db_count_alert_data(params) {
+    try {
+        return await ALERT_DATA.count({
+            where: {
+                pid: params.pid
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_alert_data,
-    db_add_alert_data
+    db_add_alert_data,
+    db_count_alert_data
 }
