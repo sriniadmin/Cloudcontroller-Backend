@@ -840,6 +840,18 @@ async function db_get_device(params) {
     }
 }
 
+async function db_count_device(params) {
+    try {
+        return await Patches.count({
+            where: {
+                tenant_id: params.tenantId
+            }
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 module.exports = {
     db_get_patch_list,
@@ -861,5 +873,6 @@ module.exports = {
     db_get_device_id,
     db_create_device,
     db_check_duplicate_device,
-    db_get_device
+    db_get_device,
+    db_count_device
 }

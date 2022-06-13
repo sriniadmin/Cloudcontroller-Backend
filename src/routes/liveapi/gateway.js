@@ -863,6 +863,12 @@ function temperature(writeApi, data) {
     .tag('deviceSN', data.deviceId)
     .floatField('flash', data.flash)
     writeApi.writePoint(point3)
+
+    //timestamp
+    const point4 = new Point(`${data.patientUUID}_temp_timestamp`)
+    .tag('deviceModel', 'Temperature')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point4)
 }
 
 function bodyFatScale(writeApi, data) {
@@ -872,6 +878,12 @@ function bodyFatScale(writeApi, data) {
     .tag('deviceModel', 'Weight')
     .floatField('weight', data.weight)
     writeApi.writePoint(point1)
+
+    //timestamp
+    const point2 = new Point(`${data.patientUUID}_weight_timestamp`)
+    .tag('deviceModel', 'Weight')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point2)
 }
 
 function urionBP(writeApi, data) {
@@ -887,6 +899,12 @@ function urionBP(writeApi, data) {
     .tag('deviceModel', 'Blood Pressure')
     .floatField('bps', data.bps)
     writeApi.writePoint(point2)
+
+    //timestamp
+    const point3 = new Point(`${data.patientUUID}_alphamed_timestamp`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point3)
 }
 
 function bp(writeApi, data) {
@@ -908,6 +926,12 @@ function bp(writeApi, data) {
     .tag('deviceModel', 'Blood Pressure')
     .floatField('battery', data.battery)
     writeApi.writePoint(point3)
+
+    //timestamp
+    const point4 = new Point(`${data.patientUUID}_ihealth_timestamp`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point4)
 }
 
 function checkme_O2(writeApi, data) {
@@ -919,13 +943,13 @@ function checkme_O2(writeApi, data) {
     writeApi.writePoint(point1)
 
     //pi
-    const point2 = new Point(`${data.patientUUID}_pi`)
+    const point2 = new Point(`${data.patientUUID}_spo2_pi`)
     .tag('deviceModel', 'Spo2')
     .floatField('pi', data.pi)
     writeApi.writePoint(point2)
 
     //pr
-    const point3 = new Point(`${data.patientUUID}_pr`)
+    const point3 = new Point(`${data.patientUUID}_spo2_pr`)
     .tag('deviceModel', 'Spo2')
     .floatField('pr', data.pr)
     writeApi.writePoint(point3)
@@ -935,6 +959,12 @@ function checkme_O2(writeApi, data) {
     .tag('deviceModel', 'Spo2')
     .floatField('battery', data.battery)
     writeApi.writePoint(point4)
+
+    //timestamp
+    const point5 = new Point(`${data.patientUUID}_spo2_timestamp`)
+    .tag('deviceModel', 'Spo2')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point5)
 }
 
 function vv330(writeApi, data) {
@@ -956,6 +986,12 @@ function vv330(writeApi, data) {
     .tag('deviceModel', 'Ecg')
     .floatField('battery', data.gwBattery)
     writeApi.writePoint(point3)
+
+    //timestamp
+    const point1 = new Point(`${data.patientUUID}_ecg_timestamp`)
+    .tag('deviceModel', 'Ecg')
+    .floatField('timestamp', data.timestamp)
+    writeApi.writePoint(point1)
 }
 
 async function CheckingThreshold(params) {

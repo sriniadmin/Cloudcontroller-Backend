@@ -122,7 +122,8 @@ const {
     db_get_patch_saas,
     db_create_device,
     db_check_duplicate_device,
-    db_get_device
+    db_get_device,
+    db_count_device
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -2981,11 +2982,13 @@ async function getDevice(req, res, next) {
     try {
         const data = await db_get_device(req.body)
 
+        const count = await db_count_device(req.body)
+
         req.apiRes = PATCH_CODE["2"]
         req.apiRes["response"] = {
             patches: data,
             count: data.length,
-            patchTotalCount: data.length,
+            patchTotalCount: count,
         }
     } catch (error) {
         console.log(error)
