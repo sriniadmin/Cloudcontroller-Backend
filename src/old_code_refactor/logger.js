@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
         const filename = `${Date.now()}_${file.originalname}`;
 
-        db_add_alert_data({
+        db_add_logger_data({
             url: `./src/public/logger/${filename}`
         })
         callback(null, filename);
@@ -43,10 +43,14 @@ async function download(req, res, next) {
         if (fs.existsSync(req.query.url)) {
             return res.download(req.query.url)
         }
-        req.apiRes["error"] = { error: 'url is not exist' }
+        req.apiRes["result"] = 'URL IS NOT EXIST'
+        req.apiRes["error"] = 'url is not exist'
+        req.apiRes["message"] = 'URL IS NOT EXIST'
     } catch (error) {
         console.log(error)
-        req.apiRes["error"] = { error: error }
+        req.apiRes["result"] = error
+        req.apiRes["error"] = error
+        req.apiRes["message"] = error
     }
     res.response(req.apiRes)
     return next()
@@ -79,9 +83,12 @@ async function getLoggerData(req, res, next) {
     try {
         const data = await db_get_logger_data(req.query)
 
+        const count = await db_count_logger_data(req.query)
+
         req.apiRes = ALERT_CODE["0"]
         req.apiRes["response"] = { 
-            data: data
+            data: data,
+            totalCount: count
         }
     } catch (error) {
         console.log(error)
