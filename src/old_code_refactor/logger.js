@@ -43,17 +43,11 @@ async function download(req, res, next) {
         if (fs.existsSync(req.query.url)) {
             return res.download(req.query.url)
         }
-        req.apiRes["result"] = 'URL IS NOT EXIST'
-        req.apiRes["error"] = 'url is not exist'
-        req.apiRes["message"] = 'URL IS NOT EXIST'
+        return res.send({message: 'URL IS NOT EXIST'});
     } catch (error) {
         console.log(error)
-        req.apiRes["result"] = error
-        req.apiRes["error"] = error
-        req.apiRes["message"] = error
+        return res.send({error: error});
     }
-    res.response(req.apiRes)
-    return next()
 }
 
 
