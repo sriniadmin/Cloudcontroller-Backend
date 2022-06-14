@@ -3,7 +3,7 @@
 //     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 // var models = initModels(sequelizeDB)
 const fs = require("fs");
-const { db_get_logger_data, db_add_alert_data } = require("../dbcontrollers/logger_data.controller")
+const { db_get_logger_data, db_add_logger_data, db_count_logger_data } = require("../dbcontrollers/logger_data.controller")
 // const multipleUploadMiddleware = require("../middleware/multipleUploadMiddleware");
 const util = require("util");
 const path = require("path");
