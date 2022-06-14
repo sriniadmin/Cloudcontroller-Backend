@@ -9,7 +9,7 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 /**
  * @openapi
- *  /api/logger/:
+ *  /api/logger/download:
  *   get:
  *       tags:
  *         - Loggers
@@ -36,7 +36,7 @@ router.get("/download", download, apiFinalProcess)
 
 /**
  * @openapi
-  *  /api/logger/:
+  *  /api/logger/upload:
  *   post:
  *       tags:
  *         - Loggers
