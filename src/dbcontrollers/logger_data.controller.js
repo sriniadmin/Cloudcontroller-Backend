@@ -22,11 +22,6 @@ async function db_get_logger_data(params) {
         //     }
         // }
         return await LOGGER_DATA.findAll({
-            where: {
-                tenant_id: params.tenantId
-            },
-            // limit: limit,
-            // offset: offset,
             order: [["time", "DESC"]]
         })
     } catch (error) {
