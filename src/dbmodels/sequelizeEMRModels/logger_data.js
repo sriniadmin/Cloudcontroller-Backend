@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: Sequelize.fn("now"),
             },
             url: {
-                type: DataTypes.STRING(45),
+                type: DataTypes.STRING(255),
                 allowNull: false,
             }
         },
