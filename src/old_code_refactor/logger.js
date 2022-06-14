@@ -2,6 +2,7 @@
 // var initModels =
 //     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 // var models = initModels(sequelizeDB)
+const fs = require("fs");
 const { db_get_logger_data, db_add_alert_data } = require("../dbcontrollers/logger_data.controller")
 // const multipleUploadMiddleware = require("../middleware/multipleUploadMiddleware");
 const util = require("util");
@@ -39,11 +40,12 @@ const multipleUploadMiddleware = util.promisify(uploadManyFiles);
 
 async function download(req, res, next) {
     try {
-        res.download(req.query.url)
-        return next()
+        if (fs.existsSync(req.query.url)) {
+            return res.download(req.query.url)
+        }
+        req.apiRes["error"] = { error: 'url is not exist' }
     } catch (error) {
         console.log(error)
-        req.apiRes = ALERT_CODE["1"]
         req.apiRes["error"] = { error: error }
     }
     res.response(req.apiRes)
