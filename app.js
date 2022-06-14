@@ -71,6 +71,7 @@ const routes = {
     "/api/profile": "profiles",
     "/api/patch/delete": "patch",
     "/saasapi/device": "patch",
+    "/api/logger": "logger"
 }
 
 // XXX - this needs to be generic prestart checks
