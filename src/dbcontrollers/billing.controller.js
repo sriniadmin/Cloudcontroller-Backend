@@ -365,7 +365,10 @@ async function db_get_billing_report_summary(params) {
             include: [
                 {
                     model:models.patient_data,
-                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled'],
+                    where: {
+                        disabled: 1
+                    }
                 }
                
             ],
