@@ -1,70 +1,77 @@
-// const sequelizeDB = require("../config/emrmysqldb")
-// var initModels =
-//     require("../dbmodels/sequelizeEMRModels/init-models").initModels
-// var models = initModels(sequelizeDB)
-const fs = require("fs");
-const { db_get_logger_data, db_add_logger_data, db_count_logger_data } = require("../dbcontrollers/logger_data.controller")
-// const multipleUploadMiddleware = require("../middleware/multipleUploadMiddleware");
-const util = require("util");
-const path = require("path");
-const multer = require("multer");
+const stream = require('stream');
+const { db_get_logger_data, db_add_logger_data, db_count_logger_data, db_download_logger_data } = require("../dbcontrollers/logger_data.controller")
 const {
     ALERT_CODE
 } = require("../lib/constants/AppEnum")
 
-
-
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, path.join(`${__dirname}/../../src/public/logger`));
-    },
-    filename: (req, file, callback) => {
-        let math = ['text/plain'];
-        if (math.indexOf(file.mimetype) === -1) {
-            let errorMess = `The file <strong>${file.originalname}</strong> is invalid. Only allowed to upload text/plain.`;
-            return callback(errorMess, null);
-        }
-
-        const filename = `${Date.now()}_${file.originalname}`;
-
-        db_add_logger_data({
-            url: `./src/public/logger/${filename}`
-        })
-        callback(null, filename);
-    }
-});
-const uploadManyFiles = multer({ storage: storage }).array("many-files", 100);
-const multipleUploadMiddleware = util.promisify(uploadManyFiles);
-
-
-
 async function download(req, res, next) {
     try {
-        if (fs.existsSync(req.query.url)) {
-            return res.download(req.query.url)
+
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
         }
-        return res.send({message: 'URL IS NOT EXIST'});
+        const data = await db_download_logger_data(req.query)
+
+        const fileContents = Buffer.from(data.data, "base64");
+
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
+
+        res.set('Content-disposition', 'attachment; filename=' + data.url);
+        res.set('Content-Type', 'text/plain');
+
+        return readStream.pipe(res);
     } catch (error) {
         console.log(error)
-        return res.send({error: error});
+        return res.status(500).json({ error: error })
     }
 }
 
 
 async function upload(req, res, next) {
     try {
-        //Upload process
-        await multipleUploadMiddleware(req, res);
-    
-        if (req.files.length <= 0) {
-          return res.send(`You must select at least 1 file`);
+        const data = req.files['many-files']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
         }
-        return res.send(`Your files has been uploaded.`);
-      } catch (error) {
+
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+        let flg = 0
+        for (const obj of list) {
+            const spl = obj.name.split('.')
+            if(spl[spl.length-1] !== 'txt'){
+                flg = 1
+                break
+            }
+            if(obj.size > 10485760){
+                flg = 2
+                break
+            }
+        }
+        if(flg === 1){
+            return res.status(470).json({ message: 'File type must be text/plain' })
+        }
+        if(flg === 2){
+            return res.status(470).json({ message: 'File size must be smaller than 10MB' })
+        }
+
+        list.forEach(obj => {
+            db_add_logger_data({
+                data: obj.data,
+                url: `${obj.name}`
+            })
+        });
+        return res.status(200).json({ message: 'Sucessful' })
+    } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
-          return res.send(`Exceeds the number of files allowed to upload.`);
+            return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
         }
-        return res.send(`Error when trying upload many files: ${error}}`);
+        return res.status(500).json({ error: error })
     }
 }
 

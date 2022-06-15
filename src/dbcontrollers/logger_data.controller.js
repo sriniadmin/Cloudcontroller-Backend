@@ -48,8 +48,22 @@ async function db_count_logger_data(params) {
     }
 }
 
+async function db_download_logger_data(params) {
+    try {
+        return await LOGGER_DATA.findOne({
+            where:{
+                id: params.id
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_logger_data,
     db_add_logger_data,
-    db_count_logger_data
+    db_count_logger_data,
+    db_download_logger_data
 }
