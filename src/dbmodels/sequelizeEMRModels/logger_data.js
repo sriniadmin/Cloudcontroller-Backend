@@ -18,6 +18,10 @@ module.exports = function (sequelize, DataTypes) {
             url: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
+            },
+            data: {
+                type: DataTypes.BLOB('medium'),
+                allowNull: false,
             }
         },
         {

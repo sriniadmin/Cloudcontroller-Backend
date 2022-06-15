@@ -81,6 +81,8 @@ const routes = {
 systemChecks.dbValidate()
 
 let app = express()
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
 const cors = require('cors')
 
 app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
