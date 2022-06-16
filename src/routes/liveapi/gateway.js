@@ -920,6 +920,12 @@ function bp(writeApi, data) {
     .floatField('bps', data.data.extras.sys)
     writeApi.writePoint(point2)
 
+    //bps
+    const point5 = new Point(`${data.patientUUID}_ihealth_hr`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('hr', data.data.extras.heartRate)
+    writeApi.writePoint(point5)
+
     //battery
     const point3 = new Point(`${data.patientUUID}_ihealth_battery`)
     .tag('deviceModel', 'Blood Pressure')

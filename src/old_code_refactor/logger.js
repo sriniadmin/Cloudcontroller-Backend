@@ -41,6 +41,10 @@ async function upload(req, res, next) {
             list.push(data)
         }
 
+        if(list.length > 10){
+            return res.status(470).json({ message: 'Maximum is 10 files' })
+        }
+
         let flg = 0
         for (const obj of list) {
             const spl = obj.name.split('.')
