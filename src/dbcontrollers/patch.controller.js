@@ -813,7 +813,7 @@ async function db_get_device(params) {
                     include:[
                         {
                             model:models.patient_data,
-                            attributes:['fname','lname','pid']
+                            attributes:['fname','lname','pid', 'med_record']
                         }
                     ],
                     required: false,
