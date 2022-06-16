@@ -125,7 +125,7 @@ const db_update_vital = vital_controller.db_update_vital
 // allergy
 const {
     db_get_allergy_list,
-    db_create_allergy,
+    db_add_allergy,
     db_update_allergy,
 } = require("../../dbcontrollers/allergy.controller")
 
@@ -2199,94 +2199,94 @@ async function updatePatientVital(req, res, next) {
     return next()
 }
 
-async function createPatientAllergy(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let allergy_data = req.body
-    logger.debug("THE ALLERGY BODY IS", allergy_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
+// async function createPatientAllergy(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let allergy_data = req.body
+//     logger.debug("THE ALLERGY BODY IS", allergy_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
 
-    //JSON SCHEMA LOGIC
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["allergySchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
+//     //JSON SCHEMA LOGIC
+//     let schema_status = schemaValidator.validate_schema(
+//         req,
+//         SCHEMA_CODE["allergySchema"]
+//     )
+//     if (!schema_status["status"]) {
+//         req.apiRes = JSON_SCHEMA_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Schema Validation Failed ",
+//         }
+//         return next()
+//     }
 
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            allergy_data["allergy_uuid"] = uuid_result
-            allergy_data["tenant_id"] = tenant_id
-            allergy_data["pid"] = given_pid
-            return db_create_allergy(tenant_id, allergy_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Allergy failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        allergy_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             allergy_data["allergy_uuid"] = uuid_result
+//             allergy_data["tenant_id"] = tenant_id
+//             allergy_data["pid"] = given_pid
+//             return db_add_allergy(tenant_id, allergy_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Allergy failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         allergy_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
 
 // Validated
-async function getPatientAllergy(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let allergy_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        allergy_list = await db_get_allergy_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = ALLERGY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE ALLERGY",
-        }
-        return next()
-    }
-    req.apiRes = ALLERGY_CODE["2"]
-    req.apiRes["response"] = {
-        allergy_list: allergy_list,
-        count: allergy_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientAllergy(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let allergy_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         allergy_list = await db_get_allergy_list(tenant_id, username, req.query)
+//     } catch (e) {
+//         req.apiRes = ALLERGY_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE ALLERGY",
+//         }
+//         return next()
+//     }
+//     req.apiRes = ALLERGY_CODE["2"]
+//     req.apiRes["response"] = {
+//         allergy_list: allergy_list,
+//         count: allergy_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientAllergy(req, res, next) {
@@ -4466,6 +4466,49 @@ async function createPatientMedicalHistory(req, res, next) {
     return next()
 }
 
+
+async function getPatientAllergy(req, res, next) {
+    try {
+        const data = await db_get_allergy_list(req.params)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+async function createPatientAllergy(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
+        req.body.allergy_uuid = await getUUID(uuidDict, { transaction: t })
+        const data = await db_add_allergy(req.body)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
 
 module.exports = {
     createPatientInBulk,
