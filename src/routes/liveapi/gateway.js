@@ -491,9 +491,19 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         }
 
         const point1 = new Point(`${req.body.patientUUID}_gateway_keep_alive_time`)
-        .tag('deviceModel', 'Blood Pressure')
+        .tag('deviceModel', 'Gateway')
         .floatField('keep_alive_time', req.body.keep_alive_time)
         writeApi.writePoint(point1)
+
+        const point2 = new Point(`${req.body.patientUUID}_gateway_version`)
+        .tag('deviceModel', 'Gateway')
+        .floatField('version', req.body.version)
+        writeApi.writePoint(point2)
+
+        const point3 = new Point(`${req.body.patientUUID}_gateway_battery`)
+        .tag('deviceModel', 'Gateway')
+        .floatField('battery', req.body.gwBattery)
+        writeApi.writePoint(point3)
 
 
         return res.status(200).json({Command: 'softkill'})
