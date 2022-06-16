@@ -805,6 +805,7 @@ router.post("/push_data", async function (req, res, next) {
             let extras = req.body.data
             if(extras && extras.extras && extras.extras.HR) data.hr = extras.extras.HR
             if(extras && extras.extras && extras.extras.RR) data.rr = extras.extras.RR
+            if(extras && extras.extras && extras.extras.ecg) data.chart = extras.extras.ecg
 
             global_variable.io.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
         }

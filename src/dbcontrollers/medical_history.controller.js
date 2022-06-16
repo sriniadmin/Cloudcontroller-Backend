@@ -138,7 +138,7 @@ async function db_get_medical_history_list(params) {
 async function db_add_medical_history(params) {
     try {
         const obj = {
-            date_of_treatment: params["date_of_treatment"] || null,
+            date_of_treatment: Date.parse(params["date_of_treatment"]) || null,
             treatment: params["treatment"] || null,
             hospital_name: params["hospital_name"] || null,
             doctor_name: params["doctor_name"] || null,
@@ -148,9 +148,7 @@ async function db_add_medical_history(params) {
             medical_history_uuid: params["medical_history_uuid"],
             documents: params["documents"] || null
         }
-        return await MedicalHistory.create({
-            obj
-        })
+        return await MedicalHistory.create(obj)
     } catch (err) {
         console.log(err)
         throw new Error(err)

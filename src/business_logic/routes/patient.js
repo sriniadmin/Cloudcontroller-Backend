@@ -4448,6 +4448,9 @@ async function getPatientMedicalHistory(req, res, next) {
 
 async function createPatientMedicalHistory(req, res, next) {
     try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
+        req.body.medical_history_uuid = await getUUID(uuidDict, { transaction: t })
         const data = await db_add_medical_history(req.body)
         req.apiRes = MEDICAL_HISTORY_CODE["3"]
         req.apiRes["response"] = {
