@@ -132,7 +132,7 @@ const {
 // medical history
 const {
     db_get_medical_history_list,
-    db_create_medical_history,
+    db_add_medical_history,
     db_update_medical_history,
 } = require("../../dbcontrollers/medical_history.controller")
 
@@ -2347,98 +2347,98 @@ async function updatePatientAllergy(req, res, next) {
     return next()
 }
 
-async function createPatientMedicalHistory(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let medical_history_data = req.body
-    logger.debug("THE MEDICAL HISTORY BODY IS", medical_history_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
+// async function createPatientMedicalHistory(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let medical_history_data = req.body
+//     logger.debug("THE MEDICAL HISTORY BODY IS", medical_history_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
 
-    // //JSON SCHEMA LOGIC
-    // let schema_status = schemaValidator.validate_schema(
-    //     req,
-    //     SCHEMA_CODE["medicalHistorySchema"]
-    // )
-    // if (!schema_status["status"]) {
-    //     req.apiRes = JSON_SCHEMA_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         error: "Schema Validation Failed ",
-    //     }
-    //     return next()
-    // }
+//     // //JSON SCHEMA LOGIC
+//     // let schema_status = schemaValidator.validate_schema(
+//     //     req,
+//     //     SCHEMA_CODE["medicalHistorySchema"]
+//     // )
+//     // if (!schema_status["status"]) {
+//     //     req.apiRes = JSON_SCHEMA_CODE["1"]
+//     //     req.apiRes["error"] = {
+//     //         error: "Schema Validation Failed ",
+//     //     }
+//     //     return next()
+//     // }
 
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            medical_history_data["medical_history_uuid"] = uuid_result
-            medical_history_data["tenant_id"] = tenant_id
-            medical_history_data["pid"] = given_pid
-            return db_create_medical_history(tenant_id, medical_history_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Medical History failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        medical_history_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             medical_history_data["medical_history_uuid"] = uuid_result
+//             medical_history_data["tenant_id"] = tenant_id
+//             medical_history_data["pid"] = given_pid
+//             return db_add_medical_history(tenant_id, medical_history_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Medical History failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         medical_history_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
 
 // Validated
-async function getPatientMedicalHistory(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let medical_history_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        medical_history_list = await db_get_medical_history_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = MEDICAL_HISTORY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE ALLERGY",
-        }
-        return next()
-    }
-    req.apiRes = MEDICAL_HISTORY_CODE["2"]
-    req.apiRes["response"] = {
-        medical_history_list: medical_history_list,
-        count: medical_history_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientMedicalHistory(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let medical_history_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         medical_history_list = await db_get_medical_history_list(?
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = MEDICAL_HISTORY_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE ALLERGY",
+//         }
+//         return next()
+//     }
+//     req.apiRes = MEDICAL_HISTORY_CODE["2"]
+//     req.apiRes["response"] = {
+//         medical_history_list: medical_history_list,
+//         count: medical_history_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientMedicalHistory(req, res, next) {
@@ -4421,6 +4421,47 @@ async function getPatientVitalThreashold(req, res, next) {
             error: error,
         }
     }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getPatientMedicalHistory(req, res, next) {
+    try {
+        const data = await db_get_medical_history_list(req.params)
+        req.apiRes = MEDICAL_HISTORY_CODE["2"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = MEDICAL_HISTORY_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientMedicalHistory(req, res, next) {
+    try {
+        const data = await db_add_medical_history(req.body)
+        req.apiRes = MEDICAL_HISTORY_CODE["3"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = MEDICAL_HISTORY_CODE["4"]
+    }
+
     res.response(req.apiRes)
     return next()
 }

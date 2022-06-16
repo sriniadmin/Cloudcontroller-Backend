@@ -68,7 +68,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         medical_history_uuid: {
             type: DataTypes.STRING(255),
-            allowNull: false
+            allowNull: true
         },
         pid: {
             type: DataTypes.STRING(255),
@@ -79,10 +79,10 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: true,
             defaultValue: Sequelize.fn('now')
         },
-        symptoms: {
-            type: DataTypes.TEXT('long'),
-            allowNull: true
-        },
+        // symptoms: {
+        //     type: DataTypes.TEXT('long'),
+        //     allowNull: true
+        // },
         documents: {
             type: DataTypes.STRING(255),
             allowNull: true
