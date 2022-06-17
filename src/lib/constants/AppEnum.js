@@ -1206,6 +1206,18 @@ let ALLERGY_CODE = {
         Message: "Failure in creating the new allergy  information",
         Details: {},
     },
+    5: {
+        Code: "UPDATE_ALLERGY_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updateing the allergy information",
+        Details: {},
+    },
+    6: {
+        Code: "UPDATE_ALLERGY_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updateing the new allergy  information",
+        Details: {},
+    },
 }
 
 let PROCEDURE_CODE = {
