@@ -185,7 +185,7 @@ const {
     db_create_patient_report,
 } = require("../../dbcontrollers/patient_report.controller")
 const {
-    db_create_procedure,
+    db_add_procedure,
     db_get_procedure_list,
     db_update_procedure,
 } = require("../../dbcontrollers/procedure.controller")
@@ -4147,7 +4147,7 @@ async function createPatientProcedure(req, res, next) {
             procedure_data["procedure_uuid"] = uuid_result
             procedure_data["tenant_id"] = tenant_id
             procedure_data["pid"] = given_pid
-            return db_create_procedure(tenant_id, procedure_data, {
+            return db_add_procedure(tenant_id, procedure_data, {
                 transaction: t,
             })
         })
@@ -4170,46 +4170,46 @@ async function createPatientProcedure(req, res, next) {
 }
 
 // Validated
-async function getPatientProcedure(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let procedure_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        procedure_list = await db_get_procedure_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = PROCEDURE_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE PROCEDURE",
-        }
-        return next()
-    }
-    req.apiRes = PROCEDURE_CODE["2"]
-    req.apiRes["response"] = {
-        procedure_list: procedure_list,
-        count: procedure_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientProcedure(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let procedure_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         procedure_list = await db_get_procedure_list(???
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = PROCEDURE_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE PROCEDURE",
+//         }
+//         return next()
+//     }
+//     req.apiRes = PROCEDURE_CODE["2"]
+//     req.apiRes["response"] = {
+//         procedure_list: procedure_list,
+//         count: procedure_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientProcedure(req, res, next) {
@@ -4568,6 +4568,50 @@ async function updatePatientAllergy(req, res, next) {
             error: error
         }
         req.apiRes = ALLERGY_CODE["6"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getPatientProcedure(req, res, next) {
+    try {
+        const data = await db_get_procedure_list(req.params)
+        req.apiRes = PROCEDURE_CODE["2"]
+        req.apiRes["response"] = {
+            procedure_list: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientProcedure(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["procedure"], tenantID: 0 }
+        req.body.procedure_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_add_procedure(req.body)
+        req.apiRes = PROCEDURE_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["4"]
     }
 
     res.response(req.apiRes)

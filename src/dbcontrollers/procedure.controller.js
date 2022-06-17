@@ -8,7 +8,7 @@ var models = initModels(sequelizeDB)
 const logger = require("../config/logger")
 const Procedure = models.procedure
 
-async function db_create_procedure(tenant_id, procedure_data, transaction) {
+async function db_add_procedure(tenant_id, procedure_data, transaction) {
     procedure_data = JSON.stringify(procedure_data)
     procedure_data = JSON.parse(procedure_data)
     let trans = null
@@ -71,79 +71,117 @@ async function db_update_procedure(
 
 
 
-async function db_get_procedure_list(tenant_id, username, params) {
-    procedure_list = ""
-    let {
-        // limit,
-        // offset,
-        // filter,
-        pid,
-        startDate,
-        endDate,
-    } = params
+// async function db_get_procedure_list(tenant_id, username, params) {
+//     procedure_list = ""
+//     let {
+//         // limit,
+//         // offset,
+//         // filter,
+//         pid,
+//         startDate,
+//         endDate,
+//     } = params
 
-    if (startDate && endDate) {
-        // when dates are provided - fetch all in the given range
+//     if (startDate && endDate) {
+//         // when dates are provided - fetch all in the given range
 
-        await Procedure.findAll({
-            // limit: parseInt(limit),
-            //offset:parseInt(offset),
-            // order: Sequelize.literal('date DESC'),
-            raw: true,
+//         await Procedure.findAll({
+//             // limit: parseInt(limit),
+//             //offset:parseInt(offset),
+//             // order: Sequelize.literal('date DESC'),
+//             raw: true,
+//             where: {
+//                 pid: pid,
+//                 diagnosis_date: {
+//                     [Op.between]: [startDate, endDate],
+//                     // same effect
+//                     // $lte: new Date(startDate),
+//                     // $gte: new Date(endDate),
+//                 },
+//             },
+//             order: [["diagnosis_date", "ASC"]],
+//         })
+//             .then((procedure_data) => {
+//                 logger.debug("Procedure list is" + procedure_data)
+//                 procedure_list = procedure_data
+//             })
+//             .catch((err) => {
+//                 logger.debug(
+//                     "Procedure list fetch error " +
+//                         tenant_id +
+//                         "not found Err:" +
+//                         err
+//                 )
+//                 throw new Error("Procedure list fetch error -  tenant check")
+//             })
+//     } else {
+//         // when datese are not provided - fetch all procedures
+
+//         await Procedure.findAll({
+//             // limit: parseInt(limit),
+//             //offset:parseInt(offset),
+//             // order: Sequelize.literal('date DESC'),
+//             raw: true,
+//             where: { pid: pid },
+//         })
+//             .then((procedure_data) => {
+//                 logger.debug("Procedure list is" + procedure_data)
+//                 procedure_list = procedure_data
+//             })
+//             .catch((err) => {
+//                 logger.debug(
+//                     "Procedure list fetch error " +
+//                         tenant_id +
+//                         "not found Err:" +
+//                         err
+//                 )
+//                 throw new Error("Procedure list fetch error -  tenant check")
+//             })
+//     }
+
+//     return procedure_list
+// }
+
+
+async function db_get_procedure_list(params) {
+    try {
+        return await Procedure.findAll({
             where: {
-                pid: pid,
-                diagnosis_date: {
-                    [Op.between]: [startDate, endDate],
-                    // same effect
-                    // $lte: new Date(startDate),
-                    // $gte: new Date(endDate),
-                },
+                pid: params.pid
             },
-            order: [["diagnosis_date", "ASC"]],
+            order: [["id", "DESC"]]
         })
-            .then((procedure_data) => {
-                logger.debug("Procedure list is" + procedure_data)
-                procedure_list = procedure_data
-            })
-            .catch((err) => {
-                logger.debug(
-                    "Procedure list fetch error " +
-                        tenant_id +
-                        "not found Err:" +
-                        err
-                )
-                throw new Error("Procedure list fetch error -  tenant check")
-            })
-    } else {
-        // when datese are not provided - fetch all procedures
-
-        await Procedure.findAll({
-            // limit: parseInt(limit),
-            //offset:parseInt(offset),
-            // order: Sequelize.literal('date DESC'),
-            raw: true,
-            where: { pid: pid },
-        })
-            .then((procedure_data) => {
-                logger.debug("Procedure list is" + procedure_data)
-                procedure_list = procedure_data
-            })
-            .catch((err) => {
-                logger.debug(
-                    "Procedure list fetch error " +
-                        tenant_id +
-                        "not found Err:" +
-                        err
-                )
-                throw new Error("Procedure list fetch error -  tenant check")
-            })
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
     }
+}
 
-    return procedure_list
+
+async function db_add_procedure(params) {
+    try {
+        const obj = {
+            pid: params["pid"],
+            tenant_id: params["tenant_id"],
+            procedure_uuid: params["procedure_uuid"],
+            code_type: params["code_type"] || null,
+            description: params["description"],
+            diagnosis_date: Date.parse(params["diagnosis_date"]),
+            result: params["result"],
+            consulting_person: params["consulting_person"] || null,
+            reaction: params["reaction"],
+            status: params["status"] || null,
+            label: params["label"] || null
+        }
+        return await Procedure.create(obj)
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
 }
 
 module.exports = {
-    db_create_procedure,
+    db_add_procedure,
     db_get_procedure_list,
     db_update_procedure,
 }
