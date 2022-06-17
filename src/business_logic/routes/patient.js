@@ -119,7 +119,7 @@ const {
 //Vitals
 const vital_controller = require("../../dbcontrollers/vital.controller")
 const db_get_vital_list = vital_controller.db_get_vital_list
-const db_create_vital = vital_controller.db_create_vital
+const db_add_vital = vital_controller.db_add_vital
 const db_update_vital = vital_controller.db_update_vital
 
 // allergy
@@ -2006,141 +2006,141 @@ async function getPatientLocation(req, res, next) {
     return next()
 }
 
-async function createPatientVital(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let vital_data = req.body
-    logger.debug("THE VITAL BODY IS", vital_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["vitalsSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            vital_data["vital_uuid"] = uuid_result
-            vital_data["tenant_id"] = tenant_id
-            vital_data["pid"] = given_pid
-            return db_create_vital(tenant_id, vital_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Vitals failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        vital_data: respResult,
-        count: respResult.length,
-    }
-    //TODO: Add the logic to send to the sensor consumer here
-    // TODO: Make it Modular code as library reusable for any other purpose
-    const { Kafka } = require("kafkajs")
-    const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
-    const topic = given_pid
-    const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
-    logger.debug("Created kakfa handle", kafka)
-    let producer
-    try {
-        producer = kafka.producer()
-        logger.debug("Created kakfa handle sending", producer)
-    } catch (error) {
-        logger.debug("Kafka Creation failed", error)
-    }
-    let jsonVitalData = {
-        height: respResult["height"],
-        weight: respResult["weight"],
-        spo2: respResult["spo2"],
-        pulse: respResult["pulse"],
-        rr: respResult["respiration"],
-        bpd: respResult["bpd"],
-        bps: respResult["bps"],
-        painIdx: respResult["pain_index"],
-        temperature: respResult["temperature"],
-    }
-    let jsonVitals = {
-        DeviceType: "Manual",
-        vitalData: jsonVitalData,
-        PatientUUID: topic,
-    }
-    var sendMessage = async () => {
-        // try {
-        await producer.connect()
-        await producer.send({
-            topic: topic,
-            messages: [{ key: "spo2", value: jsonVitals }],
-        })
-        await producer.disconnect()
-    }
-    logger.debug("Kakfa Send message")
-    try {
-        sendMessage()
-    } catch (error) {
-        //TODO: Need to have a retry or some other way this data is sent to sensor_consumer - if things fail
-        logger.debug("Error in Sending message in Kafka", error)
-        await producer.disconnect()
-    }
-    // End of Kafka Send
-    return next()
-}
+// async function createPatientVital(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let vital_data = req.body
+//     logger.debug("THE VITAL BODY IS", vital_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     //JSON SCHEMA VALIDATION
+//     let schema_status = schemaValidator.validate_schema(
+//         req,
+//         SCHEMA_CODE["vitalsSchema"]
+//     )
+//     if (!schema_status["status"]) {
+//         req.apiRes = JSON_SCHEMA_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Schema Validation Failed ",
+//         }
+//         return next()
+//     }
+//     uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             vital_data["vital_uuid"] = uuid_result
+//             vital_data["tenant_id"] = tenant_id
+//             vital_data["pid"] = given_pid
+//             return db_add_vital(tenant_id, vital_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Vitals failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         vital_data: respResult,
+//         count: respResult.length,
+//     }
+//     //TODO: Add the logic to send to the sensor consumer here
+//     // TODO: Make it Modular code as library reusable for any other purpose
+//     const { Kafka } = require("kafkajs")
+//     const clientId = "my-app"
+//     const brokers = [process.env.KAFKA_BROKER + ":9092"]
+//     const topic = given_pid
+//     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
+//     logger.debug("Created kakfa handle", kafka)
+//     let producer
+//     try {
+//         producer = kafka.producer()
+//         logger.debug("Created kakfa handle sending", producer)
+//     } catch (error) {
+//         logger.debug("Kafka Creation failed", error)
+//     }
+//     let jsonVitalData = {
+//         height: respResult["height"],
+//         weight: respResult["weight"],
+//         spo2: respResult["spo2"],
+//         pulse: respResult["pulse"],
+//         rr: respResult["respiration"],
+//         bpd: respResult["bpd"],
+//         bps: respResult["bps"],
+//         painIdx: respResult["pain_index"],
+//         temperature: respResult["temperature"],
+//     }
+//     let jsonVitals = {
+//         DeviceType: "Manual",
+//         vitalData: jsonVitalData,
+//         PatientUUID: topic,
+//     }
+//     var sendMessage = async () => {
+//         // try {
+//         await producer.connect()
+//         await producer.send({
+//             topic: topic,
+//             messages: [{ key: "spo2", value: jsonVitals }],
+//         })
+//         await producer.disconnect()
+//     }
+//     logger.debug("Kakfa Send message")
+//     try {
+//         sendMessage()
+//     } catch (error) {
+//         //TODO: Need to have a retry or some other way this data is sent to sensor_consumer - if things fail
+//         logger.debug("Error in Sending message in Kafka", error)
+//         await producer.disconnect()
+//     }
+//     // End of Kafka Send
+//     return next()
+// }
 
 // Validated
-async function getPatientVital(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let vitals
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        vitals = await db_get_vital_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = VITAL_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE VITALS",
-        }
-        return next()
-    }
-    req.apiRes = VITAL_CODE["2"]
-    req.apiRes["response"] = {
-        vitals: vitals,
-        count: vitals.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientVital(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let vitals
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         vitals = await db_get_vital_list(tenant_id, username, req.query)
+//     } catch (e) {
+//         req.apiRes = VITAL_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE VITALS",
+//         }
+//         return next()
+//     }
+//     req.apiRes = VITAL_CODE["2"]
+//     req.apiRes["response"] = {
+//         vitals: vitals,
+//         count: vitals.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientVital(req, res, next) {
@@ -4512,6 +4512,51 @@ async function createPatientAllergy(req, res, next) {
     res.response(req.apiRes)
     return next()
 }
+
+async function getPatientVital(req, res, next) {
+    try {
+        const data = await db_get_vital_list(req.params)
+        req.apiRes = VITAL_CODE["2"]
+        req.apiRes["response"] = {
+            vitals: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = VITAL_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientVital(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
+        req.body.vital_uuid = await getUUID(uuidDict, { transaction: t })
+        const data = await db_add_vital(req.body)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
 
 module.exports = {
     createPatientInBulk,
