@@ -31,89 +31,89 @@ var Vital = function (vitalobj) {
         (this.oxygen_saturation = vitalobj.oxygen_saturation),
         (this.external_id = vitalobj.external_id)
 }
-async function db_get_vital_list(tenant_id, username, params) {
-    vital_list = ""
-    let { limit, offset, filter, pid } = params
-    whereStatement = {
-        tenant_id: tenant_id,
-        pid: pid
-    }
-    logger.debug('this is vital controller')
-    await Vitals.findAll({
-        limit: parseInt(limit),
-        //offset:parseInt(offset),
-        order: Sequelize.literal('date DESC'),
-        raw: true,
-        where: whereStatement,
-    })
-        .then((vital_data) => {
-            logger.debug("Vital list is" + vital_data)
-            vital_list = vital_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Vital list fetch error " +
-                tenant_id +
-                "not found Err:" +
-                err
-            )
-            throw new Error("Vital list fetch error -  tenant check")
-        })
+// async function db_get_vital_list(tenant_id, username, params) {
+//     vital_list = ""
+//     let { limit, offset, filter, pid } = params
+//     whereStatement = {
+//         tenant_id: tenant_id,
+//         pid: pid
+//     }
+//     logger.debug('this is vital controller')
+//     await Vitals.findAll({
+//         limit: parseInt(limit),
+//         //offset:parseInt(offset),
+//         order: Sequelize.literal('date DESC'),
+//         raw: true,
+//         where: whereStatement,
+//     })
+//         .then((vital_data) => {
+//             logger.debug("Vital list is" + vital_data)
+//             vital_list = vital_data
+//         })
+//         .catch((err) => {
+//             logger.debug(
+//                 "Vital list fetch error " +
+//                 tenant_id +
+//                 "not found Err:" +
+//                 err
+//             )
+//             throw new Error("Vital list fetch error -  tenant check")
+//         })
 
-    return vital_list
+//     return vital_list
 
-}
+// }
 
-async function db_create_vital(tenant_id, vital_data, transaction) {
-    vital_list = ""
-    logger.debug("vital data is " + JSON.stringify(vital_data))
-    let pdata = new Vital(vital_data)
+// async function db_add_vital(tenant_id, vital_data, transaction) {
+//     vital_list = ""
+//     logger.debug("vital data is " + JSON.stringify(vital_data))
+//     let pdata = new Vital(vital_data)
 
-    await Vitals.create(
-        {
-            pid: vital_data["pid"],
-            user: vital_data["user"],
-            groupname: vital_data["groupname"],
-            authorized: vital_data["authorized"],
-            specialty: vital_data["specialty"],
-            activity: vital_data["activity"],
-            bps: vital_data["bps"],
-            bpd: vital_data["bpd"],
-            weight: vital_data["weight"],
-            height: vital_data["height"],
-            temperature: vital_data["temperature"],
-            temp_method: vital_data["temp_method"],
-            pulse: vital_data["pulse"],
-            respiration: vital_data["respiration"],
-            note: vital_data["note"],
-            BMI: vital_data["BMI"],
-            BMI_status: vital_data["BMI_status"],
-            waist_circ: vital_data["waist_circ"],
-            head_circ: vital_data["head_circ"],
-            oxygen_saturation: vital_data["oxygen_saturation"],
-            external_id: vital_data["external_id"],
-            vital_uuid: vital_data["vital_uuid"],
-            vital_date: vital_data["vital_date"],
-            spo2: vital_data["spo2"],
-            pain_index: vital_data["pain_index"],
-            tenant_id: tenant_id,
-            date: vital_data["date"],
-        },
-        { transaction: transaction["transaction"] }
-    )
-        .then((vital_data) => {
-            logger.debug("Vital insert output is" + JSON.stringify(vital_data))
-            vital_list = vital_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Vital insert  error " + tenant_id + " not found Err:" + err
-            )
-            throw new Error("Vital insert  error -  tenant check" + err)
-        })
+//     await Vitals.create(
+//         {
+//             pid: vital_data["pid"],
+//             user: vital_data["user"],
+//             groupname: vital_data["groupname"],
+//             authorized: vital_data["authorized"],
+//             specialty: vital_data["specialty"],
+//             activity: vital_data["activity"],
+//             bps: vital_data["bps"],
+//             bpd: vital_data["bpd"],
+//             weight: vital_data["weight"],
+//             height: vital_data["height"],
+//             temperature: vital_data["temperature"],
+//             temp_method: vital_data["temp_method"],
+//             pulse: vital_data["pulse"],
+//             respiration: vital_data["respiration"],
+//             note: vital_data["note"],
+//             BMI: vital_data["BMI"],
+//             BMI_status: vital_data["BMI_status"],
+//             waist_circ: vital_data["waist_circ"],
+//             head_circ: vital_data["head_circ"],
+//             oxygen_saturation: vital_data["oxygen_saturation"],
+//             external_id: vital_data["external_id"],
+//             vital_uuid: vital_data["vital_uuid"],
+//             vital_date: vital_data["vital_date"],
+//             spo2: vital_data["spo2"],
+//             pain_index: vital_data["pain_index"],
+//             tenant_id: tenant_id,
+//             date: vital_data["date"],
+//         },
+//         { transaction: transaction["transaction"] }
+//     )
+//         .then((vital_data) => {
+//             logger.debug("Vital insert output is" + JSON.stringify(vital_data))
+//             vital_list = vital_data
+//         })
+//         .catch((err) => {
+//             logger.debug(
+//                 "Vital insert  error " + tenant_id + " not found Err:" + err
+//             )
+//             throw new Error("Vital insert  error -  tenant check" + err)
+//         })
 
-    return vital_list
-}
+//     return vital_list
+// }
 
 async function db_update_vital(tenant_id, vital_data, given_pid, transaction) {
     let { pid } = given_pid
@@ -201,9 +201,52 @@ async function db_delete_vital(given_pid, transaction) {
         })
 }
 
+async function db_get_vital_list(params) {
+    try {
+        return await Vitals.findAll({
+            where: {
+                pid: params.pid
+            },
+            order: [["date", "DESC"]]
+        })
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
+
+async function db_add_vital(params) {
+    try {
+        const data = {
+            pid: params["pid"],
+            user: params["user"] || null,
+            groupname: params["groupname"],
+            specialty: params["specialty"],
+            bps: params["bps"],
+            bpd: params["bpd"],
+            weight: params["weight"],
+            height: params["height"],
+            temperature: params["temperature"],
+            pulse: params["pulse"],
+            respiration: params["respiration"],
+            vital_uuid: params["vital_uuid"],
+            spo2: params["spo2"],
+            pain_index: params["pain_index"],
+            tenant_id: params["tenant_id"],
+            vital_uuid: params["vital_uuid"]
+        }
+        return await Vitals.create(data)
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_vital_list,
-    db_create_vital,
+    db_add_vital,
     db_update_vital,
     db_delete_vital,
 }
