@@ -1694,58 +1694,58 @@ async function createConnector(req, res, next) {
 //PRODUCT ROUTES
 // Validated
 
-async function getProduct(req, res, next) {
-    logger.debug("THIS IS PRODUCT INVENTORY")
-    username = req.userName
-    tenant_id = req.userTenantId
-    let products
-    try {
-        products = await db_get_product_list(tenant_id, username, req.query)
-    } catch (err) {
-        logger.debug("Product list error " + err)
-        req.apiRes = PRODUCT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE PRODUCTS",
-        }
-        return next()
-    }
-    logger.debug("Product list is " + products)
-    req.apiRes = PRODUCT_CODE["2"]
-    req.apiRes["response"] = {
-        products: products,
-        count: products.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getProduct(req, res, next) {
+//     logger.debug("THIS IS PRODUCT INVENTORY")
+//     username = req.userName
+//     tenant_id = req.userTenantId
+//     let products
+//     try {
+//         products = await db_get_product_list(tenant_id, username, req.query)
+//     } catch (err) {
+//         logger.debug("Product list error " + err)
+//         req.apiRes = PRODUCT_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE PRODUCTS",
+//         }
+//         return next()
+//     }
+//     logger.debug("Product list is " + products)
+//     req.apiRes = PRODUCT_CODE["2"]
+//     req.apiRes["response"] = {
+//         products: products,
+//         count: products.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
-async function createProduct(req, res, next) {
-    logger.debug("Product body is", req.body)
-    tenant_id = req.userTenantId
-    const t = await postgresSequelizeDB.transaction()
-    var product_data = req.body
-    let products
-    try {
-        products = await postgresSequelizeDB.transaction(function (t) {
-            return db_create_product(tenant_id, product_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("PRODUCT Create error " + err)
-        req.apiRes = PRODUCT_CODE["4"]
-        req.apiRes["error"] = {
-            error: "Creation of Product failed :" + err,
-        }
-        return next()
-    }
-    req.apiRes = PRODUCT_CODE["3"]
-    req.apiRes["response"] = {
-        product_data: products,
-        count: products.length,
-    }
-    return next()
-}
+// async function createProduct(req, res, next) {
+//     logger.debug("Product body is", req.body)
+//     tenant_id = req.userTenantId
+//     const t = await postgresSequelizeDB.transaction()
+//     var product_data = req.body
+//     let products
+//     try {
+//         products = await postgresSequelizeDB.transaction(function (t) {
+//             return db_create_product(tenant_id, product_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (err) {
+//         logger.debug("PRODUCT Create error " + err)
+//         req.apiRes = PRODUCT_CODE["4"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Product failed :" + err,
+//         }
+//         return next()
+//     }
+//     req.apiRes = PRODUCT_CODE["3"]
+//     req.apiRes["response"] = {
+//         product_data: products,
+//         count: products.length,
+//     }
+//     return next()
+// }
 
 // Location Routes - For Tenant
 
@@ -2996,6 +2996,48 @@ async function getDevice(req, res, next) {
             error: error
         }
         req.apiRes = PATCH_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getProduct(req, res, next) {
+    try {
+        const data = await db_get_product_list(req.query)
+
+        req.apiRes = PRODUCT_CODE["2"]
+        req.apiRes["response"] = {
+            products: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRODUCT_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createProduct(req, res, next) {
+    try {
+        await db_create_product(req.body)
+        req.apiRes = PRODUCT_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRODUCT_CODE["4"]
     }
 
     res.response(req.apiRes)
