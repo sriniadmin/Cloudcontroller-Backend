@@ -1245,6 +1245,18 @@ let PROCEDURE_CODE = {
         Message: "Failure in creating the new allergy  information",
         Details: {},
     },
+    5: {
+        Code: "UPDATE_PROCEDURE_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updating the allergy information",
+        Details: {},
+    },
+    6: {
+        Code: "UPDATE_PROCEDURE_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the new allergy  information",
+        Details: {},
+    },
 }
 
 let BILLING_CODE = {

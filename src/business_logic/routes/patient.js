@@ -4212,50 +4212,50 @@ async function createPatientProcedure(req, res, next) {
 // }
 
 // Validated
-async function updatePatientProcedure(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let procedure_map = req.body
-    logger.debug("the procedure uuid is", procedure_map["procedure_uuid"])
+// async function updatePatientProcedure(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let procedure_map = req.body
+//     logger.debug("the procedure uuid is", procedure_map["procedure_uuid"])
 
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
 
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            return db_update_procedure(tenant_id, procedure_map, given_pid, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN UPDATING THE PROCEDURE",
-        }
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        procedure_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             return db_update_procedure(tenant_id, procedure_map, given_pid, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "ERROR IN UPDATING THE PROCEDURE",
+//         }
+//         return next()
+//     }
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = PATIENT_CODE["2"]
+//     req.apiRes["response"] = {
+//         procedure_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
 
 async function getPatientInventory(req, res, next) {
     let given_pid = req.body.pid
@@ -4612,6 +4612,26 @@ async function createPatientProcedure(req, res, next) {
             error: error
         }
         req.apiRes = PROCEDURE_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updatePatientProcedure(req, res, next) {
+    try {
+        await db_update_procedure(req.body)
+        req.apiRes = PROCEDURE_CODE["5"]
+        req.apiRes["response"] = {
+            allergy_data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["6"]
     }
 
     res.response(req.apiRes)
