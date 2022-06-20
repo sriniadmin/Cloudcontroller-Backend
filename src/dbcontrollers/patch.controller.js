@@ -29,6 +29,13 @@ models.patch.hasMany(models.patch, {
     as: "AssociatedPatch",
 })
 
+
+models.patch.hasOne(models.patch, {
+    foreignKey: "patch_serial",
+    sourceKey: "patch_serial",
+    as: "gateway",
+})
+
 async function db_get_patch_select_boxes(params) {
     let data
     try {
@@ -820,6 +827,15 @@ async function db_get_device(params) {
                     where: {
                         tenant_id: params.tenantId
                     },
+                },
+                {
+                    model: models.patch,
+                    attributes:['patch_uuid','patch_serial','patch_mac', 'patch_type'],
+                    // required: true,
+                    where: {
+                        patch_type: "gateway"
+                    },
+                    as: "gateway",
                 },
                 {
                     model: models.patch,
