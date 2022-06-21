@@ -86,6 +86,7 @@ const {
     db_patch_exist,
     db_check_patch_exist,
     db_get_patch,
+    db_update_patch_unRegister,
     db_update_patch_register
 } = require("../../dbcontrollers/patch.controller")
 const {
@@ -1377,98 +1378,16 @@ async function updatePatient(req, res, next) {
 
 // Validated
 async function createPatientPatchMap(req, res, next) {
-    //if the pid in the patch map of a specific patch is 0 , then dis-associate happens
-    //if the pid in the patch map of a specific patch is pid , then associate happens
-
     let patch_map = req.body
     let given_pid = patch_map.pid
     let tenant_id = patch_map.tenantId
-    let patient_exist
     let result
     const t = await sequelizeDB.transaction()
-    // let patientInfo
-    // // let patchInfo
-
-    // //alert setup
-    // try {
-    //     patientInfo = await db_patient_info(given_pid)
-    // } catch (err) {
-    //     logger.debug('ERROR : ', err.message)
-    // }
-
-    // try {
-    //     patchInfo = await db_get_patch(tenant_id, req.body.list[0]['patch_uuid'])
-    //     patchInfo = JSON.parse(JSON.stringify(patchInfo))['patch_name']
-    // } catch (err) {
-    //     logger.debug('ERROR : ', err.message)
-    // }
-
-    // let { fname, lname } = JSON.parse(JSON.stringify(patientInfo, null, 2))
-
-    // let alertEventId = uuid()
-
-    // let createPatientPatchAlert = alertEnum['1']
-    // createPatientPatchAlert['event'] = `create patient patch map id:${alertEventId}`
-    // createPatientPatchAlert['text'] = `${patchInfo} patch associated for ${fname} ${lname}`
-    // createPatientPatchAlert['service'] = [`${req.userTenant}`]
-
-    //JSON SCHEMA VALIDATION
-    // let schema_status = schemaValidator.validate_schema(?
-    //     [req],
-    //     SCHEMA_CODE["patchPatientMap"]
-    // )
-    // if (!schema_status["status"]) {
-    //     req.apiRes = JSON_SCHEMA_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         error: "Schema Validation Failed ",
-    //     }
-    //     return next()
-    // }
-
-    logger.debug("PATIENT EXIST CHECK")
-    patient_exist = await db_patient_exist(tenant_id, given_pid)
-    logger.debug("THIS IS IN PATIENT EXIST FUNCTION", patient_exist)
-    if (!patient_exist) {
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "PATIENT DOES NOT  EXISTS :",
-        }
-        return next()
-    }
-
-    patch_exist = await db_check_patch_exist(tenant_id, patch_map.list)
-    logger.debug("THIS IS IN PATCH EXIST FUNCTION", patch_exist)
-    if (!patch_exist) {
-        req.apiRes = PATCH_CODE["5"]
-        req.apiRes["error"] = {
-            error: "PATCH DOES NOT EXIST :",
-        }
-        return next()
-    }
-
-    //  for (let i = 0; i < patch_exist.length; i++) {
-    //     logger.debug("patch info is ", patch_exist[i])
-    //     if (patch_exist[i].length == 0) {
-    //         logger.debug("Patch does not exist", given_pid)
-    //         req.apiRes = PATCH_CODE["5"]
-    //         return next()
-    //     }
-    //      patch_map[i]["config"] = [{ "sample_freq": "30", "sample_count": "1", "stop_sample": "undefined" }]
-    //      patch_map[i]["command"] = "clearPatient"
-    //      patch_map[i]["keepaliveTime"] = "30"
-    // }
 
     let list = []
     try {
         result = await sequelizeDB.transaction( async function (t) {
-            // logger.debug(
-            //     "THE GIVEN PID IS",
-            //     given_pid,
-            //     patch_map["pid"],
-            //     patch_map[0]["pid"]
-            // )
             if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
-
             
             let associated_list = req.body.associated_list
             if(associated_list.length > 0){
@@ -1481,6 +1400,7 @@ async function createPatientPatchMap(req, res, next) {
             list.push(req.body.list[0].type_device)
             await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
 
+            await db_update_patch_register({list: [req.body.list[0].patch_uuid] ,gateway: req.body.list[0].gateway})
             
             return await db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
                 transaction: t,
@@ -1503,26 +1423,6 @@ async function createPatientPatchMap(req, res, next) {
         patch_data: respResult,
         count: respResult.length,
     }
-
-    // TODO - Validate the first time patient patch is associated or re-boarded into the system
-    // the CREATE is sent to kafka
-    // msg = {
-    //     UuidPatient: given_pid,
-    //     Method: "CREATE",
-    //     UuidTenant: "tenantb653407c-aefe-4c7b-afb0-05149343de80",
-    //     Thresholds: AlertThresholdsDict,
-    //     FrequencySetting: 1800,
-    // }
-    // await patientKafkaRegister(msg)
-
-    // try {
-    //     let response = await alerter(createPatientPatchAlert)
-    //     logger.debug(`alertResponse : ${response}`)
-    // }
-    // catch (err) {
-    //     logger.debug(`Alert ERROR : ${err.message}`)
-    // }
-
     return next()
 }
 
@@ -4309,7 +4209,7 @@ async function disablePatient(req, res, next) {
                 });
                 await db_delete_patch_associated(req.body)
             }
-            await db_update_patch_register(list)
+            await db_update_patch_unRegister(list)
             req.apiRes = PATIENT_CODE["9"]
             req.apiRes["response"] = { delete: true }
         }
@@ -4342,7 +4242,7 @@ async function unassociatePatient(req, res, next) {
         }
 
         await db_delete_each_device(req.body)
-        await db_update_patch_register([req.body.patch_uuid])
+        await db_update_patch_unRegister([req.body.patch_uuid])
         req.apiRes = ASSOCIATE_CODE["1"]
         req.apiRes["response"] = { unassociate: true }
     } catch (error) {

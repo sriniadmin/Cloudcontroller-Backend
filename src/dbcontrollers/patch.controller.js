@@ -40,7 +40,7 @@ async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', 'patch_serial', 'patch_uuid'],
+            attributes: ['id', 'patch_type', ['device_serial', 'patch_serial'], 'patch_uuid'],
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
@@ -714,12 +714,33 @@ async function db_delete_patch(params) {
     return data
 }
 
-async function db_update_patch_register(params) {
+async function db_update_patch_unRegister(params) {
     let promises = []
     params.forEach(obj => {
         promises.push(
             Patches.update(
                 { in_use: 'false' },
+                { where: {patch_uuid: obj}}
+            )
+        )
+    });
+
+    await Promise.all(promises)
+    .then((result) => {
+        return result
+    })
+    .catch((error) => {
+        console.log(error)
+        throw new Error(error)
+    })
+}
+
+async function db_update_patch_register(params) {
+    let promises = []
+    params.list.forEach(obj => {
+        promises.push(
+            Patches.update(
+                { patch_serial: params.gateway },
                 { where: {patch_uuid: obj}}
             )
         )
@@ -759,7 +780,7 @@ async function db_create_device(params) {
                 patch_mac: params.body.data[0]["patch_mac"],
                 // patch_bluetooth: patch_data[i]["patch_bluetooth"],
                 // patch_sensor_id: patch_data[i]["patch_sensor_id"],
-                patch_serial: params.body.data[0]["patch_serial"],
+                device_serial: params.body.data[0]["patch_serial"],
                 group_type: 'Device',
                 in_use: 'false',
                 tenant_id: params.body.tenantId,
@@ -808,7 +829,7 @@ async function db_get_device(params) {
             tenant_id: params.tenantId,
             [Op.or]: [
                 { patch_mac: { [Op.like]: "%" + params.search + "%"} },
-                { patch_serial: { [Op.like]: "%" + params.search + "%"} }
+                { device_serial: { [Op.like]: "%" + params.search + "%"} }
             ]
         }
     }
@@ -830,7 +851,7 @@ async function db_get_device(params) {
                 },
                 {
                     model: models.patch,
-                    attributes:['patch_uuid','patch_serial','patch_mac', 'patch_type'],
+                    attributes:['patch_uuid','device_serial', 'patch_serial','patch_mac', 'patch_type'],
                     // required: true,
                     // where: {
                     //     patch_type: "gateway"
@@ -880,10 +901,11 @@ module.exports = {
     db_get_patch_select_boxes,
     db_delete_patch,
     db_get_patch_saas,
-    db_update_patch_register,
+    db_update_patch_unRegister,
     db_get_device_id,
     db_create_device,
     db_check_duplicate_device,
     db_get_device,
-    db_count_device
+    db_count_device,
+    db_update_patch_register
 }
