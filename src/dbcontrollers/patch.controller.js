@@ -30,7 +30,7 @@ models.patch.hasMany(models.patch, {
 })
 
 
-models.patch.hasOne(models.patch, {
+models.patch.hasMany(models.patch, {
     foreignKey: "patch_serial",
     sourceKey: "patch_serial",
     as: "gateway",
@@ -807,8 +807,8 @@ async function db_get_device(params) {
         condition = {
             tenant_id: params.tenantId,
             [Op.or]: [
-                { patch_mac: { [Op.like]: `%${params.search}%` } },
-                { patch_serial: { [Op.like]: `%${params.search}%` } }
+                { patch_mac: { [Op.like]: "%" + params.search + "%"} },
+                { patch_serial: { [Op.like]: "%" + params.search + "%"} }
             ]
         }
     }
@@ -832,24 +832,19 @@ async function db_get_device(params) {
                     model: models.patch,
                     attributes:['patch_uuid','patch_serial','patch_mac', 'patch_type'],
                     // required: true,
-                    where: {
-                        patch_type: "gateway"
-                    },
+                    // where: {
+                    //     patch_type: "gateway"
+                    // },
                     as: "gateway",
-                },
-                {
-                    model: models.patch,
-                    required: true,
-                    as: "AssociatedPatch",
-                },
+                }
     
             ],
+            where: condition,
             limit: limit,
             offset: offset,
             required: false,
             order: [["date", "DESC"]],
             raw: false,
-            where: condition
         })
     } catch (error) {
         throw new Error(error)
