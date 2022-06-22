@@ -747,7 +747,7 @@ async function db_create_device(params) {
                 patch_mac: params.body.data[0]["patch_mac"],
                 // patch_bluetooth: patch_data[i]["patch_bluetooth"],
                 // patch_sensor_id: patch_data[i]["patch_sensor_id"],
-                device_serial: params.body.data[0]["patch_serial"],
+                device_serial: params.body.data[0]["device_serial"],
                 group_type: 'Device',
                 in_use: 'false',
                 tenant_id: params.body.tenantId,
@@ -765,7 +765,7 @@ async function db_check_duplicate_device(params) {
         if(params.patch_type === 'gateway'){
             condition = {
                 patch_type: params.patch_type,
-                patch_serial: params.patch_serial
+                device_serial: params.device_serial
             }
         }
         else {

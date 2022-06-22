@@ -1400,7 +1400,11 @@ async function createPatientPatchMap(req, res, next) {
             list.push(req.body.list[0].type_device)
             await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
 
-            await db_update_patch_register({list: [req.body.list[0].patch_uuid] ,gateway: req.body.list[0].gateway})
+            let gateway = req.body.list[0].gateway
+            if(req.body.list[0].type_device === 'gateway'){
+                gateway = req.body.list[0].gateway_device_serial
+            }
+            await db_update_patch_register({list: [req.body.list[0].patch_uuid] ,gateway: gateway})
             
             return await db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
                 transaction: t,
