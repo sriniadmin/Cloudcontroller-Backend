@@ -40,7 +40,7 @@ async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', ['device_serial', 'patch_serial'], 'patch_uuid'],
+            attributes: ['id', 'patch_type', 'device_serial', 'patch_uuid'],
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
@@ -534,40 +534,7 @@ async function db_patch_exist_new(patch_serial) {
     return patch_id
 }
 
-async function db_update_patch_new(tenant_id, patch_data, transaction) {
-    logger.debug("Patch data is " + patch_data)
-    if (!patch_data) return
-    patch_list = ""
-    logger.debug(
-        "Patch data is " + JSON.stringify(patch_data),
-        patch_data["patch_group_id"]
-    )
 
-    await Patches.update(
-        {
-            patch_group_id: patch_data["patch_group_id"],
-        },
-        {
-            where: {
-                patch_serial: patch_data["patch_serial"],
-            },
-        },
-        { transaction: transaction["transaction"] }
-    )
-
-        .then((patch_output_data) => {
-            logger.debug("patch insert output is" + patch_output_data)
-            patch_list = patch_output_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Patch insert  error " + tenant_id + " not found Err:" + err
-            )
-            throw new Error("Patch insert  error -  tenant check")
-        })
-
-    return patch_list
-}
 
 async function db_patch_uuid_exist(patch_uuid) {
     let patch_id
@@ -872,6 +839,7 @@ async function db_get_device(params) {
     }
 }
 
+
 async function db_count_device(params) {
     try {
         return await Patches.count({
@@ -885,13 +853,25 @@ async function db_count_device(params) {
 }
 
 
+async function db_update_patch_status(params) {
+
+    return await Patches.update(
+        { patch_status: params.patch_status },
+        { where: {patch_uuid: params.patch_uuid}}
+    )
+    .catch((error) => {
+        throw new Error(error)
+    })
+}
+
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
     db_update_patch,
     db_patch_exist,
     db_patch_exist_new,
-    db_update_patch_new,
+    db_update_patch_status,
     db_update_patch_uuid,
     db_patch_uuid_exist,
     db_patch_count,

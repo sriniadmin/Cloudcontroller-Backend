@@ -369,6 +369,16 @@ let PATCH_CODE = {
         Code: "MAC_ADDRESS_IS_ALREADY_EXIST",
         HttpStatus: "470",
         Message: "Mac address is already exist",
+    },
+    16: {
+        Code: "PATCH_STATUS_UPDATE_SUCCESSFUL",
+        HttpStatus: "200",
+        Message: "Success in updating for the devices",
+    },
+    17: {
+        Code: "PATCH_STATUS_UPDATE_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating for the devices",
     }
 }
 

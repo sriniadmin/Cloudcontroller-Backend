@@ -112,7 +112,7 @@ const {
     db_get_patch_list,
     db_patch_exist_new,
     db_patch_uuid_exist,
-    db_update_patch_new,
+    db_update_patch_status,
     db_update_patch_uuid,
     db_patch_count,
     db_patch_serial_exist,
@@ -1213,184 +1213,7 @@ async function updatePatchUuid(req, res, next) {
     return next()
 }
 
-// Validated
-async function updatePatch(req, res, next) {
-    logger.debug("the patch is ")
-    const t = await sequelizeDB.transaction()
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
 
-    let patch_data = req.body
-    logger.debug("The patch data is", patch_data)
-    let dev_array_keys = Object.keys(patch_data)
-    if (!dev_array_keys.includes("gateway")) {
-        // Return Error - as Gateway is not present
-        return res.status(PATCH_CODE["10"].HttpStatus).json({
-            result: PATCH_CODE["10"].Code,
-            response: {},
-            error: {
-                errmessage: PATCH_CODE["10"].Message,
-            },
-            privilege: {},
-        })
-    }
-    let dev_array_values = Object.values(patch_data)
-    let index = 0
-    let promises = []
-    let tenant_id = null
-    promises.push(db_get_tenant_id(tenant_name))
-    await Promise.all(promises).then((tenant_id_result) => {
-        logger.debug("the tenant id is ", tenant_id_result)
-        tenant_id = tenant_id_result
-    })
-    promises = []
-    for (index = 0; index < dev_array_keys.length; index++) {
-        logger.debug("index is ", index)
-        promises.push(db_patch_exist_new(dev_array_values[index]))
-    }
-    await Promise.all(promises)
-        .then(async (patch_serial_data) => {
-            logger.debug("the patch serial from table", patch_serial_data)
-            if (patch_serial_data.includes("")) {
-                // return error with patch serial number not found
-                return res.status(PATCH_CODE["6"].HttpStatus).json({
-                    result: PATCH_CODE["6"].Code,
-                    response: {},
-                    error: {
-                        errmessage: PATCH_CODE["6"].Message,
-                    },
-                    privilege: {},
-                })
-            }
-            index = 0
-            let inner_index = 0
-            let match_array = []
-            while (index < dev_array_keys.length) {
-                inner_index = 0
-                temp_key = dev_array_keys[index]
-                temp_value = dev_array_values[index]
-                while (inner_index < dev_array_keys.length) {
-                    logger.debug(
-                        "Verifying the patch type , serial number matches",
-                        temp_value,
-                        patch_serial_data[inner_index]["patch_type"],
-                        patch_serial_data[inner_index]["patch_serial"],
-                        temp_key
-                    )
-                    if (
-                        temp_key == patch_serial_data[inner_index]["patch_type"]
-                    ) {
-                        if (
-                            temp_value ==
-                            patch_serial_data[inner_index]["patch_serial"]
-                        ) {
-                            match_array.push(temp_value)
-                            break
-                        }
-                    }
-                    inner_index += 1
-                }
-                index += 1
-            }
-            logger.debug(
-                "Match array and req array",
-                match_array,
-                dev_array_values
-            )
-            let intersection = dev_array_values.filter((x) =>
-                match_array.includes(x)
-            )
-            if (intersection.length < dev_array_values.length) {
-                logger.debug(
-                    "Serial Number and Patch Type are not matching",
-                    intersection
-                )
-                // return error - stating serial number and patch type is not matching for one or more devices
-                return res.status(PATCH_CODE["7"].HttpStatus).json({
-                    result: PATCH_CODE["7"].Code,
-                    response: {},
-                    error: {
-                        errmessage: PATCH_CODE["7"].Message,
-                    },
-                    privilege: {},
-                })
-            }
-            // All validations are completed
-            // Update the group id of gateway to other patches
-            let temp_promises = []
-            let gateway_group_id = null
-            for (index = 0; index < dev_array_keys.length; index++) {
-                logger.debug("index is ", index)
-                if (patch_serial_data[index]["patch_type"] == "gateway") {
-                    gateway_group_id =
-                        patch_serial_data[index]["patch_group_id"]
-                }
-            }
-            for (index = 0; index < dev_array_keys.length; index++) {
-                logger.debug("index is ", index)
-                if (patch_serial_data[index]["patch_type"] != "gateway") {
-                    patch_serial_data[index]["patch_group_id"] =
-                        gateway_group_id
-                    logger.debug("THE PATCH INDEX IS", patch_serial_data[index])
-                    let temp_serial_data = patch_serial_data[index]
-                    temp_promises.push(
-                        sequelizeDB.transaction(function (t) {
-                            logger.debug("THE PATCH INDEX IS", temp_serial_data)
-                            db_update_patch_new(tenant_id, temp_serial_data, {
-                                transaction: t,
-                            })
-                        })
-                    )
-                }
-            }
-            logger.debug("TEMP PROMISES IS", temp_promises)
-            await Promise.all(temp_promises)
-                .then((patch_group_update) => {
-                    logger.debug(
-                        "the patch group update is",
-                        patch_group_update
-                    )
-                    return res.status(PATCH_CODE["8"].HttpStatus).json({
-                        result: PATCH_CODE["8"].Code,
-                        response: {},
-                        error: {
-                            errmessage: PATCH_CODE["8"].Message,
-                        },
-                        privilege: {},
-                    })
-
-                    // return success here
-                })
-                .catch((err) => {
-                    logger.debug(
-                        "Patch insert  error " + " not found Err:" + err
-                    )
-                    return res.status(PATCH_CODE["9"].HttpStatus).json({
-                        result: PATCH_CODE["9"].Code,
-                        response: {},
-                        error: {
-                            errmessage: PATCH_CODE["9"].Message,
-                        },
-                        privilege: {},
-                    })
-                })
-        })
-        .catch((err) => {
-            logger.debug("Patch insert  error " + " not found Err:" + err)
-            return res.status(TRANSACTION_CODE["1"].HttpStatus).json({
-                result: TRANSACTION_CODE["1"].Code,
-                response: {},
-                error: {
-                    errmessage: TRANSACTION_CODE["1"].Message,
-                },
-                privilege: {},
-            })
-        })
-}
-
-//Tenants function
-// Validated
 async function getTenant(req, res, next) {
     username = req.userName
     tenant_id = req.userTenantId
@@ -3044,6 +2867,25 @@ async function createProduct(req, res, next) {
     return next()
 }
 
+
+async function updatePatch(req, res, next) {
+    try {
+        await db_update_patch_status(req.body[0])
+        req.apiRes = PATCH_CODE["16"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATCH_CODE["17"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
 
 module.exports = {
     getUserInventory,
