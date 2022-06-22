@@ -686,20 +686,23 @@ async function db_update_patch_unRegister(params) {
     params.forEach(obj => {
         promises.push(
             Patches.update(
-                { in_use: 'false' },
-                { where: {patch_uuid: obj}}
+                {
+                    in_use: 'false',
+                    patch_serial: null
+                },
+                { where: { patch_uuid: obj } }
             )
         )
     });
 
     await Promise.all(promises)
-    .then((result) => {
-        return result
-    })
-    .catch((error) => {
-        console.log(error)
-        throw new Error(error)
-    })
+        .then((result) => {
+            return result
+        })
+        .catch((error) => {
+            console.log(error)
+            throw new Error(error)
+        })
 }
 
 async function db_update_patch_register(params) {

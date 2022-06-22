@@ -586,7 +586,7 @@ router.post("/gateway_register", async function (req, res, next) {
         for (index = 0; index < data.length; index++) {
             let temp_device = {}
             temp_device["type"] = data[index].patches[0]["patch_type"]
-            temp_device["serial_no"] = data[index].patches[0]["patch_serial"]
+            temp_device["serial_no"] = data[index].patches[0]["device_serial"]
             temp_device["mac_address"] = data[index].patches[0]["patch_mac"]
             temp_device["config"] = data[index].config
             device_list.push(temp_device)
@@ -651,7 +651,7 @@ router.post("/gateway_register", async function (req, res, next) {
                         temp_device["type"] =
                             patch_patient_list[index].patches[0]["patch_type"]
                         temp_device["serial_no"] =
-                            patch_patient_list[index].patches[0]["patch_serial"]
+                            patch_patient_list[index].patches[0]["device_serial"]
                         temp_device["mac_address"] =
                             patch_patient_list[index].patches[0]["patch_mac"]
                         temp_device["config"] = patch_patient_list[index].config
