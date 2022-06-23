@@ -748,13 +748,13 @@ async function db_create_device(params) {
                 patch_group_id: params.body.data[0]["patch_uuid"],
                 // specialty: patch_data[i]["specialty"],
                 patch_mac: params.body.data[0]["patch_mac"],
-                // patch_bluetooth: patch_data[i]["patch_bluetooth"],
-                // patch_sensor_id: patch_data[i]["patch_sensor_id"],
+                tags: JSON.stringify(params.body.data[0]["tags"]),
+                sim: params.body.data[0]["sim"],
                 device_serial: params.body.data[0]["device_serial"],
                 group_type: 'Device',
                 in_use: 'false',
                 tenant_id: params.body.tenantId,
-                // pid: patch_data[i]["pid"],
+                phone: params.body.data[0]["phone"],
             },
         )
     } catch (error) {

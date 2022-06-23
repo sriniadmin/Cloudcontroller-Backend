@@ -31,22 +31,6 @@ async function db_validate_user_auth(email, password) {
     return user_id
 }
 
-
-async function db_user_exist(user_uuid) {
-    let user_data
-    try {
-        user_data = await Users.count({
-            where: {
-                user_uuid: user_uuid,
-            },
-            raw: true,
-        })
-    } catch (err) {
-        throw new Error("User  " + user_uuid + "not found Err:" + err)
-    }
-    return user_data
-}
-
 async function db_username_exist(username) {
     let user_data
     logger.debug("THIS IS IN USERNAME FUNCTION", user_data)
@@ -227,6 +211,33 @@ async function db_get_user_list(params) {
         console.log(err)
         throw new Error(err)
     }
+}
+
+
+async function db_user_exist(params) {
+    try {
+        return await Users.findOne({
+            where:{
+                
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+
+    let user_data
+    try {
+        user_data = await Users.count({
+            where: {
+                user_uuid: user_uuid,
+            },
+            raw: true,
+        })
+    } catch (err) {
+        throw new Error("User  " + user_uuid + "not found Err:" + err)
+    }
+    return user_data
 }
 
 

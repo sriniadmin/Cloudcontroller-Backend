@@ -217,6 +217,18 @@ module.exports = function (sequelize, DataTypes) {
             device_serial: {
                 type: DataTypes.STRING(255),
                 allowNull: false
+            },
+            tags: {
+                type: DataTypes.STRING(255),
+                allowNull: true
+            },
+            sim: {
+                type: DataTypes.STRING(45),
+                allowNull: true
+            },
+            phone: {
+                type: DataTypes.STRING(45),
+                allowNull: true
             }
         },
         {
