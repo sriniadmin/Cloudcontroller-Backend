@@ -981,7 +981,7 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(8),
                 allowNull: false,
             },
-            contry_name: {
+            country_name: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             }

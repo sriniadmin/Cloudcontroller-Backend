@@ -159,7 +159,7 @@ const EDIT_PATIENT = function (params) {
         med_record: params.med_record || null,
         discharge_date: params.discharge_date || null,
         patient_type: params.patient_type,
-        contry_name: params.contry_name
+        country_name: params.country_name
     }
 }
 
