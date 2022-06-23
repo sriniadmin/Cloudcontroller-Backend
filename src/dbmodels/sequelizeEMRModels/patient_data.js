@@ -449,7 +449,7 @@ module.exports = function (sequelize, DataTypes) {
                     is: /^$|[a-z ,.'-]+$/i,
                 },
             },
-            country_code: {
+            county_code: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
                 defaultValue: "",
