@@ -13,36 +13,6 @@ models.users.belongsTo(models.user_tenant_map, {
     targetKey: "user_uuid",
 })
 
-async function db_get_user_list(tenant_id, params) {
-    let data
-
-    try {
-        data = await Users.findAll({
-            attributes: [
-                "id",
-                "username",
-                "fname",
-                "lname",
-                "mname",
-                "active",
-                "email",
-                "role",
-                "phone",
-                "user_uuid",
-                "title",
-                "tenant_id",
-            ],
-            where: {
-                tenant_id: tenant_id,
-                role: ['Doctor', 'doctor', 'Nurse', 'nurse']
-            },
-            raw: false
-        })
-    } catch (error) {
-        console.log(error)
-    }
-    return data
-}
 
 async function db_validate_user_auth(email, password) {
     //todo:Have to validate email and password
@@ -61,26 +31,6 @@ async function db_validate_user_auth(email, password) {
     return user_id
 }
 
-async function db_create_user(tenant_id, user_data, transaction) {
-    user_data = JSON.stringify(user_data)
-    user_data = JSON.parse(user_data)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    let users
-    try {
-        users = await Users.create(user_data, { transaction: trans })
-        logger.debug("User insert output is" + users)
-    } catch (err) {
-        logger.debug(
-            "User insert  error " + tenant_id + " not found Err:" + err
-        )
-        throw new Error("User insert  error -  tenant check" + err)
-    }
-    return users
-}
 
 async function db_user_exist(user_uuid) {
     let user_data
@@ -178,6 +128,7 @@ async function db_get_email_users(email, phone) {
     return emailUsers
 }
 
+
 async function db_user_email(email, user_data) {
     let userEmail
     logger.debug("the email and password is", email)
@@ -194,6 +145,7 @@ async function db_user_email(email, user_data) {
     }
     return userEmail
 }
+
 
 async function db_email_exist(email) {
     let user_data
@@ -245,6 +197,48 @@ async function db_update_patient_user(
     }
     return users
 }
+
+
+async function db_get_user_list(params) {
+    try {
+        return await Users.findAll({
+            attributes: [
+                "id",
+                "username",
+                "fname",
+                "lname",
+                "mname",
+                "active",
+                "email",
+                "role",
+                "phone",
+                "user_uuid",
+                "title",
+                "tenant_id",
+            ],
+            where: {
+                tenant_id: params.tenantId,
+                role: ['Doctor', 'doctor', 'Nurse', 'nurse']
+            },
+            order: [["date", "ASC"]],
+            raw: false
+        })
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
+
+async function db_create_user(params) {
+    try {
+        return await Users.create(params)
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
 
 module.exports = {
     db_get_user_list,

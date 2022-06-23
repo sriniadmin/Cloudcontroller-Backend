@@ -223,32 +223,6 @@ async function getUserInventory(req, res, next) {
     return next()
 }
 
-// Validated
-async function getSelfUser(req, res, next) {
-    email = req.userEmail
-    tenant_id = req.userTenantId
-    let users
-    try {
-        req.query["email"] = email
-        req.query["self"] = true
-        users = await db_get_user_list(tenant_id, email, req.query)
-    } catch (err) {
-        logger.debug("USER DOES NOT EXIST " + err)
-        req.apiRes = USER_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Error in fetching the user :" + err,
-        }
-        return next()
-    }
-    req.apiRes = USER_CODE["2"]
-    req.apiRes["response"] = {
-        users: users,
-        count: users.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 async function getSelfUserAlert(req, next) {
     email = req.userEmail
     tenant_id = req.userTenantId
@@ -536,114 +510,6 @@ async function validateModels(req, res, next) {
     req.apiRes["response"] = {
         modelValidation: model_result,
     }
-    res.response(req.apiRes)
-    return next()
-}
-
-// Validated
-async function createUser(req, res, next) {
-    logger.debug("User body is", req.body)
-    tenant_id = req.userTenantId
-    let user_tenant_data = req.body.user_tenant_data
-    // To work in swagger we are required to send the user_tenant_data as array , which helps in user_tenant creation
-    // user_tenant_data:
-    // [ { tenant_id: 'tenant8ea56b12-ff44-4b5c-839c-f609363ba385',
-    //     role: 'Admin',
-    //     tenant_name: 'demohospital.com' } ] }
-    logger.debug("the user data in the body is", user_tenant_data)
-    if (
-        typeof req.body.tenant_id !== "undefined" &&
-        req.body.tenant_id.includes("tenant")
-    ) {
-        tenant_id = req.body.tenant_id
-        logger.debug(
-            "The TenantID for User Inventory is ",
-            tenant_id,
-            req.body.tenant_id
-        )
-    }
-    let userName_exist
-    const t = await sequelizeDB.transaction()
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["usersSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    var user_data = req.body
-    let userName = req.body["username"]
-    logger.debug("THE USER NAME IS", userName, typeof userName)
-
-    let alertEventId = uuid()
-
-    let createUserAlert = alertEnum['1']
-    createUserAlert['event'] = `create user id:${alertEventId}`
-    createUserAlert['text'] = `User ${userName} created`
-    createUserAlert['service'] = [`${req.userTenant}`]
-
-    try {
-        userName_exist = await db_username_exist(userName)
-        logger.debug("THIS IS IN USERNAME EXIST FUNCTION", userName_exist)
-        if (userName_exist) {
-            req.apiRes = USER_CODE["6"]
-            req.apiRes["error"] = {
-                error: "USER ALREADY EXISTS :",
-            }
-            return next()
-        }
-    } catch (err) {
-        logger.debug("USER ALREADY EXISTS", err)
-        return next()
-    }
-    uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
-    let users
-    try {
-        users = await sequelizeDB.transaction(async function (t) {
-            await getUUID(uuidDict, { transaction: t }).then((uuid_result) => {
-                logger.debug("The uuid result is", uuid_result)
-                //user_data["tenant_id"] = tenant_id
-                user_data["user_uuid"] = uuid_result
-                return db_create_user(tenant_id, user_data, {
-                    transaction: t,
-                }).then((user_info) => {
-                    logger.debug("the user info is", user_info)
-                    user_tenant_data.map((item) => {
-                        item.user_uuid = user_info.dataValues.user_uuid
-                    })
-                    // return db_create_user_tenant(tenant_id, user_tenant_data, {
-                    //     transaction: t,
-                    // })
-                })
-            })
-        })
-    } catch (err) {
-        logger.debug("USER Create error " + err)
-        req.apiRes = USER_CODE["4"]
-        req.apiRes["error"] = {
-            error: "Creation of User failed :" + err,
-        }
-        return next()
-    }
-    logger.debug("USER  is" + users)
-    req.apiRes = USER_CODE["3"]
-    req.apiRes["response"] = {
-        users: [user_data],
-        count: user_data.length,
-    }
-
-    try {
-        let response = await alerter(createUserAlert)
-        logger.debug(`alertResponse : ${response}`)
-    }
-    catch (err) {
-        logger.debug(`Alert ERROR : ${err.message}`)
-    }
-
     res.response(req.apiRes)
     return next()
 }
@@ -2886,6 +2752,73 @@ async function updatePatch(req, res, next) {
     res.response(req.apiRes)
     return next()
 }
+
+
+// async function getTenant(req, res, next) {
+//     try {
+//         const data = await db_get_tenant_list(req.query)
+
+//         req.apiRes = TENANTS_CODE["2"]
+//         req.apiRes["response"] = {
+//             tenants: data,
+//             count: data.length
+//         }
+//     } catch (error) {
+//         console.log(error)
+//         req.apiRes["error"] = {
+//             error: error
+//         }
+//         req.apiRes = TENANTS_CODE["1"]
+//     }
+
+//     res.response(req.apiRes)
+//     return next()
+// }
+
+async function getSelfUser(req, res, next) {
+    try {
+        const data = await db_get_user_list(req.query)
+
+        req.apiRes = USER_CODE["2"]
+        req.apiRes["response"] = {
+            users: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createUser(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
+        req.body.user_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_create_user(req.body)
+        req.apiRes = USER_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
 
 module.exports = {
     getUserInventory,

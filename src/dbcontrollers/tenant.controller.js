@@ -222,5 +222,16 @@ async function db_get_tenant_name(tenant_id) {
 }
 
 
+// async function db_get_tenant_list(params) {
+//     try {
+//         return await Tenants.findAll({
+//             order: [["tenant_name", "ASC"]]
+//         })
+//     } catch (err) {
+//         console.log(err)
+//         throw new Error(err)
+//     }
+// }
+
 
 module.exports = { db_get_tenant_id, db_get_tenant_list, db_create_tenant, db_tenant_exist, db_update_tenant, db_tenant_exist_trans,db_get_tenant_name }
