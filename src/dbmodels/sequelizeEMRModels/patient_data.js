@@ -843,7 +843,7 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.INTEGER,
                 allowNull: true,
             },
-            county: {
+            country: {
                 type: DataTypes.STRING(40),
                 allowNull: true,
                 defaultValue: "",
@@ -977,6 +977,14 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: true,
             },
+            patient_type: {
+                type: DataTypes.STRING(8),
+                allowNull: false,
+            },
+            contry_name: {
+                type: DataTypes.STRING(255),
+                allowNull: false,
+            }
         },
         {
             sequelize,

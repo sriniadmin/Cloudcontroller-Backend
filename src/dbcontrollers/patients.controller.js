@@ -157,7 +157,9 @@ const EDIT_PATIENT = function (params) {
         bed_uuid: params.bed_uuid || null,
         vital_uuid: params.vital_uuid || null,
         med_record: params.med_record || null,
-        discharge_date: params.discharge_date || null
+        discharge_date: params.discharge_date || null,
+        patient_type: params.patient_type,
+        contry_name: params.contry_name
     }
 }
 
