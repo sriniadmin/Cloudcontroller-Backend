@@ -1,15 +1,15 @@
 const redis = require('redis');
 const jwt = require("jsonwebtoken")
 const logger = require("../../../config/logger")
-logger.debug("The Redis keys are ", process.env.REDIS_SERVER, process.env.REDIS_PORT, process.env.REDIS_KEY, process.env)
+logger.debug("The Redis keys are ", process.env.REDIS_HOST, process.env.REDIS_PORT, process.env.REDIS_KEY, process.env)
 
 // create and connect redis client to local instance.
 // const redisClient = redis.createClient();
 const redisClient = redis.createClient({
-  host: process.env.REDIS_SERVER,
+  host: process.env.REDIS_HOST,
   // port: process.env.REDIS_PORT,
   // password: process.env.REDIS_KEY
-  port: 6379
+  port: process.env.REDIS_PORT
 });
 
 

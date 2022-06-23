@@ -1,5 +1,8 @@
 var express = require("express")
 var router = express.Router()
+const token = process.env.INFLUX_DB_TOKEN
+const org = process.env.INFLUX_DB_ORG
+const bucket = process.env.INFLUX_DB_BUCKET
 // const logger = require("../../config/logger")
 var log4js = require('log4js');
 log4js.configure('./src/config/log4js-config.json');
@@ -87,7 +90,7 @@ console.log('THRESHOLD LIST: ', global_variable.threshold_list)
 //     logger.debug("Kafka received data is ", req.body["patientUUID"])
 //     const { Kafka } = require("kafkajs")
 //     const clientId = "my-app"
-//     const brokers = [process.env.KAFKA_BROKER + ":9092"]
+//     const brokers = [process.env.KAFKA_BROKER_HOST + process.env.KAFKA_BROKER_PORT]
 //     const topic = req.body["patientUUID"]
 //     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
 //     logger.debug("Created kakfa handle", req.body)
@@ -474,10 +477,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         if(!req.body.keep_alive_time){
             return res.status(470).json({Message: 'keep_alive_time is missing'})
         }
-        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
-        const org = 'live247'
-        const bucket = 'emr_dev'
-        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const client = new InfluxDB({url: 'http://' + process.env.INFLUX_DB_HOST + ':' + process.env.INFLUX_DB_PORT, token: token})
         const writeApi = client.getWriteApi(org, bucket)
 
         if(global_variable.socket){
@@ -708,11 +708,7 @@ router.post("/gateway_register", async function (req, res, next) {
 router.post("/push_data", async function (req, res, next) {
     try {
         //Receiving sensor data
-        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
-        const org = 'live247'
-        const bucket = 'emr_dev'
-
-        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const client = new InfluxDB({url: 'http://' + process.env.INFLUX_DB_HOST + ':' + process.env.INFLUX_DB_PORT, token: token})
         const writeApi = client.getWriteApi(org, bucket)
 
         //Passing data to UI via socket.io

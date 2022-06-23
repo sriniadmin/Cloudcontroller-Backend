@@ -211,7 +211,7 @@ io.on('connection', (socket) => {
     global_variable.io = io
 });
 
-server.listen(7124);
+server.listen(process.env.WEB_APP_PORT);
 
 // app.listen(port, function () {
 //     logger.debug("Server running on port => ", port)
