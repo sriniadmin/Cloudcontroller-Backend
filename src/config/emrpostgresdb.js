@@ -4,7 +4,7 @@ logger.debug(__dirname + "/../../.env")
 require("dotenv").config({ path: __dirname + "/../../.env" })
 
 module.exports = new postgresSequelize(
-    process.env.EMR_POSTGRES_DB,
+    process.env.POSTGRES_DB_NAME,
     process.env.POSTGRES_DB_USER,
     process.env.POSTGRES_DB_PASS,
     {

@@ -119,7 +119,7 @@ async function db_get_product_list(params) {
             where: {
                 product_name: { [Op.iLike]: `%${params.product_name}%` },
             },
-            order: [["id", "DESC"]]
+            order: [["product_name", "ASC"]]
         })
     } catch (err) {
         console.log(err)
