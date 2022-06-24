@@ -315,9 +315,9 @@ module.exports = function (sequelize, DataTypes) {
             phone: {
                 type: DataTypes.STRING(30),
                 allowNull: true,
-                validate: {
-                    is: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                },
+                // validate: {
+                //     is: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                // },
             },
             fax: {
                 type: DataTypes.STRING(30),
