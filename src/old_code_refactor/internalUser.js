@@ -2699,9 +2699,16 @@ async function createDevice(req, res, next) {
         tags = params.tags
         if(tags.length>0){
             recallFuntion(params.tags.length, 0, req, res, next)
+        }else{
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            params["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            
+            const data = await db_create_device(req)
+            req.apiRes = PATCH_CODE["3"]
+            req.apiRes["response"] = { data: data }
+            res.response(req.apiRes)
+            return next()
         }
-
-
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
