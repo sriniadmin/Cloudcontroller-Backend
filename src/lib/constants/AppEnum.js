@@ -379,7 +379,17 @@ let PATCH_CODE = {
         Code: "PATCH_STATUS_UPDATE_FAILURE",
         HttpStatus: "470",
         Message: "Failure in updating for the devices",
-    }
+    },
+    18: {
+        Code: "SIM_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Sim is already exist",
+    },
+    19: {
+        Code: "PHONE_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Phone is already exist",
+    },
 }
 
 let VITAL_CODE = {

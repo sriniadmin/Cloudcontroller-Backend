@@ -13,7 +13,11 @@ const alertEnum = require('../alerter/alertEnum')
 const { v1: uuid } = require('uuid')
 const { createWorker, PSM, createScheduler } = require("tesseract.js")
 const lodash = require("lodash")
+let tags
+const Sequelize = require("sequelize")
+const Op = Sequelize.Op
 
+const recallFuntion = recall
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 var models = initModels(sequelizeDB)
@@ -2634,28 +2638,66 @@ async function getPathSaas(req, res, next) {
 
 async function createDevice(req, res, next) {
     try {
-        uuidDict = {
-            uuidType: UUID_CONST["patch"],
-            tenantID: tenant_id,
-        }
-        const result = await db_check_duplicate_device(req.body.data[0])
+        const params = req.body.data[0]
 
-        if(result && (req.body.data[0].patch_type === 'gateway')){
+        let condition = {}
+        if(params.patch_type === 'gateway'){
+            condition = {
+                patch_type: params.patch_type,
+                device_serial: params.device_serial
+            }
+        }
+        else {
+            condition = {
+                patch_type: params.patch_type,
+                patch_mac: params.patch_mac
+            }
+        }
+
+        const check_number = await db_check_duplicate_device(condition)
+
+        if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
             res.response(req.apiRes)
             return next()
         }
-        else if(result){
+        else if(check_number){
             req.apiRes = PATCH_CODE["15"]
             res.response(req.apiRes)
             return next()
         }
 
-        req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
-        
-        const data = await db_create_device(req)
-        req.apiRes = PATCH_CODE["3"]
-        req.apiRes["response"] = { data: data }
+
+        if(params.patch_type === 'gateway'){
+            condition = {
+                sim: params.sim
+            }
+            const check_sim = await db_check_duplicate_device(condition)
+            if(check_sim){
+                req.apiRes = PATCH_CODE["18"]
+                res.response(req.apiRes)
+                return next()
+            }
+
+
+            condition = {
+                phone: params.phone
+            }
+            const check_phone = await db_check_duplicate_device(condition)
+            if(check_phone){
+                req.apiRes = PATCH_CODE["19"]
+                res.response(req.apiRes)
+                return next()
+            }
+        }
+
+
+        tags = params.tags
+        if(tags.length>0){
+            recallFuntion(params.tags.length, 0, req, res, next)
+        }
+
+
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
@@ -2663,8 +2705,41 @@ async function createDevice(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+}
+
+async function recall(length, number, req, res, next) {
+    try {
+        condition = {
+            tags: { [Op.like]: `%"${tags[number]}"%` }
+        }
+        const check_tags = await db_check_duplicate_device(condition)
+        if (check_tags) {
+            req.apiRes = {
+                Code: "TAGS_IS_ALREADY_EXIST",
+                HttpStatus: "470",
+                Message: `Tag: "${tags[number]}" is already exist`,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+        if (length === number) {
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            
+            const data = await db_create_device(req)
+            req.apiRes = PATCH_CODE["3"]
+            req.apiRes["response"] = { data: data }
+            res.response(req.apiRes)
+            return next()
+        }
+        recallFuntion(length, number + 1, req, res, next)
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATCH_CODE["4"]
+        req.apiRes["error"] = { error: error }
+        res.response(req.apiRes)
+        return next()
+    }
 }
 
 async function getDevice(req, res, next) {

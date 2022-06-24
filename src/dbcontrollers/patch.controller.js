@@ -758,22 +758,8 @@ async function db_create_device(params) {
 
 async function db_check_duplicate_device(params) {
     try {
-        let condition = {}
-        if(params.patch_type === 'gateway'){
-            condition = {
-                patch_type: params.patch_type,
-                device_serial: params.device_serial
-            }
-        }
-        else {
-            condition = {
-                patch_type: params.patch_type,
-                patch_mac: params.patch_mac
-            }
-        }
         return await Patches.findOne({
-            where: condition,
-            raw: true,
+            where: params
         })
     } catch (error) {
         throw new Error(error)
