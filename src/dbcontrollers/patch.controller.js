@@ -30,17 +30,11 @@ models.patch.hasMany(models.patch, {
 })
 
 
-models.patch.hasMany(models.patch, {
-    foreignKey: "patch_serial",
-    sourceKey: "patch_serial",
-    as: "gateway",
-})
-
 async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', 'device_serial', 'patch_uuid'],
+            attributes: ['id', 'patch_type', 'device_serial', 'patch_uuid', 'tags', 'sim', 'phone'],
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
@@ -819,15 +813,6 @@ async function db_get_device(params) {
                         tenant_id: params.tenantId
                     },
                 },
-                {
-                    model: models.patch,
-                    attributes:['patch_uuid','device_serial', 'patch_serial','patch_mac', 'patch_type'],
-                    // required: true,
-                    // where: {
-                    //     patch_type: "gateway"
-                    // },
-                    as: "gateway",
-                }
     
             ],
             where: condition,
