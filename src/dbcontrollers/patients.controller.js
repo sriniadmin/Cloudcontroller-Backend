@@ -847,6 +847,9 @@ async function db_edit_patient(params) {
 }
 
 async function db_add_new_patient(params) {
+    if(!params.patient_type){
+        params.patient_type = 'remote'
+    }
     try {
         let data = EDIT_PATIENT(params)
         data.pid = params.pid
