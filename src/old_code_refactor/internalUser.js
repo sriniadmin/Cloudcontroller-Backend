@@ -2669,25 +2669,29 @@ async function createDevice(req, res, next) {
 
 
         if(params.patch_type === 'gateway'){
-            condition = {
-                sim: params.sim
-            }
-            const check_sim = await db_check_duplicate_device(condition)
-            if(check_sim){
-                req.apiRes = PATCH_CODE["18"]
-                res.response(req.apiRes)
-                return next()
+            if(params.sim){
+                condition = {
+                    sim: params.sim
+                }
+                const check_sim = await db_check_duplicate_device(condition)
+                if(check_sim){
+                    req.apiRes = PATCH_CODE["18"]
+                    res.response(req.apiRes)
+                    return next()
+                }
             }
 
 
-            condition = {
-                phone: params.phone
-            }
-            const check_phone = await db_check_duplicate_device(condition)
-            if(check_phone){
-                req.apiRes = PATCH_CODE["19"]
-                res.response(req.apiRes)
-                return next()
+            if(params.phone){
+                condition = {
+                    phone: params.phone
+                }
+                const check_phone = await db_check_duplicate_device(condition)
+                if(check_phone){
+                    req.apiRes = PATCH_CODE["19"]
+                    res.response(req.apiRes)
+                    return next()
+                }
             }
         }
 
