@@ -214,31 +214,31 @@ async function db_get_user_list(params) {
 }
 
 
-async function db_user_exist(params) {
-    try {
-        return await Users.findOne({
-            where:{
-                
-            }
-        })
-    } catch (error) {
-        console.log(error)
-        throw new Error(error)
-    }
+// async function db_user_exist(params) {
+//     try {
+//         return await Users.findOne({
+//             where:{
 
-    let user_data
-    try {
-        user_data = await Users.count({
-            where: {
-                user_uuid: user_uuid,
-            },
-            raw: true,
-        })
-    } catch (err) {
-        throw new Error("User  " + user_uuid + "not found Err:" + err)
-    }
-    return user_data
-}
+//             }
+//         })
+//     } catch (error) {
+//         console.log(error)
+//         throw new Error(error)
+//     }
+
+//     let user_data
+//     try {
+//         user_data = await Users.count({
+//             where: {
+//                 user_uuid: user_uuid,
+//             },
+//             raw: true,
+//         })
+//     } catch (err) {
+//         throw new Error("User  " + user_uuid + "not found Err:" + err)
+//     }
+//     return user_data
+// }
 
 
 async function db_create_user(params) {
@@ -256,7 +256,7 @@ module.exports = {
     db_create_user,
     db_validate_user_auth,
     db_update_user,
-    db_user_exist,
+    // db_user_exist,
     db_user_count,
     db_username_exist,
     db_user_email,
