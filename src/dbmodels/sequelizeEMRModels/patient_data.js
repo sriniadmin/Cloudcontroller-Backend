@@ -984,6 +984,10 @@ module.exports = function (sequelize, DataTypes) {
             country_name: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
+            },
+            tags: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
             }
         },
         {

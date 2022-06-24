@@ -1,6 +1,9 @@
 // const Sequelize = require("sequelize")
 // const Op = Sequelize.Op
 const sequelizeDB = require("../config/emrmysqldb")
+const Sequelize = require("sequelize")
+const Op = Sequelize.Op
+const moment = require('moment');
 // const bcrypt = require("bcrypt")
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
@@ -147,7 +150,10 @@ async function db_get_procedure_list(params) {
     try {
         return await Procedure.findAll({
             where: {
-                pid: params.pid
+                pid: params.pid,
+                date: {
+                    [Op.like]: moment(params.date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                }
             },
             order: [["id", "DESC"]]
         })
