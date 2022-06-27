@@ -1,7 +1,7 @@
 var express = require("express")
 var router = express.Router()
 var {
-    getSelfUser,
+    getUserProfile,
     updateUser,
     getUserInventory,
     createUser,
@@ -52,7 +52,7 @@ router.get("/userinventory", getUserInventory, apiFinalProcess)
 
 /**
  * @openapi
- *  /api/users/_self:
+ *  /api/users/profile:
  *   get:
  *       tags:
  *         - Users
@@ -81,7 +81,7 @@ router.get("/userinventory", getUserInventory, apiFinalProcess)
  *            description: The number of items to skip before starting to collect the result set
  */
 
-router.get("/_self", getSelfUser, apiFinalProcess)
+router.get("/profile", getUserProfile, apiFinalProcess)
 
 /**
  * @openapi

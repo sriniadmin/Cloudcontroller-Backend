@@ -148,6 +148,7 @@ const {
 } = require("../dbcontrollers/profile.controller")
 
 const db_get_user_list = user_controller.db_get_user_list
+const db_get_user_profile = user_controller.db_get_user_profile
 const db_get_user = user_controller.db_get_user
 const db_update_user = user_controller.db_update_user
 const db_user_exist = user_controller.db_user_exist
@@ -2473,6 +2474,11 @@ async function getUserTenant(req, res, next) {
 }
 
 async function getProfiles(req, res, next) {
+    try {
+        
+    } catch (error) {
+        
+    }
     let pid = req.query.pid
     let profile
     let pidCount = await dbProfileExists(pid)
@@ -2849,9 +2855,9 @@ async function updatePatch(req, res, next) {
 //     return next()
 // }
 
-async function getSelfUser(req, res, next) {
+async function getUserProfile(req, res, next) {
     try {
-        const data = await db_get_user_list(req.query)
+        const data = await db_get_user_profile(req.query)
 
         req.apiRes = USER_CODE["2"]
         req.apiRes["response"] = {
@@ -2876,17 +2882,11 @@ async function createUser(req, res, next) {
         const exist = await db_get_user(req.body)
         if(exist && exist.email === req.body.email){
             req.apiRes = USER_CODE["11"]
-            req.apiRes["response"] = {
-                data: req.body
-            }
             res.response(req.apiRes)
             return next()
         }
         else if(exist && exist.username === req.body.username){
             req.apiRes = USER_CODE["12"]
-            req.apiRes["response"] = {
-                data: req.body
-            }
             res.response(req.apiRes)
             return next()
         }
@@ -2913,7 +2913,7 @@ async function createUser(req, res, next) {
 
 module.exports = {
     getUserInventory,
-    getSelfUser,
+    getUserProfile,
     createUuid,
     textToSpeech,
     imageUpload,

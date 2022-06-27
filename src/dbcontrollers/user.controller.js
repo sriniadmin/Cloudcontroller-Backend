@@ -196,8 +196,8 @@ async function db_get_user_list(params) {
                 "tenant_id",
             ],
             where: {
-                tenant_id: params.tenantId,
-                role: ['Doctor', 'doctor', 'Nurse', 'nurse']
+                tenant_id: params.tenantId
+                // ,role: ['Doctor', 'doctor', 'Nurse', 'nurse']
             },
             order: [["date", "DESC"]],
             raw: false
@@ -263,6 +263,20 @@ async function db_get_user(params) {
 }
 
 
+async function db_get_user_profile(params) {
+    try {
+        return await Users.findOne({
+            where: {
+                user_uuid: params.user_uuid
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_user_list,
     db_create_user,
@@ -275,5 +289,6 @@ module.exports = {
     db_get_email_users,
     db_email_exist,
     db_update_patient_user,
-    db_get_user
+    db_get_user,
+    db_get_user_profile
 }
