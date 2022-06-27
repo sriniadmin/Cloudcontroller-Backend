@@ -197,11 +197,7 @@ async function db_get_tenant_name(tenant_id) {
 
 async function db_get_tenant_list(params) {
     try {
-        return await Tenants.findAll({
-            where: {
-                tenant_uuid: params.tenantId
-            } 
-        })
+        return await Tenants.findAll()
     } catch (error) {
         throw new Error(error)
     }
