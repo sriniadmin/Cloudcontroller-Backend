@@ -291,6 +291,18 @@ let USER_CODE = {
         Message: "PROFILE NAME ALREADY EXISTS",
         Details: {},
     },
+    13: {
+        Code: "UPDATE_USER_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the user information",
+        Details: {},
+    },
+    14: {
+        Code: "UPDATE_USER_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updating the user information",
+        Details: {},
+    },
 }
 
 

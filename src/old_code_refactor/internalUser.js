@@ -513,70 +513,6 @@ async function validateModels(req, res, next) {
     return next()
 }
 
-// Validated
-async function updateUser(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let user_data = req.body
-    let given_uuid = req.params.user_uuid
-    tenant_id = req.userTenantId
-    let user_exist
-    let result
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["usersSchema"]
-    )
-    if (!schema_status["status"]) {
-        logger.debug("STATUS IS", schema_status, schema_status["status"])
-        logger.debug("ERROR IS", schema_status["error"])
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-
-    try {
-        user_exist = await db_user_exist(given_uuid)
-        logger.debug("THIS IS USER EXIST FUNCTION", user_exist)
-        if (!user_exist) {
-            req.apiRes = USER_CODE["5"]
-            req.apiRes["error"] = {
-                error: "USER does not exist :" + given_uuid,
-            }
-            return next()
-        }
-    } catch (err) {
-        logger.debug("Exception : %s PID %s", err, given_uuid)
-        return next()
-    }
-
-    try {
-        result = await sequelizeDB.transaction(function (t) {
-            return db_update_user(tenant_id, user_data, given_uuid, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("ERROR IN UPDATING THE USER" + err)
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN UPDATING THE USER :" + err,
-        }
-        return next()
-    }
-    logger.debug("Result is" + result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-
-    req.apiRes["response"] = {
-        user_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
-
 async function passwordCheck(password, hash) {
     let result = -1
     try {
@@ -2904,6 +2840,37 @@ async function createUser(req, res, next) {
             error: error
         }
         req.apiRes = USER_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updateUser(req, res, next) {
+    try {
+        // const exist = await db_get_user(req.body)
+        // if(exist && exist.email === req.body.email){
+        //     req.apiRes = USER_CODE["11"]
+        //     res.response(req.apiRes)
+        //     return next()
+        // }
+        // else if(exist && exist.username === req.body.username){
+        //     req.apiRes = USER_CODE["12"]
+        //     res.response(req.apiRes)
+        //     return next()
+        // }
+        await db_update_user(req.body)
+        req.apiRes = USER_CODE["14"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["13"]
     }
 
     res.response(req.apiRes)

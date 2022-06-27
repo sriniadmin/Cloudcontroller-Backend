@@ -59,35 +59,6 @@ async function db_user_count(params) {
     }
 }
 
-async function db_update_user(tenant_id, user_data, given_uuid, transaction) {
-    let { user_uuid } = given_uuid
-    user_data = JSON.stringify(user_data)
-    user_data = JSON.parse(user_data)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    let users
-    try {
-        users = await Users.update(
-            user_data,
-            {
-                where: {
-                    user_uuid: given_uuid,
-                },
-            },
-            { transaction: trans }
-        )
-        logger.debug("User insert output is" + users)
-    } catch (err) {
-        logger.debug(
-            "User insert  error " + tenant_id + " not found Err:" + err
-        )
-        throw new Error("User insert  error -  tenant check" + err)
-    }
-    return users
-}
 
 async function db_get_email_users(email, phone) {
     let emailUsers
@@ -270,6 +241,23 @@ async function db_get_user_profile(params) {
                 user_uuid: params.user_uuid
             }
         })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+
+async function db_update_user(params) {
+    try {
+        return await Users.update(
+            params,
+            {
+                where: {
+                    user_uuid: params.user_uuid
+                }
+            }
+        )
     } catch (error) {
         console.log(error)
         throw new Error(error)
