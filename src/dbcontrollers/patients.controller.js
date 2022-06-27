@@ -160,7 +160,9 @@ const EDIT_PATIENT = function (params) {
         discharge_date: params.discharge_date || null,
         patient_type: params.patient_type,
         country_name: params.country_name,
-        tags: JSON.stringify(params.tags) || null
+        tags: JSON.stringify(params.tags) || null,
+        primary_consultant: params.primary_consultant,
+        secondary_consultant: params.secondary_consultant
     }
 }
 

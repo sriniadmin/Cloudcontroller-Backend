@@ -988,7 +988,15 @@ module.exports = function (sequelize, DataTypes) {
             tags: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
-            }
+            },
+            primary_consultant: {
+                type: DataTypes.JSON,
+                allowNull: true
+            },
+            secondary_consultant: {
+                type: DataTypes.JSON,
+                allowNull: true
+            },
         },
         {
             sequelize,
