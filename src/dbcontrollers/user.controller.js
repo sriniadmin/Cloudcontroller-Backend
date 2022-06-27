@@ -47,21 +47,16 @@ async function db_username_exist(username) {
     return user_data
 }
 
-async function db_user_count(tenant_id) {
-    let total_user_count
+async function db_user_count(params) {
     try {
-        total_user_count = await Users.count()
+        return await Users.count({
+            where: {
+                tenant_id: params.tenantId,
+            }
+        })
     } catch (error) {
-        logger.debug(
-            "Users list count failed error " +
-                tenant_id +
-                "not found Err:" +
-                err
-        )
-        throw new Error("DBQuery: Users List Count Failed")
+        throw new Error(error)
     }
-    logger.debug("Total User Count is %s", total_user_count)
-    return total_user_count
 }
 
 async function db_update_user(tenant_id, user_data, given_uuid, transaction) {

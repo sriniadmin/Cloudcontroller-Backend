@@ -200,28 +200,21 @@ function getFilter(filter, subfilter) {
 
 // Validated
 async function getUserInventory(req, res, next) {
-    let tenant_id = req.query.tenantId
-
-    let users
-    let totalCount = 0
-
     try {
-        users = await db_get_user_list(tenant_id, req.query)
-        totalCount = await db_user_count(tenant_id)
-        users = dbOutput_JSON(users)
-        totalCount = dbOutput_JSON(totalCount)
-    } catch (err) {
+        const data = await db_get_user_list(req.query)
+        const count = await db_user_count(req.query)
+
+        req.apiRes = USER_CODE["2"]
+        req.apiRes["response"] = {
+            users: data,
+            count: data.length,
+            userTotalCount: count,
+        }
+    } catch (error) {
         req.apiRes = USER_CODE["1"]
         req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE USER",
+            error: error,
         }
-        return next()
-    }
-    req.apiRes = USER_CODE["2"]
-    req.apiRes["response"] = {
-        users: [users],
-        count: users.length,
-        userTotalCount: totalCount,
     }
     res.response(req.apiRes)
     return next()
