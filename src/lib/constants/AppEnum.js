@@ -279,6 +279,18 @@ let USER_CODE = {
         Message: "Failure in fetching the user tenant map",
         Details: {},
     },
+    11: {
+        Code: "EMAIL ALREADY EXISTS",
+        HttpStatus: "470",
+        Message: "EMAIL ALREADY EXISTS",
+        Details: {},
+    },
+    12: {
+        Code: "PROFILE NAME ALREADY EXISTS",
+        HttpStatus: "470",
+        Message: "PROFILE NAME ALREADY EXISTS",
+        Details: {},
+    },
 }
 
 

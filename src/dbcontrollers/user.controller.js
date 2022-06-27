@@ -246,6 +246,23 @@ async function db_create_user(params) {
 }
 
 
+async function db_get_user_list(params) {
+    try {
+        return await Users.findOne({
+            where: {
+                [Op.or]: [
+                    { email: params.email },
+                    { username: params.username }
+                ]
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_user_list,
     db_create_user,

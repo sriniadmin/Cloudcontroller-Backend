@@ -2872,6 +2872,23 @@ async function getSelfUser(req, res, next) {
 
 async function createUser(req, res, next) {
     try {
+        const exist = await db_create_user(req.body)
+        if(exist && exist.email === req.body.email){
+            req.apiRes = USER_CODE["11"]
+            req.apiRes["response"] = {
+                data: req.body
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+        else if(exist && exist.username === req.body.username){
+            req.apiRes = USER_CODE["12"]
+            req.apiRes["response"] = {
+                data: req.body
+            }
+            res.response(req.apiRes)
+            return next()
+        }
         const t = await sequelizeDB.transaction()
         const uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
         req.body.user_uuid = await getUUID(uuidDict, { transaction: t })
