@@ -199,7 +199,7 @@ async function db_get_user_list(params) {
                 tenant_id: params.tenantId,
                 role: ['Doctor', 'doctor', 'Nurse', 'nurse']
             },
-            order: [["date", "ASC"]],
+            order: [["date", "DESC"]],
             raw: false
         })
     } catch (err) {
@@ -246,7 +246,7 @@ async function db_create_user(params) {
 }
 
 
-async function db_get_user_list(params) {
+async function db_get_user(params) {
     try {
         return await Users.findOne({
             where: {
@@ -275,4 +275,5 @@ module.exports = {
     db_get_email_users,
     db_email_exist,
     db_update_patient_user,
+    db_get_user
 }

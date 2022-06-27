@@ -148,6 +148,7 @@ const {
 } = require("../dbcontrollers/profile.controller")
 
 const db_get_user_list = user_controller.db_get_user_list
+const db_get_user = user_controller.db_get_user
 const db_update_user = user_controller.db_update_user
 const db_user_exist = user_controller.db_user_exist
 const db_create_user = user_controller.db_create_user
@@ -2872,7 +2873,7 @@ async function getSelfUser(req, res, next) {
 
 async function createUser(req, res, next) {
     try {
-        const exist = await db_create_user(req.body)
+        const exist = await db_get_user(req.body)
         if(exist && exist.email === req.body.email){
             req.apiRes = USER_CODE["11"]
             req.apiRes["response"] = {
