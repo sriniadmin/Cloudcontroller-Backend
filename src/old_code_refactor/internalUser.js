@@ -1078,27 +1078,21 @@ async function updatePatchUuid(req, res, next) {
 
 
 async function getTenant(req, res, next) {
-    username = req.userName
-    tenant_id = req.userTenantId
-    let tenants
-
     try {
-        tenants = await db_get_tenant_list(tenant_id, username)
-    } catch (err) {
-        logger.debug("tenant list error " + err)
+        const data = await db_get_tenant_list(req.query)
+        req.apiRes = TENANTS_CODE["2"]
+        req.apiRes["response"] = {
+            tenants: data,
+            count: data.length,
+        }
+    } catch (error) {
+        console.log(error)
         req.apiRes = TENANTS_CODE["1"]
         req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE TENANT",
+            error: error,
         }
-        return next()
     }
-
-    logger.debug("Tenant list is " + tenants)
-    req.apiRes = TENANTS_CODE["2"]
-    req.apiRes["response"] = {
-        tenants: [tenants],
-        count: tenants.length,
-    }
+    res.response(req.apiRes)
     return next()
 }
 
