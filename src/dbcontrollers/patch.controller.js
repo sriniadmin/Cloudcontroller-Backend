@@ -857,10 +857,10 @@ async function db_reset_device(params) {
     try {
         let data = {}
         if(params.reset){
-            data.scan = params.reset
+            data.reset = params.reset
         }
         else{
-            data.reset = params.scan
+            data.scan = params.scan
         }
         return await Patches.update(
             data,
