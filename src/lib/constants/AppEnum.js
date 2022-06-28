@@ -414,6 +414,27 @@ let PATCH_CODE = {
         HttpStatus: "470",
         Message: "Phone is already exist",
     },
+
+    20: {
+        Code: "RESET_SUCCESSFUL",
+        HttpStatus: "200",
+        Message: "RESET SUCCESSFUL",
+    },
+    21: {
+        Code: "RESET_FAILURE",
+        HttpStatus: "470",
+        Message: "RESET FAILURE",
+    },
+    22: {
+        Code: "SCAN_SUCCESSFUL",
+        HttpStatus: "200",
+        Message: "SCAN SUCCESSFUL",
+    },
+    23: {
+        Code: "SCAN_FAILURE",
+        HttpStatus: "470",
+        Message: "SCAN FAILURE",
+    },
 }
 
 let VITAL_CODE = {

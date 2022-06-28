@@ -853,6 +853,26 @@ async function db_update_patch_gateway(params) {
 }
 
 
+async function db_reset_device(params) {
+    try {
+        let data = {}
+        if(params.reset){
+            data.scan = params.reset
+        }
+        else{
+            data.reset = params.scan
+        }
+        return await Patches.update(
+            data,
+            { where: {patch_uuid: params.patch_uuid}}
+        )
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
@@ -876,5 +896,6 @@ module.exports = {
     db_get_device,
     db_count_device,
     db_update_patch_register,
-    db_update_patch_gateway
+    db_update_patch_gateway,
+    db_reset_device
 }

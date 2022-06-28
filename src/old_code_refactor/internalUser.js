@@ -127,7 +127,8 @@ const {
     db_create_device,
     db_check_duplicate_device,
     db_get_device,
-    db_count_device
+    db_count_device,
+    db_reset_device
 } = require("../dbcontrollers/patch.controller")
 
 const {
@@ -183,6 +184,10 @@ const {
     // db_create_user_tenant,
     db_get_user_tenant,
 } = require("../dbcontrollers/user_tenant.controller")
+
+const {
+    db_gateway_by_patient
+} = require("../dbcontrollers/patch_patient.controller")
 
 function getFilter(filter, subfilter) {
     if (!filter) return { [subfilter]: null }
@@ -2878,6 +2883,34 @@ async function updateUser(req, res, next) {
 }
 
 
+async function resetDevice(req, res, next) {
+    try {
+        await db_reset_device(req.body)
+        req.apiRes = PATCH_CODE["22"]
+        if(req.body.reset){
+            req.apiRes = PATCH_CODE["20"]
+        }
+        req.apiRes["response"] = {
+            data: req.body
+        }
+        global_variable.gateway_list = db_gateway_by_patient()
+        console.log(global_variable.gateway_list)
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATCH_CODE["23"]
+        if(req.body.reset){
+            req.apiRes = PATCH_CODE["21"]
+        }
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
 module.exports = {
     getUserInventory,
     getUserProfile,
@@ -2937,5 +2970,6 @@ module.exports = {
     getDeviceType,
     getPathSaas,
     createDevice,
-    getDevice
+    getDevice,
+    resetDevice
 }
