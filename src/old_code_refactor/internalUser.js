@@ -13,7 +13,11 @@ const alertEnum = require('../alerter/alertEnum')
 const { v1: uuid } = require('uuid')
 const { createWorker, PSM, createScheduler } = require("tesseract.js")
 const lodash = require("lodash")
+let tags
+const Sequelize = require("sequelize")
+const Op = Sequelize.Op
 
+const recallFuntion = recall
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 var models = initModels(sequelizeDB)
@@ -112,7 +116,7 @@ const {
     db_get_patch_list,
     db_patch_exist_new,
     db_patch_uuid_exist,
-    db_update_patch_new,
+    db_update_patch_status,
     db_update_patch_uuid,
     db_patch_count,
     db_patch_serial_exist,
@@ -144,6 +148,8 @@ const {
 } = require("../dbcontrollers/profile.controller")
 
 const db_get_user_list = user_controller.db_get_user_list
+const db_get_user_profile = user_controller.db_get_user_profile
+const db_get_user = user_controller.db_get_user
 const db_update_user = user_controller.db_update_user
 const db_user_exist = user_controller.db_user_exist
 const db_create_user = user_controller.db_create_user
@@ -196,54 +202,21 @@ function getFilter(filter, subfilter) {
 
 // Validated
 async function getUserInventory(req, res, next) {
-    let tenant_id = req.query.tenantId
-
-    let users
-    let totalCount = 0
-
     try {
-        users = await db_get_user_list(tenant_id, req.query)
-        totalCount = await db_user_count(tenant_id)
-        users = dbOutput_JSON(users)
-        totalCount = dbOutput_JSON(totalCount)
-    } catch (err) {
+        const data = await db_get_user_list(req.query)
+        const count = await db_user_count(req.query)
+
+        req.apiRes = USER_CODE["2"]
+        req.apiRes["response"] = {
+            users: data,
+            count: data.length,
+            userTotalCount: count,
+        }
+    } catch (error) {
         req.apiRes = USER_CODE["1"]
         req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE USER",
+            error: error,
         }
-        return next()
-    }
-    req.apiRes = USER_CODE["2"]
-    req.apiRes["response"] = {
-        users: [users],
-        count: users.length,
-        userTotalCount: totalCount,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
-// Validated
-async function getSelfUser(req, res, next) {
-    email = req.userEmail
-    tenant_id = req.userTenantId
-    let users
-    try {
-        req.query["email"] = email
-        req.query["self"] = true
-        users = await db_get_user_list(tenant_id, email, req.query)
-    } catch (err) {
-        logger.debug("USER DOES NOT EXIST " + err)
-        req.apiRes = USER_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Error in fetching the user :" + err,
-        }
-        return next()
-    }
-    req.apiRes = USER_CODE["2"]
-    req.apiRes["response"] = {
-        users: users,
-        count: users.length,
     }
     res.response(req.apiRes)
     return next()
@@ -537,178 +510,6 @@ async function validateModels(req, res, next) {
         modelValidation: model_result,
     }
     res.response(req.apiRes)
-    return next()
-}
-
-// Validated
-async function createUser(req, res, next) {
-    logger.debug("User body is", req.body)
-    tenant_id = req.userTenantId
-    let user_tenant_data = req.body.user_tenant_data
-    // To work in swagger we are required to send the user_tenant_data as array , which helps in user_tenant creation
-    // user_tenant_data:
-    // [ { tenant_id: 'tenant8ea56b12-ff44-4b5c-839c-f609363ba385',
-    //     role: 'Admin',
-    //     tenant_name: 'demohospital.com' } ] }
-    logger.debug("the user data in the body is", user_tenant_data)
-    if (
-        typeof req.body.tenant_id !== "undefined" &&
-        req.body.tenant_id.includes("tenant")
-    ) {
-        tenant_id = req.body.tenant_id
-        logger.debug(
-            "The TenantID for User Inventory is ",
-            tenant_id,
-            req.body.tenant_id
-        )
-    }
-    let userName_exist
-    const t = await sequelizeDB.transaction()
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["usersSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    var user_data = req.body
-    let userName = req.body["username"]
-    logger.debug("THE USER NAME IS", userName, typeof userName)
-
-    let alertEventId = uuid()
-
-    let createUserAlert = alertEnum['1']
-    createUserAlert['event'] = `create user id:${alertEventId}`
-    createUserAlert['text'] = `User ${userName} created`
-    createUserAlert['service'] = [`${req.userTenant}`]
-
-    try {
-        userName_exist = await db_username_exist(userName)
-        logger.debug("THIS IS IN USERNAME EXIST FUNCTION", userName_exist)
-        if (userName_exist) {
-            req.apiRes = USER_CODE["6"]
-            req.apiRes["error"] = {
-                error: "USER ALREADY EXISTS :",
-            }
-            return next()
-        }
-    } catch (err) {
-        logger.debug("USER ALREADY EXISTS", err)
-        return next()
-    }
-    uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
-    let users
-    try {
-        users = await sequelizeDB.transaction(async function (t) {
-            await getUUID(uuidDict, { transaction: t }).then((uuid_result) => {
-                logger.debug("The uuid result is", uuid_result)
-                //user_data["tenant_id"] = tenant_id
-                user_data["user_uuid"] = uuid_result
-                return db_create_user(tenant_id, user_data, {
-                    transaction: t,
-                }).then((user_info) => {
-                    logger.debug("the user info is", user_info)
-                    user_tenant_data.map((item) => {
-                        item.user_uuid = user_info.dataValues.user_uuid
-                    })
-                    // return db_create_user_tenant(tenant_id, user_tenant_data, {
-                    //     transaction: t,
-                    // })
-                })
-            })
-        })
-    } catch (err) {
-        logger.debug("USER Create error " + err)
-        req.apiRes = USER_CODE["4"]
-        req.apiRes["error"] = {
-            error: "Creation of User failed :" + err,
-        }
-        return next()
-    }
-    logger.debug("USER  is" + users)
-    req.apiRes = USER_CODE["3"]
-    req.apiRes["response"] = {
-        users: [user_data],
-        count: user_data.length,
-    }
-
-    try {
-        let response = await alerter(createUserAlert)
-        logger.debug(`alertResponse : ${response}`)
-    }
-    catch (err) {
-        logger.debug(`Alert ERROR : ${err.message}`)
-    }
-
-    res.response(req.apiRes)
-    return next()
-}
-
-// Validated
-async function updateUser(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let user_data = req.body
-    let given_uuid = req.params.user_uuid
-    tenant_id = req.userTenantId
-    let user_exist
-    let result
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["usersSchema"]
-    )
-    if (!schema_status["status"]) {
-        logger.debug("STATUS IS", schema_status, schema_status["status"])
-        logger.debug("ERROR IS", schema_status["error"])
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-
-    try {
-        user_exist = await db_user_exist(given_uuid)
-        logger.debug("THIS IS USER EXIST FUNCTION", user_exist)
-        if (!user_exist) {
-            req.apiRes = USER_CODE["5"]
-            req.apiRes["error"] = {
-                error: "USER does not exist :" + given_uuid,
-            }
-            return next()
-        }
-    } catch (err) {
-        logger.debug("Exception : %s PID %s", err, given_uuid)
-        return next()
-    }
-
-    try {
-        result = await sequelizeDB.transaction(function (t) {
-            return db_update_user(tenant_id, user_data, given_uuid, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("ERROR IN UPDATING THE USER" + err)
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN UPDATING THE USER :" + err,
-        }
-        return next()
-    }
-    logger.debug("Result is" + result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-
-    req.apiRes["response"] = {
-        user_data: respResult,
-        count: respResult.length,
-    }
     return next()
 }
 
@@ -1213,206 +1014,23 @@ async function updatePatchUuid(req, res, next) {
     return next()
 }
 
-// Validated
-async function updatePatch(req, res, next) {
-    logger.debug("the patch is ")
-    const t = await sequelizeDB.transaction()
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
 
-    let patch_data = req.body
-    logger.debug("The patch data is", patch_data)
-    let dev_array_keys = Object.keys(patch_data)
-    if (!dev_array_keys.includes("gateway")) {
-        // Return Error - as Gateway is not present
-        return res.status(PATCH_CODE["10"].HttpStatus).json({
-            result: PATCH_CODE["10"].Code,
-            response: {},
-            error: {
-                errmessage: PATCH_CODE["10"].Message,
-            },
-            privilege: {},
-        })
-    }
-    let dev_array_values = Object.values(patch_data)
-    let index = 0
-    let promises = []
-    let tenant_id = null
-    promises.push(db_get_tenant_id(tenant_name))
-    await Promise.all(promises).then((tenant_id_result) => {
-        logger.debug("the tenant id is ", tenant_id_result)
-        tenant_id = tenant_id_result
-    })
-    promises = []
-    for (index = 0; index < dev_array_keys.length; index++) {
-        logger.debug("index is ", index)
-        promises.push(db_patch_exist_new(dev_array_values[index]))
-    }
-    await Promise.all(promises)
-        .then(async (patch_serial_data) => {
-            logger.debug("the patch serial from table", patch_serial_data)
-            if (patch_serial_data.includes("")) {
-                // return error with patch serial number not found
-                return res.status(PATCH_CODE["6"].HttpStatus).json({
-                    result: PATCH_CODE["6"].Code,
-                    response: {},
-                    error: {
-                        errmessage: PATCH_CODE["6"].Message,
-                    },
-                    privilege: {},
-                })
-            }
-            index = 0
-            let inner_index = 0
-            let match_array = []
-            while (index < dev_array_keys.length) {
-                inner_index = 0
-                temp_key = dev_array_keys[index]
-                temp_value = dev_array_values[index]
-                while (inner_index < dev_array_keys.length) {
-                    logger.debug(
-                        "Verifying the patch type , serial number matches",
-                        temp_value,
-                        patch_serial_data[inner_index]["patch_type"],
-                        patch_serial_data[inner_index]["patch_serial"],
-                        temp_key
-                    )
-                    if (
-                        temp_key == patch_serial_data[inner_index]["patch_type"]
-                    ) {
-                        if (
-                            temp_value ==
-                            patch_serial_data[inner_index]["patch_serial"]
-                        ) {
-                            match_array.push(temp_value)
-                            break
-                        }
-                    }
-                    inner_index += 1
-                }
-                index += 1
-            }
-            logger.debug(
-                "Match array and req array",
-                match_array,
-                dev_array_values
-            )
-            let intersection = dev_array_values.filter((x) =>
-                match_array.includes(x)
-            )
-            if (intersection.length < dev_array_values.length) {
-                logger.debug(
-                    "Serial Number and Patch Type are not matching",
-                    intersection
-                )
-                // return error - stating serial number and patch type is not matching for one or more devices
-                return res.status(PATCH_CODE["7"].HttpStatus).json({
-                    result: PATCH_CODE["7"].Code,
-                    response: {},
-                    error: {
-                        errmessage: PATCH_CODE["7"].Message,
-                    },
-                    privilege: {},
-                })
-            }
-            // All validations are completed
-            // Update the group id of gateway to other patches
-            let temp_promises = []
-            let gateway_group_id = null
-            for (index = 0; index < dev_array_keys.length; index++) {
-                logger.debug("index is ", index)
-                if (patch_serial_data[index]["patch_type"] == "gateway") {
-                    gateway_group_id =
-                        patch_serial_data[index]["patch_group_id"]
-                }
-            }
-            for (index = 0; index < dev_array_keys.length; index++) {
-                logger.debug("index is ", index)
-                if (patch_serial_data[index]["patch_type"] != "gateway") {
-                    patch_serial_data[index]["patch_group_id"] =
-                        gateway_group_id
-                    logger.debug("THE PATCH INDEX IS", patch_serial_data[index])
-                    let temp_serial_data = patch_serial_data[index]
-                    temp_promises.push(
-                        sequelizeDB.transaction(function (t) {
-                            logger.debug("THE PATCH INDEX IS", temp_serial_data)
-                            db_update_patch_new(tenant_id, temp_serial_data, {
-                                transaction: t,
-                            })
-                        })
-                    )
-                }
-            }
-            logger.debug("TEMP PROMISES IS", temp_promises)
-            await Promise.all(temp_promises)
-                .then((patch_group_update) => {
-                    logger.debug(
-                        "the patch group update is",
-                        patch_group_update
-                    )
-                    return res.status(PATCH_CODE["8"].HttpStatus).json({
-                        result: PATCH_CODE["8"].Code,
-                        response: {},
-                        error: {
-                            errmessage: PATCH_CODE["8"].Message,
-                        },
-                        privilege: {},
-                    })
-
-                    // return success here
-                })
-                .catch((err) => {
-                    logger.debug(
-                        "Patch insert  error " + " not found Err:" + err
-                    )
-                    return res.status(PATCH_CODE["9"].HttpStatus).json({
-                        result: PATCH_CODE["9"].Code,
-                        response: {},
-                        error: {
-                            errmessage: PATCH_CODE["9"].Message,
-                        },
-                        privilege: {},
-                    })
-                })
-        })
-        .catch((err) => {
-            logger.debug("Patch insert  error " + " not found Err:" + err)
-            return res.status(TRANSACTION_CODE["1"].HttpStatus).json({
-                result: TRANSACTION_CODE["1"].Code,
-                response: {},
-                error: {
-                    errmessage: TRANSACTION_CODE["1"].Message,
-                },
-                privilege: {},
-            })
-        })
-}
-
-//Tenants function
-// Validated
 async function getTenant(req, res, next) {
-    username = req.userName
-    tenant_id = req.userTenantId
-    let tenants
-
     try {
-        tenants = await db_get_tenant_list(tenant_id, username)
-    } catch (err) {
-        logger.debug("tenant list error " + err)
+        const data = await db_get_tenant_list(req.query)
+        req.apiRes = TENANTS_CODE["2"]
+        req.apiRes["response"] = {
+            tenants: data,
+            count: data.length,
+        }
+    } catch (error) {
+        console.log(error)
         req.apiRes = TENANTS_CODE["1"]
         req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE TENANT",
+            error: error,
         }
-        return next()
     }
-
-    logger.debug("Tenant list is " + tenants)
-    req.apiRes = TENANTS_CODE["2"]
-    req.apiRes["response"] = {
-        tenants: [tenants],
-        count: tenants.length,
-    }
+    res.response(req.apiRes)
     return next()
 }
 
@@ -1694,58 +1312,58 @@ async function createConnector(req, res, next) {
 //PRODUCT ROUTES
 // Validated
 
-async function getProduct(req, res, next) {
-    logger.debug("THIS IS PRODUCT INVENTORY")
-    username = req.userName
-    tenant_id = req.userTenantId
-    let products
-    try {
-        products = await db_get_product_list(tenant_id, username, req.query)
-    } catch (err) {
-        logger.debug("Product list error " + err)
-        req.apiRes = PRODUCT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE PRODUCTS",
-        }
-        return next()
-    }
-    logger.debug("Product list is " + products)
-    req.apiRes = PRODUCT_CODE["2"]
-    req.apiRes["response"] = {
-        products: products,
-        count: products.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getProduct(req, res, next) {
+//     logger.debug("THIS IS PRODUCT INVENTORY")
+//     username = req.userName
+//     tenant_id = req.userTenantId
+//     let products
+//     try {
+//         products = await db_get_product_list(tenant_id, username, req.query)
+//     } catch (err) {
+//         logger.debug("Product list error " + err)
+//         req.apiRes = PRODUCT_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE PRODUCTS",
+//         }
+//         return next()
+//     }
+//     logger.debug("Product list is " + products)
+//     req.apiRes = PRODUCT_CODE["2"]
+//     req.apiRes["response"] = {
+//         products: products,
+//         count: products.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
-async function createProduct(req, res, next) {
-    logger.debug("Product body is", req.body)
-    tenant_id = req.userTenantId
-    const t = await postgresSequelizeDB.transaction()
-    var product_data = req.body
-    let products
-    try {
-        products = await postgresSequelizeDB.transaction(function (t) {
-            return db_create_product(tenant_id, product_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("PRODUCT Create error " + err)
-        req.apiRes = PRODUCT_CODE["4"]
-        req.apiRes["error"] = {
-            error: "Creation of Product failed :" + err,
-        }
-        return next()
-    }
-    req.apiRes = PRODUCT_CODE["3"]
-    req.apiRes["response"] = {
-        product_data: products,
-        count: products.length,
-    }
-    return next()
-}
+// async function createProduct(req, res, next) {
+//     logger.debug("Product body is", req.body)
+//     tenant_id = req.userTenantId
+//     const t = await postgresSequelizeDB.transaction()
+//     var product_data = req.body
+//     let products
+//     try {
+//         products = await postgresSequelizeDB.transaction(function (t) {
+//             return db_create_product(tenant_id, product_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (err) {
+//         logger.debug("PRODUCT Create error " + err)
+//         req.apiRes = PRODUCT_CODE["4"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Product failed :" + err,
+//         }
+//         return next()
+//     }
+//     req.apiRes = PRODUCT_CODE["3"]
+//     req.apiRes["response"] = {
+//         product_data: products,
+//         count: products.length,
+//     }
+//     return next()
+// }
 
 // Location Routes - For Tenant
 
@@ -2792,6 +2410,11 @@ async function getUserTenant(req, res, next) {
 }
 
 async function getProfiles(req, res, next) {
+    try {
+        
+    } catch (error) {
+        
+    }
     let pid = req.query.pid
     let profile
     let pidCount = await dbProfileExists(pid)
@@ -2945,28 +2568,77 @@ async function getPathSaas(req, res, next) {
 
 async function createDevice(req, res, next) {
     try {
-        uuidDict = {
-            uuidType: UUID_CONST["patch"],
-            tenantID: tenant_id,
-        }
-        const result = await db_check_duplicate_device(req.body.data[0])
+        const params = req.body.data[0]
 
-        if(result && (req.body.data[0].patch_type === 'gateway')){
+        let condition = {}
+        if(params.patch_type === 'gateway'){
+            condition = {
+                patch_type: params.patch_type,
+                device_serial: params.device_serial
+            }
+        }
+        else {
+            condition = {
+                patch_type: params.patch_type,
+                patch_mac: params.patch_mac
+            }
+        }
+
+        const check_number = await db_check_duplicate_device(condition)
+
+        if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
             res.response(req.apiRes)
             return next()
         }
-        else if(result){
+        else if(check_number){
             req.apiRes = PATCH_CODE["15"]
             res.response(req.apiRes)
             return next()
         }
 
-        req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
-        
-        const data = await db_create_device(req)
-        req.apiRes = PATCH_CODE["3"]
-        req.apiRes["response"] = { data: data }
+
+        if(params.patch_type === 'gateway'){
+            if(params.sim){
+                condition = {
+                    sim: params.sim
+                }
+                const check_sim = await db_check_duplicate_device(condition)
+                if(check_sim){
+                    req.apiRes = PATCH_CODE["18"]
+                    res.response(req.apiRes)
+                    return next()
+                }
+            }
+
+
+            if(params.phone){
+                condition = {
+                    phone: params.phone
+                }
+                const check_phone = await db_check_duplicate_device(condition)
+                if(check_phone){
+                    req.apiRes = PATCH_CODE["19"]
+                    res.response(req.apiRes)
+                    return next()
+                }
+            }
+        }
+
+
+        tags = params.tags
+        if(tags.length>0){
+            recallFuntion(params.tags.length, 0, req, res, next)
+        }else{
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            params["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            
+            const data = await db_create_device(req)
+            req.apiRes = PATCH_CODE["3"]
+            req.apiRes["response"] = { data: data }
+            res.response(req.apiRes)
+            return next()
+        }
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
@@ -2974,8 +2646,41 @@ async function createDevice(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+}
+
+async function recall(length, number, req, res, next) {
+    try {
+        condition = {
+            tags: { [Op.like]: `%"${tags[number]}"%` }
+        }
+        const check_tags = await db_check_duplicate_device(condition)
+        if (check_tags) {
+            req.apiRes = {
+                Code: "TAGS_IS_ALREADY_EXIST",
+                HttpStatus: "470",
+                Message: `Tag: "${tags[number]}" is already exist`,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+        if (length === number) {
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            
+            const data = await db_create_device(req)
+            req.apiRes = PATCH_CODE["3"]
+            req.apiRes["response"] = { data: data }
+            res.response(req.apiRes)
+            return next()
+        }
+        recallFuntion(length, number + 1, req, res, next)
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATCH_CODE["4"]
+        req.apiRes["error"] = { error: error }
+        res.response(req.apiRes)
+        return next()
+    }
 }
 
 async function getDevice(req, res, next) {
@@ -3003,9 +2708,179 @@ async function getDevice(req, res, next) {
 }
 
 
+async function getProduct(req, res, next) {
+    try {
+        const data = await db_get_product_list(req.query)
+
+        req.apiRes = PRODUCT_CODE["2"]
+        req.apiRes["response"] = {
+            products: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRODUCT_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createProduct(req, res, next) {
+    try {
+        await db_create_product(req.body)
+        req.apiRes = PRODUCT_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRODUCT_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updatePatch(req, res, next) {
+    try {
+        await db_update_patch_status(req.body[0])
+        req.apiRes = PATCH_CODE["16"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATCH_CODE["17"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+// async function getTenant(req, res, next) {
+//     try {
+//         const data = await db_get_tenant_list(req.query)
+
+//         req.apiRes = TENANTS_CODE["2"]
+//         req.apiRes["response"] = {
+//             tenants: data,
+//             count: data.length
+//         }
+//     } catch (error) {
+//         console.log(error)
+//         req.apiRes["error"] = {
+//             error: error
+//         }
+//         req.apiRes = TENANTS_CODE["1"]
+//     }
+
+//     res.response(req.apiRes)
+//     return next()
+// }
+
+async function getUserProfile(req, res, next) {
+    try {
+        const data = await db_get_user_profile(req.query)
+
+        req.apiRes = USER_CODE["2"]
+        req.apiRes["response"] = {
+            users: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createUser(req, res, next) {
+    try {
+        const exist = await db_get_user(req.body)
+        if(exist && exist.email === req.body.email){
+            req.apiRes = USER_CODE["11"]
+            res.response(req.apiRes)
+            return next()
+        }
+        else if(exist && exist.username === req.body.username){
+            req.apiRes = USER_CODE["12"]
+            res.response(req.apiRes)
+            return next()
+        }
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
+        req.body.user_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_create_user(req.body)
+        req.apiRes = USER_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updateUser(req, res, next) {
+    try {
+        // const exist = await db_get_user(req.body)
+        // if(exist && exist.email === req.body.email){
+        //     req.apiRes = USER_CODE["11"]
+        //     res.response(req.apiRes)
+        //     return next()
+        // }
+        // else if(exist && exist.username === req.body.username){
+        //     req.apiRes = USER_CODE["12"]
+        //     res.response(req.apiRes)
+        //     return next()
+        // }
+        await db_update_user(req.body)
+        req.apiRes = USER_CODE["14"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["13"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
 module.exports = {
     getUserInventory,
-    getSelfUser,
+    getUserProfile,
     createUuid,
     textToSpeech,
     imageUpload,

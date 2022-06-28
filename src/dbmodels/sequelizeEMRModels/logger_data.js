@@ -10,25 +10,17 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 primaryKey: true,
             },
-            pid: {
-                type: DataTypes.STRING(100),
-                allowNull: false,
-            },
-            device_type: {
-                type: DataTypes.STRING(45),
-                allowNull: false,
-            },
             time: {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: Sequelize.fn("now"),
             },
             url: {
-                type: DataTypes.STRING(45),
+                type: DataTypes.STRING(255),
                 allowNull: false,
             },
-            tenant_id: {
-                type: DataTypes.STRING(45),
+            data: {
+                type: DataTypes.BLOB('medium'),
                 allowNull: false,
             }
         },

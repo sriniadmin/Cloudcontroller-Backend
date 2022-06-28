@@ -279,6 +279,30 @@ let USER_CODE = {
         Message: "Failure in fetching the user tenant map",
         Details: {},
     },
+    11: {
+        Code: "EMAIL ALREADY EXISTS",
+        HttpStatus: "470",
+        Message: "EMAIL ALREADY EXISTS",
+        Details: {},
+    },
+    12: {
+        Code: "PROFILE NAME ALREADY EXISTS",
+        HttpStatus: "470",
+        Message: "PROFILE NAME ALREADY EXISTS",
+        Details: {},
+    },
+    13: {
+        Code: "UPDATE_USER_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the user information",
+        Details: {},
+    },
+    14: {
+        Code: "UPDATE_USER_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updating the user information",
+        Details: {},
+    },
 }
 
 
@@ -369,7 +393,27 @@ let PATCH_CODE = {
         Code: "MAC_ADDRESS_IS_ALREADY_EXIST",
         HttpStatus: "470",
         Message: "Mac address is already exist",
-    }
+    },
+    16: {
+        Code: "PATCH_STATUS_UPDATE_SUCCESSFUL",
+        HttpStatus: "200",
+        Message: "Success in updating for the devices",
+    },
+    17: {
+        Code: "PATCH_STATUS_UPDATE_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating for the devices",
+    },
+    18: {
+        Code: "SIM_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Sim is already exist",
+    },
+    19: {
+        Code: "PHONE_IS_ALREADY_EXIST",
+        HttpStatus: "470",
+        Message: "Phone is already exist",
+    },
 }
 
 let VITAL_CODE = {
@@ -1206,6 +1250,18 @@ let ALLERGY_CODE = {
         Message: "Failure in creating the new allergy  information",
         Details: {},
     },
+    5: {
+        Code: "UPDATE_ALLERGY_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updateing the allergy information",
+        Details: {},
+    },
+    6: {
+        Code: "UPDATE_ALLERGY_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updateing the new allergy  information",
+        Details: {},
+    },
 }
 
 let PROCEDURE_CODE = {
@@ -1231,6 +1287,18 @@ let PROCEDURE_CODE = {
         Code: "CREATE_PROCEDURE_FAILURE",
         HttpStatus: "470",
         Message: "Failure in creating the new allergy  information",
+        Details: {},
+    },
+    5: {
+        Code: "UPDATE_PROCEDURE_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updating the allergy information",
+        Details: {},
+    },
+    6: {
+        Code: "UPDATE_PROCEDURE_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the new allergy  information",
         Details: {},
     },
 }

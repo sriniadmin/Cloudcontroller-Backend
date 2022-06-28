@@ -81,6 +81,8 @@ const routes = {
 systemChecks.dbValidate()
 
 let app = express()
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
 const cors = require('cors')
 
 app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
@@ -209,7 +211,7 @@ io.on('connection', (socket) => {
     global_variable.io = io
 });
 
-server.listen(7124);
+server.listen(process.env.WEB_APP_PORT);
 
 // app.listen(port, function () {
 //     logger.debug("Server running on port => ", port)

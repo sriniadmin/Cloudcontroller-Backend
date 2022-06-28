@@ -86,6 +86,7 @@ const {
     db_patch_exist,
     db_check_patch_exist,
     db_get_patch,
+    db_update_patch_unRegister,
     db_update_patch_register
 } = require("../../dbcontrollers/patch.controller")
 const {
@@ -119,20 +120,20 @@ const {
 //Vitals
 const vital_controller = require("../../dbcontrollers/vital.controller")
 const db_get_vital_list = vital_controller.db_get_vital_list
-const db_create_vital = vital_controller.db_create_vital
+const db_add_vital = vital_controller.db_add_vital
 const db_update_vital = vital_controller.db_update_vital
 
 // allergy
 const {
     db_get_allergy_list,
-    db_create_allergy,
+    db_add_allergy,
     db_update_allergy,
 } = require("../../dbcontrollers/allergy.controller")
 
 // medical history
 const {
     db_get_medical_history_list,
-    db_create_medical_history,
+    db_add_medical_history,
     db_update_medical_history,
 } = require("../../dbcontrollers/medical_history.controller")
 
@@ -185,7 +186,7 @@ const {
     db_create_patient_report,
 } = require("../../dbcontrollers/patient_report.controller")
 const {
-    db_create_procedure,
+    db_add_procedure,
     db_get_procedure_list,
     db_update_procedure,
 } = require("../../dbcontrollers/procedure.controller")
@@ -970,7 +971,7 @@ async function patientKafkaRegister(msg) {
     logger.debug("Kafka Test")
     const { Kafka } = require("kafkajs")
     const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
+    const brokers = [process.env.KAFKA_BROKER_HOST + process.env.KAFKA_BROKER_PORT]
     // const topic = req.body["patientUUID"]
     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
     logger.debug("Created kakfa handle", kafka)
@@ -1377,98 +1378,16 @@ async function updatePatient(req, res, next) {
 
 // Validated
 async function createPatientPatchMap(req, res, next) {
-    //if the pid in the patch map of a specific patch is 0 , then dis-associate happens
-    //if the pid in the patch map of a specific patch is pid , then associate happens
-
     let patch_map = req.body
     let given_pid = patch_map.pid
     let tenant_id = patch_map.tenantId
-    let patient_exist
     let result
     const t = await sequelizeDB.transaction()
-    // let patientInfo
-    // // let patchInfo
-
-    // //alert setup
-    // try {
-    //     patientInfo = await db_patient_info(given_pid)
-    // } catch (err) {
-    //     logger.debug('ERROR : ', err.message)
-    // }
-
-    // try {
-    //     patchInfo = await db_get_patch(tenant_id, req.body.list[0]['patch_uuid'])
-    //     patchInfo = JSON.parse(JSON.stringify(patchInfo))['patch_name']
-    // } catch (err) {
-    //     logger.debug('ERROR : ', err.message)
-    // }
-
-    // let { fname, lname } = JSON.parse(JSON.stringify(patientInfo, null, 2))
-
-    // let alertEventId = uuid()
-
-    // let createPatientPatchAlert = alertEnum['1']
-    // createPatientPatchAlert['event'] = `create patient patch map id:${alertEventId}`
-    // createPatientPatchAlert['text'] = `${patchInfo} patch associated for ${fname} ${lname}`
-    // createPatientPatchAlert['service'] = [`${req.userTenant}`]
-
-    //JSON SCHEMA VALIDATION
-    // let schema_status = schemaValidator.validate_schema(?
-    //     [req],
-    //     SCHEMA_CODE["patchPatientMap"]
-    // )
-    // if (!schema_status["status"]) {
-    //     req.apiRes = JSON_SCHEMA_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         error: "Schema Validation Failed ",
-    //     }
-    //     return next()
-    // }
-
-    logger.debug("PATIENT EXIST CHECK")
-    patient_exist = await db_patient_exist(tenant_id, given_pid)
-    logger.debug("THIS IS IN PATIENT EXIST FUNCTION", patient_exist)
-    if (!patient_exist) {
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "PATIENT DOES NOT  EXISTS :",
-        }
-        return next()
-    }
-
-    patch_exist = await db_check_patch_exist(tenant_id, patch_map.list)
-    logger.debug("THIS IS IN PATCH EXIST FUNCTION", patch_exist)
-    if (!patch_exist) {
-        req.apiRes = PATCH_CODE["5"]
-        req.apiRes["error"] = {
-            error: "PATCH DOES NOT EXIST :",
-        }
-        return next()
-    }
-
-    //  for (let i = 0; i < patch_exist.length; i++) {
-    //     logger.debug("patch info is ", patch_exist[i])
-    //     if (patch_exist[i].length == 0) {
-    //         logger.debug("Patch does not exist", given_pid)
-    //         req.apiRes = PATCH_CODE["5"]
-    //         return next()
-    //     }
-    //      patch_map[i]["config"] = [{ "sample_freq": "30", "sample_count": "1", "stop_sample": "undefined" }]
-    //      patch_map[i]["command"] = "clearPatient"
-    //      patch_map[i]["keepaliveTime"] = "30"
-    // }
 
     let list = []
     try {
         result = await sequelizeDB.transaction( async function (t) {
-            // logger.debug(
-            //     "THE GIVEN PID IS",
-            //     given_pid,
-            //     patch_map["pid"],
-            //     patch_map[0]["pid"]
-            // )
             if (patch_map["pid"] != "0") patch_map["pid"] = given_pid
-
             
             let associated_list = req.body.associated_list
             if(associated_list.length > 0){
@@ -1481,6 +1400,11 @@ async function createPatientPatchMap(req, res, next) {
             list.push(req.body.list[0].type_device)
             await db_update_patient_associated_list({pid: given_pid, associated_list: JSON.stringify(list)})
 
+            let gateway = req.body.list[0].gateway
+            if(req.body.list[0].type_device === 'gateway'){
+                gateway = req.body.list[0].gateway_device_serial
+            }
+            await db_update_patch_register({list: [req.body.list[0].patch_uuid] ,gateway: gateway})
             
             return await db_create_patch_associate_one(tenant_id, patch_map.list, given_pid, {
                 transaction: t,
@@ -1503,26 +1427,6 @@ async function createPatientPatchMap(req, res, next) {
         patch_data: respResult,
         count: respResult.length,
     }
-
-    // TODO - Validate the first time patient patch is associated or re-boarded into the system
-    // the CREATE is sent to kafka
-    // msg = {
-    //     UuidPatient: given_pid,
-    //     Method: "CREATE",
-    //     UuidTenant: "tenantb653407c-aefe-4c7b-afb0-05149343de80",
-    //     Thresholds: AlertThresholdsDict,
-    //     FrequencySetting: 1800,
-    // }
-    // await patientKafkaRegister(msg)
-
-    // try {
-    //     let response = await alerter(createPatientPatchAlert)
-    //     logger.debug(`alertResponse : ${response}`)
-    // }
-    // catch (err) {
-    //     logger.debug(`Alert ERROR : ${err.message}`)
-    // }
-
     return next()
 }
 
@@ -2006,141 +1910,141 @@ async function getPatientLocation(req, res, next) {
     return next()
 }
 
-async function createPatientVital(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let vital_data = req.body
-    logger.debug("THE VITAL BODY IS", vital_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["vitalsSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            vital_data["vital_uuid"] = uuid_result
-            vital_data["tenant_id"] = tenant_id
-            vital_data["pid"] = given_pid
-            return db_create_vital(tenant_id, vital_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Vitals failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        vital_data: respResult,
-        count: respResult.length,
-    }
-    //TODO: Add the logic to send to the sensor consumer here
-    // TODO: Make it Modular code as library reusable for any other purpose
-    const { Kafka } = require("kafkajs")
-    const clientId = "my-app"
-    const brokers = [process.env.KAFKA_BROKER + ":9092"]
-    const topic = given_pid
-    const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
-    logger.debug("Created kakfa handle", kafka)
-    let producer
-    try {
-        producer = kafka.producer()
-        logger.debug("Created kakfa handle sending", producer)
-    } catch (error) {
-        logger.debug("Kafka Creation failed", error)
-    }
-    let jsonVitalData = {
-        height: respResult["height"],
-        weight: respResult["weight"],
-        spo2: respResult["spo2"],
-        pulse: respResult["pulse"],
-        rr: respResult["respiration"],
-        bpd: respResult["bpd"],
-        bps: respResult["bps"],
-        painIdx: respResult["pain_index"],
-        temperature: respResult["temperature"],
-    }
-    let jsonVitals = {
-        DeviceType: "Manual",
-        vitalData: jsonVitalData,
-        PatientUUID: topic,
-    }
-    var sendMessage = async () => {
-        // try {
-        await producer.connect()
-        await producer.send({
-            topic: topic,
-            messages: [{ key: "spo2", value: jsonVitals }],
-        })
-        await producer.disconnect()
-    }
-    logger.debug("Kakfa Send message")
-    try {
-        sendMessage()
-    } catch (error) {
-        //TODO: Need to have a retry or some other way this data is sent to sensor_consumer - if things fail
-        logger.debug("Error in Sending message in Kafka", error)
-        await producer.disconnect()
-    }
-    // End of Kafka Send
-    return next()
-}
+// async function createPatientVital(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let vital_data = req.body
+//     logger.debug("THE VITAL BODY IS", vital_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     //JSON SCHEMA VALIDATION
+//     let schema_status = schemaValidator.validate_schema(
+//         req,
+//         SCHEMA_CODE["vitalsSchema"]
+//     )
+//     if (!schema_status["status"]) {
+//         req.apiRes = JSON_SCHEMA_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Schema Validation Failed ",
+//         }
+//         return next()
+//     }
+//     uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             vital_data["vital_uuid"] = uuid_result
+//             vital_data["tenant_id"] = tenant_id
+//             vital_data["pid"] = given_pid
+//             return db_add_vital(tenant_id, vital_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Vitals failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         vital_data: respResult,
+//         count: respResult.length,
+//     }
+//     //TODO: Add the logic to send to the sensor consumer here
+//     // TODO: Make it Modular code as library reusable for any other purpose
+//     const { Kafka } = require("kafkajs")
+//     const clientId = "my-app"
+//     const brokers = [process.env.KAFKA_BROKER_HOST + process.env.KAFKA_BROKER_PORT]
+//     const topic = given_pid
+//     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
+//     logger.debug("Created kakfa handle", kafka)
+//     let producer
+//     try {
+//         producer = kafka.producer()
+//         logger.debug("Created kakfa handle sending", producer)
+//     } catch (error) {
+//         logger.debug("Kafka Creation failed", error)
+//     }
+//     let jsonVitalData = {
+//         height: respResult["height"],
+//         weight: respResult["weight"],
+//         spo2: respResult["spo2"],
+//         pulse: respResult["pulse"],
+//         rr: respResult["respiration"],
+//         bpd: respResult["bpd"],
+//         bps: respResult["bps"],
+//         painIdx: respResult["pain_index"],
+//         temperature: respResult["temperature"],
+//     }
+//     let jsonVitals = {
+//         DeviceType: "Manual",
+//         vitalData: jsonVitalData,
+//         PatientUUID: topic,
+//     }
+//     var sendMessage = async () => {
+//         // try {
+//         await producer.connect()
+//         await producer.send({
+//             topic: topic,
+//             messages: [{ key: "spo2", value: jsonVitals }],
+//         })
+//         await producer.disconnect()
+//     }
+//     logger.debug("Kakfa Send message")
+//     try {
+//         sendMessage()
+//     } catch (error) {
+//         //TODO: Need to have a retry or some other way this data is sent to sensor_consumer - if things fail
+//         logger.debug("Error in Sending message in Kafka", error)
+//         await producer.disconnect()
+//     }
+//     // End of Kafka Send
+//     return next()
+// }
 
 // Validated
-async function getPatientVital(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let vitals
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        vitals = await db_get_vital_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = VITAL_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE VITALS",
-        }
-        return next()
-    }
-    req.apiRes = VITAL_CODE["2"]
-    req.apiRes["response"] = {
-        vitals: vitals,
-        count: vitals.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientVital(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let vitals
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         vitals = await db_get_vital_list(tenant_id, username, req.query)
+//     } catch (e) {
+//         req.apiRes = VITAL_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE VITALS",
+//         }
+//         return next()
+//     }
+//     req.apiRes = VITAL_CODE["2"]
+//     req.apiRes["response"] = {
+//         vitals: vitals,
+//         count: vitals.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientVital(req, res, next) {
@@ -2199,246 +2103,246 @@ async function updatePatientVital(req, res, next) {
     return next()
 }
 
-async function createPatientAllergy(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let allergy_data = req.body
-    logger.debug("THE ALLERGY BODY IS", allergy_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
+// async function createPatientAllergy(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let allergy_data = req.body
+//     logger.debug("THE ALLERGY BODY IS", allergy_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
 
-    //JSON SCHEMA LOGIC
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["allergySchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
+//     //JSON SCHEMA LOGIC
+//     let schema_status = schemaValidator.validate_schema(
+//         req,
+//         SCHEMA_CODE["allergySchema"]
+//     )
+//     if (!schema_status["status"]) {
+//         req.apiRes = JSON_SCHEMA_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Schema Validation Failed ",
+//         }
+//         return next()
+//     }
 
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            allergy_data["allergy_uuid"] = uuid_result
-            allergy_data["tenant_id"] = tenant_id
-            allergy_data["pid"] = given_pid
-            return db_create_allergy(tenant_id, allergy_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Allergy failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        allergy_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
-
-// Validated
-async function getPatientAllergy(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let allergy_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        allergy_list = await db_get_allergy_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = ALLERGY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE ALLERGY",
-        }
-        return next()
-    }
-    req.apiRes = ALLERGY_CODE["2"]
-    req.apiRes["response"] = {
-        allergy_list: allergy_list,
-        count: allergy_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             allergy_data["allergy_uuid"] = uuid_result
+//             allergy_data["tenant_id"] = tenant_id
+//             allergy_data["pid"] = given_pid
+//             return db_add_allergy(tenant_id, allergy_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Allergy failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         allergy_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
 
 // Validated
-async function updatePatientAllergy(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let allergy_map = req.body
-
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-
-    //JSON SCHEMA LOGIC
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["allergySchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-
-
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            return db_update_allergy(tenant_id, allergy_map, given_pid, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN UPDATING THE ALLERGY VITAL ",
-        }
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        allergy_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
-
-async function createPatientMedicalHistory(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let medical_history_data = req.body
-    logger.debug("THE MEDICAL HISTORY BODY IS", medical_history_data)
-    given_pid = req.params.pid
-    tenant_id = req.userTenantId
-    let result
-    uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
-
-    // //JSON SCHEMA LOGIC
-    // let schema_status = schemaValidator.validate_schema(
-    //     req,
-    //     SCHEMA_CODE["medicalHistorySchema"]
-    // )
-    // if (!schema_status["status"]) {
-    //     req.apiRes = JSON_SCHEMA_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         error: "Schema Validation Failed ",
-    //     }
-    //     return next()
-    // }
-
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            medical_history_data["medical_history_uuid"] = uuid_result
-            medical_history_data["tenant_id"] = tenant_id
-            medical_history_data["pid"] = given_pid
-            return db_create_medical_history(tenant_id, medical_history_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Creation of Medical History failed :" + error,
-        }
-        return next()
-    }
-    logger.debug("Result is", result)
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        medical_history_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
+// async function getPatientAllergy(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let allergy_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         allergy_list = await db_get_allergy_list(tenant_id, username, req.query)
+//     } catch (e) {
+//         req.apiRes = ALLERGY_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE ALLERGY",
+//         }
+//         return next()
+//     }
+//     req.apiRes = ALLERGY_CODE["2"]
+//     req.apiRes["response"] = {
+//         allergy_list: allergy_list,
+//         count: allergy_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
-async function getPatientMedicalHistory(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let medical_history_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        medical_history_list = await db_get_medical_history_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = MEDICAL_HISTORY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE ALLERGY",
-        }
-        return next()
-    }
-    req.apiRes = MEDICAL_HISTORY_CODE["2"]
-    req.apiRes["response"] = {
-        medical_history_list: medical_history_list,
-        count: medical_history_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function updatePatientAllergy(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let allergy_map = req.body
+
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+
+//     //JSON SCHEMA LOGIC
+//     let schema_status = schemaValidator.validate_schema(
+//         req,
+//         SCHEMA_CODE["allergySchema"]
+//     )
+//     if (!schema_status["status"]) {
+//         req.apiRes = JSON_SCHEMA_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Schema Validation Failed ",
+//         }
+//         return next()
+//     }
+
+
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             return db_update_allergy(tenant_id, allergy_map, given_pid, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "ERROR IN UPDATING THE ALLERGY VITAL ",
+//         }
+//         return next()
+//     }
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = PATIENT_CODE["2"]
+//     req.apiRes["response"] = {
+//         allergy_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
+
+// async function createPatientMedicalHistory(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let medical_history_data = req.body
+//     logger.debug("THE MEDICAL HISTORY BODY IS", medical_history_data)
+//     given_pid = req.params.pid
+//     tenant_id = req.userTenantId
+//     let result
+//     uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
+
+//     // //JSON SCHEMA LOGIC
+//     // let schema_status = schemaValidator.validate_schema(
+//     //     req,
+//     //     SCHEMA_CODE["medicalHistorySchema"]
+//     // )
+//     // if (!schema_status["status"]) {
+//     //     req.apiRes = JSON_SCHEMA_CODE["1"]
+//     //     req.apiRes["error"] = {
+//     //         error: "Schema Validation Failed ",
+//     //     }
+//     //     return next()
+//     // }
+
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             let uuid_result = await getUUID(uuidDict, { transaction: t })
+//             logger.debug("The uuid result is", uuid_result)
+//             medical_history_data["medical_history_uuid"] = uuid_result
+//             medical_history_data["tenant_id"] = tenant_id
+//             medical_history_data["pid"] = given_pid
+//             return db_add_medical_history(tenant_id, medical_history_data, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "Creation of Medical History failed :" + error,
+//         }
+//         return next()
+//     }
+//     logger.debug("Result is", result)
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = TRANSACTION_CODE["0"]
+//     req.apiRes["response"] = {
+//         medical_history_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
+
+// Validated
+// async function getPatientMedicalHistory(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let medical_history_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         medical_history_list = await db_get_medical_history_list(?
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = MEDICAL_HISTORY_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE ALLERGY",
+//         }
+//         return next()
+//     }
+//     req.apiRes = MEDICAL_HISTORY_CODE["2"]
+//     req.apiRes["response"] = {
+//         medical_history_list: medical_history_list,
+//         count: medical_history_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
 async function updatePatientMedicalHistory(req, res, next) {
@@ -4147,7 +4051,7 @@ async function createPatientProcedure(req, res, next) {
             procedure_data["procedure_uuid"] = uuid_result
             procedure_data["tenant_id"] = tenant_id
             procedure_data["pid"] = given_pid
-            return db_create_procedure(tenant_id, procedure_data, {
+            return db_add_procedure(tenant_id, procedure_data, {
                 transaction: t,
             })
         })
@@ -4170,92 +4074,92 @@ async function createPatientProcedure(req, res, next) {
 }
 
 // Validated
-async function getPatientProcedure(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let procedure_list
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        procedure_list = await db_get_procedure_list(
-            tenant_id,
-            username,
-            req.query
-        )
-    } catch (e) {
-        req.apiRes = PROCEDURE_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE PROCEDURE",
-        }
-        return next()
-    }
-    req.apiRes = PROCEDURE_CODE["2"]
-    req.apiRes["response"] = {
-        procedure_list: procedure_list,
-        count: procedure_list.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
+// async function getPatientProcedure(req, res, next) {
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
+//     let procedure_list
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     req.query.pid = req.params.pid
+//     try {
+//         procedure_list = await db_get_procedure_list(???
+//             tenant_id,
+//             username,
+//             req.query
+//         )
+//     } catch (e) {
+//         req.apiRes = PROCEDURE_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE PROCEDURE",
+//         }
+//         return next()
+//     }
+//     req.apiRes = PROCEDURE_CODE["2"]
+//     req.apiRes["response"] = {
+//         procedure_list: procedure_list,
+//         count: procedure_list.length,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 // Validated
-async function updatePatientProcedure(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let procedure_map = req.body
-    logger.debug("the procedure uuid is", procedure_map["procedure_uuid"])
+// async function updatePatientProcedure(req, res, next) {
+//     const t = await sequelizeDB.transaction()
+//     let procedure_map = req.body
+//     logger.debug("the procedure uuid is", procedure_map["procedure_uuid"])
 
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
+//     let username = req.userName
+//     let given_pid = req.params.pid
+//     let tenant_id = req.userTenantId
+//     let patient_exist
 
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            return db_update_procedure(tenant_id, procedure_map, given_pid, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN UPDATING THE PROCEDURE",
-        }
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        procedure_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
+//     try {
+//         patient_exist = await db_patient_exist(tenant_id, given_pid)
+//         if (!validate_patient_exist(patient_exist, req)) return next()
+//     } catch (error) {
+//         logger.debug("Exception : %s PID %s", error, given_pid)
+//         logger.debug("The error in catch is ", error)
+//         req.apiRes = PATIENT_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "Patient - ",
+//         }
+//         return next()
+//     }
+//     try {
+//         result = await sequelizeDB.transaction(async function (t) {
+//             return db_update_procedure(tenant_id, procedure_map, given_pid, {
+//                 transaction: t,
+//             })
+//         })
+//     } catch (error) {
+//         req.apiRes = TRANSACTION_CODE["1"]
+//         req.apiRes["error"] = {
+//             errMessage: "ERROR IN UPDATING THE PROCEDURE",
+//         }
+//         return next()
+//     }
+//     respResult = dbOutput_JSON(result)
+//     respResult = req.body
+//     req.apiRes = PATIENT_CODE["2"]
+//     req.apiRes["response"] = {
+//         procedure_data: respResult,
+//         count: respResult.length,
+//     }
+//     return next()
+// }
 
 async function getPatientInventory(req, res, next) {
     let given_pid = req.body.pid
@@ -4309,7 +4213,7 @@ async function disablePatient(req, res, next) {
                 });
                 await db_delete_patch_associated(req.body)
             }
-            await db_update_patch_register(list)
+            await db_update_patch_unRegister(list)
             req.apiRes = PATIENT_CODE["9"]
             req.apiRes["response"] = { delete: true }
         }
@@ -4342,7 +4246,7 @@ async function unassociatePatient(req, res, next) {
         }
 
         await db_delete_each_device(req.body)
-        await db_update_patch_register([req.body.patch_uuid])
+        await db_update_patch_unRegister([req.body.patch_uuid])
         req.apiRes = ASSOCIATE_CODE["1"]
         req.apiRes["response"] = { unassociate: true }
     } catch (error) {
@@ -4421,6 +4325,219 @@ async function getPatientVitalThreashold(req, res, next) {
             error: error,
         }
     }
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getPatientMedicalHistory(req, res, next) {
+    try {
+        const data = await db_get_medical_history_list(req.params)
+        req.apiRes = MEDICAL_HISTORY_CODE["2"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = MEDICAL_HISTORY_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientMedicalHistory(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["medicalhistory"], tenantID: 0 }
+        req.body.medical_history_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_add_medical_history(req.body)
+        req.apiRes = MEDICAL_HISTORY_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = MEDICAL_HISTORY_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getPatientAllergy(req, res, next) {
+    try {
+        const data = await db_get_allergy_list(req.params)
+        req.apiRes = ALLERGY_CODE["2"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ALLERGY_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+async function createPatientAllergy(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["allergy"], tenantID: 0 }
+        req.body.allergy_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_add_allergy(req.body)
+        req.apiRes = ALLERGY_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ALLERGY_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+async function getPatientVital(req, res, next) {
+    try {
+        const data = await db_get_vital_list(req.params)
+        req.apiRes = VITAL_CODE["2"]
+        req.apiRes["response"] = {
+            vitals: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = VITAL_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientVital(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["vital"], tenantID: 0 }
+        req.body.vital_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_add_vital(req.body)
+        req.apiRes = VITAL_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = VITAL_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updatePatientAllergy(req, res, next) {
+    try {
+        await db_update_allergy(req.body)
+        req.apiRes = ALLERGY_CODE["5"]
+        req.apiRes["response"] = {
+            allergy_data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ALLERGY_CODE["6"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getPatientProcedure(req, res, next) {
+    try {
+        const data = await db_get_procedure_list(req.params)
+        req.apiRes = PROCEDURE_CODE["2"]
+        req.apiRes["response"] = {
+            procedure_list: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientProcedure(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["procedure"], tenantID: 0 }
+        req.body.procedure_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_add_procedure(req.body)
+        req.apiRes = PROCEDURE_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function updatePatientProcedure(req, res, next) {
+    try {
+        await db_update_procedure(req.body)
+        req.apiRes = PROCEDURE_CODE["5"]
+        req.apiRes["response"] = {
+            allergy_data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PROCEDURE_CODE["6"]
+    }
+
     res.response(req.apiRes)
     return next()
 }

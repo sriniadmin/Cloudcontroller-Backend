@@ -3,12 +3,12 @@ const { sensorClient, baselineClient } = require('./grpc_lib')
 const logger = require("../../config/logger")
 
 const { InfluxDB, FluxTableMetaData } = require('@influxdata/influxdb-client')
-const INFLUX_SERVER = process.env.INFLUX_SERVER
-const INFLUX_SERVER_PORT = process.env.INFLUX_SERVER_PORT
+const INFLUX_DB_HOST = process.env.INFLUX_DB_HOST
+const INFLUX_DB_PORT = process.env.INFLUX_DB_PORT
 
-const token = process.env.INFLUX_TOKEN
+const token = process.env.INFLUX_DB_TOKEN
 const org = "test_org"
-const url = "http://" + INFLUX_SERVER + ":" + INFLUX_SERVER_PORT
+const url = "http://" + INFLUX_DB_HOST + ":" + INFLUX_DB_PORT
 
 
 

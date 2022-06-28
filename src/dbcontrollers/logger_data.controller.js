@@ -22,11 +22,6 @@ async function db_get_logger_data(params) {
         //     }
         // }
         return await LOGGER_DATA.findAll({
-            where: {
-                tenant_id: params.tenantId
-            },
-            // limit: limit,
-            // offset: offset,
             order: [["time", "DESC"]]
         })
     } catch (error) {
@@ -35,7 +30,7 @@ async function db_get_logger_data(params) {
     }
 }
 
-async function db_add_alert_data(params) {
+async function db_add_logger_data(params) {
     try {
         return await LOGGER_DATA.create(params)
     } catch (error) {
@@ -44,11 +39,20 @@ async function db_add_alert_data(params) {
     }
 }
 
-async function db_count_alert_data(params) {
+async function db_count_logger_data(params) {
     try {
-        return await LOGGER_DATA.count({
-            where: {
-                tenant_id: params.tenantId
+        return await LOGGER_DATA.count({})
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+async function db_download_logger_data(params) {
+    try {
+        return await LOGGER_DATA.findOne({
+            where:{
+                id: params.id
             }
         })
     } catch (error) {
@@ -59,6 +63,7 @@ async function db_count_alert_data(params) {
 
 module.exports = {
     db_get_logger_data,
-    db_add_alert_data,
-    db_count_alert_data
+    db_add_logger_data,
+    db_count_logger_data,
+    db_download_logger_data
 }

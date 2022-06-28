@@ -29,11 +29,12 @@ models.patch.hasMany(models.patch, {
     as: "AssociatedPatch",
 })
 
+
 async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', 'patch_serial', 'patch_uuid'],
+            attributes: ['id', 'patch_type', 'device_serial', 'patch_uuid', 'tags', 'sim', 'phone'],
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
@@ -527,40 +528,7 @@ async function db_patch_exist_new(patch_serial) {
     return patch_id
 }
 
-async function db_update_patch_new(tenant_id, patch_data, transaction) {
-    logger.debug("Patch data is " + patch_data)
-    if (!patch_data) return
-    patch_list = ""
-    logger.debug(
-        "Patch data is " + JSON.stringify(patch_data),
-        patch_data["patch_group_id"]
-    )
 
-    await Patches.update(
-        {
-            patch_group_id: patch_data["patch_group_id"],
-        },
-        {
-            where: {
-                patch_serial: patch_data["patch_serial"],
-            },
-        },
-        { transaction: transaction["transaction"] }
-    )
-
-        .then((patch_output_data) => {
-            logger.debug("patch insert output is" + patch_output_data)
-            patch_list = patch_output_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Patch insert  error " + tenant_id + " not found Err:" + err
-            )
-            throw new Error("Patch insert  error -  tenant check")
-        })
-
-    return patch_list
-}
 
 async function db_patch_uuid_exist(patch_uuid) {
     let patch_id
@@ -707,12 +675,36 @@ async function db_delete_patch(params) {
     return data
 }
 
-async function db_update_patch_register(params) {
+async function db_update_patch_unRegister(params) {
     let promises = []
     params.forEach(obj => {
         promises.push(
             Patches.update(
-                { in_use: 'false' },
+                {
+                    in_use: 'false',
+                    patch_serial: null
+                },
+                { where: { patch_uuid: obj } }
+            )
+        )
+    });
+
+    await Promise.all(promises)
+        .then((result) => {
+            return result
+        })
+        .catch((error) => {
+            console.log(error)
+            throw new Error(error)
+        })
+}
+
+async function db_update_patch_register(params) {
+    let promises = []
+    params.list.forEach(obj => {
+        promises.push(
+            Patches.update(
+                { patch_serial: params.gateway },
                 { where: {patch_uuid: obj}}
             )
         )
@@ -750,13 +742,13 @@ async function db_create_device(params) {
                 patch_group_id: params.body.data[0]["patch_uuid"],
                 // specialty: patch_data[i]["specialty"],
                 patch_mac: params.body.data[0]["patch_mac"],
-                // patch_bluetooth: patch_data[i]["patch_bluetooth"],
-                // patch_sensor_id: patch_data[i]["patch_sensor_id"],
-                patch_serial: params.body.data[0]["patch_serial"],
+                tags: JSON.stringify(params.body.data[0]["tags"]),
+                sim: params.body.data[0]["sim"],
+                device_serial: params.body.data[0]["device_serial"],
                 group_type: 'Device',
                 in_use: 'false',
                 tenant_id: params.body.tenantId,
-                // pid: patch_data[i]["pid"],
+                phone: params.body.data[0]["phone"],
             },
         )
     } catch (error) {
@@ -766,22 +758,8 @@ async function db_create_device(params) {
 
 async function db_check_duplicate_device(params) {
     try {
-        let condition = {}
-        if(params.patch_type === 'gateway'){
-            condition = {
-                patch_type: params.patch_type,
-                patch_serial: params.patch_serial
-            }
-        }
-        else {
-            condition = {
-                patch_type: params.patch_type,
-                patch_mac: params.patch_mac
-            }
-        }
         return await Patches.findOne({
-            where: condition,
-            raw: true,
+            where: params
         })
     } catch (error) {
         throw new Error(error)
@@ -800,8 +778,8 @@ async function db_get_device(params) {
         condition = {
             tenant_id: params.tenantId,
             [Op.or]: [
-                { patch_mac: { [Op.like]: `%${params.search}%` } },
-                { patch_serial: { [Op.like]: `%${params.search}%` } }
+                { patch_mac: { [Op.like]: "%" + params.search + "%"} },
+                { device_serial: { [Op.like]: "%" + params.search + "%"} }
             ]
         }
     }
@@ -813,7 +791,7 @@ async function db_get_device(params) {
                     include:[
                         {
                             model:models.patient_data,
-                            attributes:['fname','lname','pid']
+                            attributes:['fname','lname','pid', 'med_record']
                         }
                     ],
                     required: false,
@@ -821,24 +799,20 @@ async function db_get_device(params) {
                         tenant_id: params.tenantId
                     },
                 },
-                {
-                    model: models.patch,
-                    required: true,
-                    as: "AssociatedPatch",
-                },
     
             ],
+            where: condition,
             limit: limit,
             offset: offset,
             required: false,
             order: [["date", "DESC"]],
             raw: false,
-            where: condition
         })
     } catch (error) {
         throw new Error(error)
     }
 }
+
 
 async function db_count_device(params) {
     try {
@@ -853,13 +827,25 @@ async function db_count_device(params) {
 }
 
 
+async function db_update_patch_status(params) {
+
+    return await Patches.update(
+        { patch_status: params.patch_status },
+        { where: {patch_uuid: params.patch_uuid}}
+    )
+    .catch((error) => {
+        throw new Error(error)
+    })
+}
+
+
 module.exports = {
     db_get_patch_list,
     db_create_patch,
     db_update_patch,
     db_patch_exist,
     db_patch_exist_new,
-    db_update_patch_new,
+    db_update_patch_status,
     db_update_patch_uuid,
     db_patch_uuid_exist,
     db_patch_count,
@@ -869,10 +855,11 @@ module.exports = {
     db_get_patch_select_boxes,
     db_delete_patch,
     db_get_patch_saas,
-    db_update_patch_register,
+    db_update_patch_unRegister,
     db_get_device_id,
     db_create_device,
     db_check_duplicate_device,
     db_get_device,
-    db_count_device
+    db_count_device,
+    db_update_patch_register
 }

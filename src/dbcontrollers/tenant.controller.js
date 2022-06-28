@@ -12,33 +12,6 @@ var Tenant = function (tenantobj) {
     this.tenant_name = tenantobj.tenant_name,
         this.tenant_uuid = tenantobj.tenant_uuid
 }
-async function db_get_tenant_list(tenant_id, username) {
-    // This async function gets the tenants matching the tenant_name
-    // It currently does not check if more than one tenant exist or not. TODO
-    // Returns a promise of the tenant_id number
-    tenant_list = ""
-    await Tenants.findAll({
-        // The where class is needed to find the USER having the same tenant id
-        // where: {
-        //     tenant_id: tenant_id,
-        //     username: username,
-
-        // },
-        raw: true,
-    })
-        .then((tenant_data) => {
-            logger.debug("tenant list is" + tenant_data)
-            tenant_list = tenant_data
-        })
-        .catch((err) => {
-            logger.debug("tenant list fetch error " + tenant_id + "not found Err:" + err)
-            throw new Error(
-                "tenant list fetch error -  tenant check"
-            )
-        })
-
-    return tenant_list
-}
 
 async function db_create_tenant(tenant_id, tenant_data, transaction) {
     //This route created new patch in the db
@@ -221,6 +194,26 @@ async function db_get_tenant_name(tenant_id) {
     return tenant
 }
 
+
+async function db_get_tenant_list(params) {
+    try {
+        return await Tenants.findAll()
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+
+// async function db_get_tenant_list(params) {
+//     try {
+//         return await Tenants.findAll({
+//             order: [["tenant_name", "ASC"]]
+//         })
+//     } catch (err) {
+//         console.log(err)
+//         throw new Error(err)
+//     }
+// }
 
 
 module.exports = { db_get_tenant_id, db_get_tenant_list, db_create_tenant, db_tenant_exist, db_update_tenant, db_tenant_exist_trans,db_get_tenant_name }

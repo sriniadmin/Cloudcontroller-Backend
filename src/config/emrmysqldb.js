@@ -1,22 +1,23 @@
 const Sequelize = require("sequelize")
+const fs = require('fs');
 const logger = require("./logger")
 logger.debug(__dirname + "/../../.env")
 require("dotenv").config({ path: __dirname + "/../../.env" })
 
-
 module.exports = new Sequelize(
-    process.env.EMR_DB,
-    process.env.EMR_DB_USER,
-    process.env.EMR_DB_PASS,
+    process.env.MYSQL_DB_NAME,
+    process.env.MYSQL_DB_USER,
+    process.env.MYSQL_DB_PASS,
     {
-        host: process.env.EMR_DB_HOST,
-        dialect: process.env.EMR_DB_DIALECT,
+        host: process.env.MYSQL_DB_HOST,
+        dialect: process.env.MYSQL_DB_DIALECT,
         operatorsAliases: false,
-        logging: false,
-        // dialectOptions: {
-        //     statement_timeout: 1000,
-        //     idle_in_transaction_session_timeout: 5000
-        // },
+        logging: true,
+        dialectOptions: {
+            ssl: {
+                ca: fs.readFileSync(__dirname + '/ca.pem')
+            }
+        },
         pool: {
             max: 40,
             min: 0,

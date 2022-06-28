@@ -143,19 +143,19 @@ module.exports = function (sequelize, DataTypes) {
         },
         diagnosis_date: {
             type: DataTypes.DATE,
-            allowNull: true,
+            allowNull: false,
         },
         code_type: {
             type: DataTypes.STRING(255),
-            allowNull: true
+            allowNull: false
         },
         description: {
             type: DataTypes.STRING(255),
-            allowNull: true
+            allowNull: false
         },
         result: {
             type: DataTypes.STRING(255),
-            allowNull: true
+            allowNull: false
         },
         consulting_person: {
             type: DataTypes.STRING(255),
@@ -169,29 +169,30 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING(255),
             allowNull: true
         },
-        before_procedure: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        },
-        after_procedure: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        },
-        during_procedure: {
-            type: DataTypes.STRING(255),
-            allowNull: true
-        },
-        procedureType: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        document: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        procedure_date_time: {
-            type: DataTypes.JSON,
-            allowNull: true
+        // before_procedure: {
+        //     type: DataTypes.STRING(255),
+        //     allowNull: true
+        // },
+        // after_procedure: {
+        //     type: DataTypes.STRING(255),
+        //     allowNull: true
+        // },
+        // during_procedure: {
+        //     type: DataTypes.STRING(255),
+        //     allowNull: true
+        // },
+        // procedureType: {
+        //     type: DataTypes.JSON,
+        //     allowNull: true
+        // },
+        // document: {
+        //     type: DataTypes.JSON,
+        //     allowNull: true
+        // },
+        date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.fn('now')
         },
     }, {
         sequelize,

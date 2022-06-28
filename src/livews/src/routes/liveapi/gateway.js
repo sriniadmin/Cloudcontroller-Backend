@@ -87,7 +87,7 @@ router.post("/push_dataee", async function (req, res, next) {
     logger.debug("Kafka received data is ", req.body["patientUUID"])
       const { Kafka } = require("kafkajs")
       const clientId = "my-app"
-      const brokers = [process.env.KAFKA_BROKER+":9092"]
+      const brokers = [process.env.KAFKA_BROKER_HOST + process.env.KAFKA_BROKER_PORT]
       const topic = req.body["patientUUID"]
       const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
   logger.debug("Created kakfa handle", req.body)

@@ -1,5 +1,6 @@
 let IGNORE_AUTH_PATH = [
   "/api/sign/login",
+  "/api/logger/upload",
   "/api/login",
   "/signup",
   "/sign/signup",

@@ -157,7 +157,12 @@ const EDIT_PATIENT = function (params) {
         bed_uuid: params.bed_uuid || null,
         vital_uuid: params.vital_uuid || null,
         med_record: params.med_record || null,
-        discharge_date: params.discharge_date || null
+        discharge_date: params.discharge_date || null,
+        patient_type: params.patient_type,
+        country_name: params.country_name,
+        tags: JSON.stringify(params.tags) || null,
+        primary_consultant: params.primary_consultant,
+        secondary_consultant: params.secondary_consultant
     }
 }
 
@@ -845,6 +850,9 @@ async function db_edit_patient(params) {
 }
 
 async function db_add_new_patient(params) {
+    if(!params.patient_type){
+        params.patient_type = 'remote'
+    }
     try {
         let data = EDIT_PATIENT(params)
         data.pid = params.pid

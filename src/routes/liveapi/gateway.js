@@ -1,5 +1,8 @@
 var express = require("express")
 var router = express.Router()
+const token = process.env.INFLUX_DB_TOKEN
+const org = process.env.INFLUX_DB_ORG
+const bucket = process.env.INFLUX_DB_BUCKET
 // const logger = require("../../config/logger")
 var log4js = require('log4js');
 log4js.configure('./src/config/log4js-config.json');
@@ -87,7 +90,7 @@ console.log('THRESHOLD LIST: ', global_variable.threshold_list)
 //     logger.debug("Kafka received data is ", req.body["patientUUID"])
 //     const { Kafka } = require("kafkajs")
 //     const clientId = "my-app"
-//     const brokers = [process.env.KAFKA_BROKER + ":9092"]
+//     const brokers = [process.env.KAFKA_BROKER_HOST + process.env.KAFKA_BROKER_PORT]
 //     const topic = req.body["patientUUID"]
 //     const kafka = new Kafka({ clientId, brokers }) // This should be a pool to send TODO
 //     logger.debug("Created kakfa handle", req.body)
@@ -474,10 +477,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         if(!req.body.keep_alive_time){
             return res.status(470).json({Message: 'keep_alive_time is missing'})
         }
-        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
-        const org = 'live247'
-        const bucket = 'emr_dev'
-        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const client = new InfluxDB({url: 'http://' + process.env.INFLUX_DB_HOST + ':' + process.env.INFLUX_DB_PORT, token: token})
         const writeApi = client.getWriteApi(org, bucket)
 
         if(global_variable.socket){
@@ -491,9 +491,19 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         }
 
         const point1 = new Point(`${req.body.patientUUID}_gateway_keep_alive_time`)
-        .tag('deviceModel', 'Blood Pressure')
+        .tag('deviceModel', 'Gateway')
         .floatField('keep_alive_time', req.body.keep_alive_time)
         writeApi.writePoint(point1)
+
+        const point2 = new Point(`${req.body.patientUUID}_gateway_version`)
+        .tag('deviceModel', 'Gateway')
+        .floatField('version', req.body.version)
+        writeApi.writePoint(point2)
+
+        const point3 = new Point(`${req.body.patientUUID}_gateway_battery`)
+        .tag('deviceModel', 'Gateway')
+        .floatField('battery', req.body.gwBattery)
+        writeApi.writePoint(point3)
 
 
         return res.status(200).json({Command: 'softkill'})
@@ -576,7 +586,7 @@ router.post("/gateway_register", async function (req, res, next) {
         for (index = 0; index < data.length; index++) {
             let temp_device = {}
             temp_device["type"] = data[index].patches[0]["patch_type"]
-            temp_device["serial_no"] = data[index].patches[0]["patch_serial"]
+            temp_device["serial_no"] = data[index].patches[0]["device_serial"]
             temp_device["mac_address"] = data[index].patches[0]["patch_mac"]
             temp_device["config"] = data[index].config
             device_list.push(temp_device)
@@ -641,7 +651,7 @@ router.post("/gateway_register", async function (req, res, next) {
                         temp_device["type"] =
                             patch_patient_list[index].patches[0]["patch_type"]
                         temp_device["serial_no"] =
-                            patch_patient_list[index].patches[0]["patch_serial"]
+                            patch_patient_list[index].patches[0]["device_serial"]
                         temp_device["mac_address"] =
                             patch_patient_list[index].patches[0]["patch_mac"]
                         temp_device["config"] = patch_patient_list[index].config
@@ -698,11 +708,7 @@ router.post("/gateway_register", async function (req, res, next) {
 router.post("/push_data", async function (req, res, next) {
     try {
         //Receiving sensor data
-        const token = 'WcOjz3fEA8GWSNoCttpJ-ADyiwx07E4qZiDaZtNJF9EGlmXwswiNnOX9AplUdFUlKQmisosXTMdBGhJr0EfCXw=='
-        const org = 'live247'
-        const bucket = 'emr_dev'
-
-        const client = new InfluxDB({url: 'http://20.230.234.202:8086', token: token})
+        const client = new InfluxDB({url: 'http://' + process.env.INFLUX_DB_HOST + ':' + process.env.INFLUX_DB_PORT, token: token})
         const writeApi = client.getWriteApi(org, bucket)
 
         //Passing data to UI via socket.io
@@ -795,6 +801,7 @@ router.post("/push_data", async function (req, res, next) {
             let extras = req.body.data
             if(extras && extras.extras && extras.extras.HR) data.hr = extras.extras.HR
             if(extras && extras.extras && extras.extras.RR) data.rr = extras.extras.RR
+            if(extras && extras.extras && extras.extras.ecg) data.chart = extras.extras.ecg
 
             global_variable.io.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
         }
@@ -919,6 +926,12 @@ function bp(writeApi, data) {
     .tag('deviceModel', 'Blood Pressure')
     .floatField('bps', data.data.extras.sys)
     writeApi.writePoint(point2)
+
+    //bps
+    const point5 = new Point(`${data.patientUUID}_ihealth_hr`)
+    .tag('deviceModel', 'Blood Pressure')
+    .floatField('hr', data.data.extras.heartRate)
+    writeApi.writePoint(point5)
 
     //battery
     const point3 = new Point(`${data.patientUUID}_ihealth_battery`)

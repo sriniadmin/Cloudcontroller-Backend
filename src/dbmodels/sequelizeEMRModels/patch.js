@@ -182,10 +182,7 @@ module.exports = function (sequelize, DataTypes) {
             },
             patch_serial: {
                 type: DataTypes.STRING(250),
-                allowNull: false,
-                validate: {
-                    is: /[a-zA-Z0-9\s]*$/,
-                },
+                allowNull: true
             },
             tenant_id: {
                 type: DataTypes.STRING(255),
@@ -217,6 +214,22 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: true
             },
+            device_serial: {
+                type: DataTypes.STRING(255),
+                allowNull: false
+            },
+            tags: {
+                type: DataTypes.STRING(255),
+                allowNull: true
+            },
+            sim: {
+                type: DataTypes.STRING(45),
+                allowNull: true
+            },
+            phone: {
+                type: DataTypes.STRING(45),
+                allowNull: true
+            }
         },
         {
             sequelize,

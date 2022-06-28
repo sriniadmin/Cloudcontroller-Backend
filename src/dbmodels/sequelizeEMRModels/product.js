@@ -31,9 +31,9 @@
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('product', {
     id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0,
       primaryKey: true
     },
     ndc_product_code: {

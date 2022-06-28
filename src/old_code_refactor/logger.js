@@ -1,9 +1,5 @@
-// const sequelizeDB = require("../config/emrmysqldb")
-// var initModels =
-//     require("../dbmodels/sequelizeEMRModels/init-models").initModels
-// var models = initModels(sequelizeDB)
-const { db_get_logger_data } = require("../dbcontrollers/logger_data.controller")
-
+const stream = require('stream');
+const { db_get_logger_data, db_add_logger_data, db_count_logger_data, db_download_logger_data } = require("../dbcontrollers/logger_data.controller")
 const {
     ALERT_CODE
 } = require("../lib/constants/AppEnum")
@@ -11,46 +7,93 @@ const {
 async function download(req, res, next) {
     try {
 
-        const file = `./src/public/logger/test.txt`
-        res.download(file)
-        return next()
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
+        }
+        const data = await db_download_logger_data(req.query)
+
+        const fileContents = Buffer.from(data.data, "base64");
+
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
+
+        res.set('Content-disposition', 'attachment; filename=' + data.url);
+        res.set('Content-Type', 'text/plain');
+
+        return readStream.pipe(res);
     } catch (error) {
         console.log(error)
-        req.apiRes = ALERT_CODE["1"]
-        req.apiRes["error"] = { error: error }
+        return res.status(500).json({ error: error })
     }
-    res.response(req.apiRes)
-    return next()
 }
+
 
 async function upload(req, res, next) {
-    // try {
-    //     const data = await db_get_alert_data(req.query)
+    try {
+        const data = req.files['many-files']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
+        }
 
-    //     const count = await db_count_alert_data(req.query)
-    //     req.apiRes = ALERT_CODE["0"]
-    //     req.apiRes["response"] = { 
-    //         data: data, 
-    //         count: count
-    //     }
-    // } catch (error) {
-    //     console.log(error)
-    //     req.apiRes = ALERT_CODE["1"]
-    //     req.apiRes["error"] = { error: error }
-    // }
-    const file = ``;
-    res.download(file)
-    return next()
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+        if(list.length > 10){
+            return res.status(470).json({ message: 'Maximum is 10 files' })
+        }
+
+        let flg = 0
+        for (const obj of list) {
+            const spl = obj.name.split('.')
+            if(spl[spl.length-1] !== 'txt'){
+                flg = 1
+                break
+            }
+            if(obj.size > 10485760){
+                flg = 2
+                break
+            }
+        }
+        if(flg === 1){
+            return res.status(470).json({ message: 'File type must be text/plain' })
+        }
+        if(flg === 2){
+            return res.status(470).json({ message: 'File size must be smaller than 10MB' })
+        }
+
+        list.forEach(obj => {
+            db_add_logger_data({
+                data: obj.data,
+                url: `${obj.name}`
+            })
+        });
+        return res.status(200).json({ message: 'Sucessful' })
+    } catch (error) {
+        if (error.code === "LIMIT_UNEXPECTED_FILE") {
+            return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
+        }
+        return res.status(500).json({ error: error })
+    }
 }
+
+
+
+
 
 
 async function getLoggerData(req, res, next) {
     try {
         const data = await db_get_logger_data(req.query)
 
+        const count = await db_count_logger_data(req.query)
+
         req.apiRes = ALERT_CODE["0"]
         req.apiRes["response"] = { 
-            data: data
+            data: data,
+            totalCount: count
         }
     } catch (error) {
         console.log(error)
