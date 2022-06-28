@@ -19,12 +19,13 @@ const redisClient = require("../../external_services/redis/cache_service/redis_c
 const { otpverify } = require("../../../src/business_logic/routes/patient")
 const db_patient_exist = patient_controller.db_patient_exist
 const db_check_patient_exist = patient_controller.db_check_patient_exist
-const { db_patch_exist } = require("../../dbcontrollers/patch.controller")
+const { db_patch_exist, db_update_patch_gateway } = require("../../dbcontrollers/patch.controller")
 const { db_get_patch_map_list, 
     clear_command,
     update_keepalive,
     db_get_pid_associated,
-    db_threshold_by_patient
+    db_threshold_by_patient,
+    db_gateway_by_patient
 } = require("../../dbcontrollers/patch_patient.controller")
 
 const { PATIENT_CODE, INTERNAL_CODE } = require("../../lib/constants/AppEnum")
@@ -34,7 +35,10 @@ const {InfluxDB, Point} = require('@influxdata/influxdb-client')
 
 global_variable.threshold_list = db_threshold_by_patient()
 
+global_variable.gateway_list = db_gateway_by_patient()
+
 console.log('THRESHOLD LIST: ', global_variable.threshold_list)
+console.log('GATEWAY LIST: ', global_variable.gateway_list)
 
 /**
  * @openapi
@@ -505,8 +509,28 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         .floatField('battery', req.body.gwBattery)
         writeApi.writePoint(point3)
 
+        let list = await global_variable.gateway_list
 
-        return res.status(200).json({Command: 'softkill'})
+        let result = {
+            Command: 'softkill'
+        }
+        for (const obj of list) {
+            if(obj.pid === req.body.patientUUID){
+                if(obj['patch_patient_maps.patches.scan'] !== undefined){
+                    if((((req.body['scan'] === true) || (req.body['scan'] === false)) && (req.body['scan'] !== obj['patch_patient_maps.patches.scan'])) 
+                    || (((req.body['reset'] === true) || (req.body['reset'] === false)) && (req.body['reset'] !== obj['patch_patient_maps.patches.reset']))){
+                        await db_update_patch_gateway({scan: Number(!Boolean(req.body['scan'])), reset: Number(!Boolean(req.body['reset'])), patch_uuid: obj['patch_patient_maps.patch_uuid']})
+                        obj['patch_patient_maps.patches.scan'] = Number(!Boolean(req.body['scan']))
+                        obj['patch_patient_maps.patches.reset'] = Number(!Boolean(req.body['reset']))
+                    }
+                    result.scan = !Boolean(Number(obj['patch_patient_maps.patches.scan']))
+                    result.reset = !Boolean(Number(obj['patch_patient_maps.patches.reset']))
+                    break;
+                }
+            }
+        }
+
+        return res.status(200).json(result)
     } catch (error) {
         console.log(error)
         return res.status(500).json('ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)

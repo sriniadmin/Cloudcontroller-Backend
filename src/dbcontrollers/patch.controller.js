@@ -838,6 +838,20 @@ async function db_update_patch_status(params) {
     })
 }
 
+async function db_update_patch_gateway(params) {
+
+    return await Patches.update(
+        { 
+            scan: params.scan,
+            reset: params.reset
+        },
+        { where: {patch_uuid: params.patch_uuid}}
+    )
+    .catch((error) => {
+        throw new Error(error)
+    })
+}
+
 
 module.exports = {
     db_get_patch_list,
@@ -861,5 +875,6 @@ module.exports = {
     db_check_duplicate_device,
     db_get_device,
     db_count_device,
-    db_update_patch_register
+    db_update_patch_register,
+    db_update_patch_gateway
 }
