@@ -236,86 +236,6 @@ function get_endDate(presData, startDate) {
     return tempDate.addDays(parseInt(daysToAdd))
 }
 
-async function db_create_prescription(
-    tenant_id,
-    prescription_data,
-    transaction
-) {
-    prescription_list = ""
-    let pdata = new Prescription(prescription_data)
-    logger.debug("Prescription data is " + JSON.stringify(prescription_data))
-    const promises = [];
-    for (let i = 0; i < prescription_data["drug"].length; i++) {
-
-        logger.debug("The drugs are", prescription_data["drug"][i])
-        logger.debug('the date added is', prescription_data["date_added"])
-        logger.debug('THE NEW DATE ADDED IS', prescription_data["date_added"][i])
-        let endDate = get_endDate(prescription_data["drug"][i], prescription_data["date_added"])
-        logger.debug('THE END DATE CALCULATION IS', endDate)
-        promises.push(Prescriptions.create(
-            {
-                prescription_uuid: prescription_data["prescription_uuid"],
-                substitute: prescription_data["substitute"],
-                site: prescription_data["site"],
-                filled_by_id: prescription_data["filled_by_id"],
-                pharmacy_id: prescription_data["pharmacy_id"],
-                date_added: prescription_data["date_added"],
-                date_modified: prescription_data["date_modified"],
-                provider_id: prescription_data["provider_id"],
-                encounter: prescription_data["encounter"],
-                drug: [prescription_data["drug"][i]],
-                drug_uuid: prescription_data["drug_uuid"],
-                rxnorm_drugcode: prescription_data["rxnorm_drugcode"],
-                form: prescription_data["form"],
-                dosage: prescription_data["dosage"],
-                quantity: prescription_data["quantity"],
-                size: prescription_data["size"],
-                unit: prescription_data["unit"],
-                route: prescription_data["route"],
-                interval: prescription_data["interval"],
-                refills: prescription_data["refills"],
-                per_refill: prescription_data["per_refill"],
-                filled_date: prescription_data["filled_date"],
-                medication: prescription_data["medication"],
-                note_uuid: prescription_data["note_uuid"],
-                active: prescription_data["active"],
-                datetime: prescription_data["datetime"],
-                prac_uuid: prescription_data["prac_uuid"],
-                prescriptionguid: prescription_data["prescriptionguid"],
-                erx_source: prescription_data["erx_source"],
-                erx_uploaded: prescription_data["erx_uploaded"],
-                drug_info_erx: prescription_data["drug_info_erx"],
-                external_id: prescription_data["external_id"],
-                end_date: endDate,
-                indication: prescription_data["indication"],
-                prn: prescription_data["prn"],
-                ntx: prescription_data["ntx"],
-                rtx: prescription_data["rtx"],
-                txDate: prescription_data["txDate"],
-                tenant_uuid: prescription_data["tenant_uuid"],
-                pid: prescription_data["pid"],
-            },
-            { transaction: transaction["transaction"] }
-        ))
-    }
-    logger.debug("Promise is ", promises)
-    await Promise.all(promises)
-        .then((prescription_data) => {
-            logger.debug("Prescription insert output is" + prescription_data)
-            prescription_list = prescription_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Prescription insert  error " +
-                tenant_id +
-                " not found Err:" +
-                err
-            )
-            throw new Error("Prescription insert  error -  tenant check" + err)
-        })
-
-    return prescription_list
-}
 
 async function db_update_prescription(
     tenant_id,
@@ -426,6 +346,60 @@ async function db_delete_prescription(given_pid, transaction) {
             throw new Error("Could not delete prescription with pid", given_pid)
         })
 }
+
+
+async function db_create_prescription(params) {
+    try {
+        let endDate = get_endDate(params.drug[0], params["date_added"])
+
+        return await Prescriptions.create({
+            prescription_uuid: params["prescription_uuid"],
+            substitute: params["substitute"],
+            site: params["site"],
+            filled_by_id: params["filled_by_id"],
+            pharmacy_id: params["pharmacy_id"],
+            date_added: params["date_added"],
+            date_modified: params["date_modified"],
+            provider_id: params["provider_id"],
+            encounter: params["encounter"],
+            drug: params.drug,
+            drug_uuid: params["drug_uuid"],
+            rxnorm_drugcode: params["rxnorm_drugcode"],
+            form: params["form"],
+            dosage: params["dosage"],
+            quantity: params["quantity"],
+            size: params["size"],
+            unit: params["unit"],
+            route: params["route"],
+            interval: params["interval"],
+            refills: params["refills"],
+            per_refill: params["per_refill"],
+            filled_date: params["filled_date"],
+            medication: params["medication"],
+            note_uuid: params["note_uuid"],
+            active: params["active"],
+            datetime: params["datetime"],
+            prac_uuid: params["prac_uuid"],
+            prescriptionguid: params["prescriptionguid"],
+            erx_source: params["erx_source"],
+            erx_uploaded: params["erx_uploaded"],
+            drug_info_erx: params["drug_info_erx"],
+            external_id: params["external_id"],
+            end_date: endDate,
+            indication: params["indication"],
+            prn: params["prn"],
+            ntx: params["ntx"],
+            rtx: params["rtx"],
+            txDate: params["txDate"],
+            tenant_uuid: params["tenant_uuid"],
+            pid: params["pid"],
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
 
 module.exports = {
     db_get_prescription_list,
