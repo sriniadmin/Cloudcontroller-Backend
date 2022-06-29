@@ -2390,29 +2390,6 @@ async function passwordReset(req, res, next) {
 //     return next()
 // }
 
-async function getUserTenant(req, res, next) {
-    //let tenant_id = req.userTenantId
-    let user_tenant
-    logger.debug("the req.query is", req.query)
-    try {
-        user_tenant = await db_get_user_tenant(req.query)
-    } catch (err) {
-        logger.debug("Task list error " + err)
-        req.apiRes = USER_CODE["10"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE USER TENANT   ",
-        }
-        return next()
-    }
-
-    //logger.debug("Task report list is " + user_tenant)
-    req.apiRes = USER_CODE["9"]
-    req.apiRes["response"] = {
-        userTenantData: user_tenant,
-    }
-    res.response(req.apiRes)
-    return next()
-}
 
 async function getProfiles(req, res, next) {
     try {
@@ -2904,6 +2881,28 @@ async function resetDevice(req, res, next) {
         if(req.body.reset){
             req.apiRes = PATCH_CODE["21"]
         }
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getUserTenant(req, res, next) {
+    try {
+        const data = await db_get_user_tenant(req.query)
+
+        req.apiRes = USER_CODE["9"]
+        req.apiRes["response"] = {
+            userTenantData: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = USER_CODE["10"]
     }
 
     res.response(req.apiRes)
