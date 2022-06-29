@@ -488,48 +488,44 @@ async function db_patient_exist(
 }
 
 async function db_get_patient_inventory(params) {
-    let limit = params.limit
-    let offset = (params.offset-1) * limit
-    let condition = {
-        tenant_id: params.tenantId,
-        disabled: 1
-    }
-    if(params.name){
-        offset = 0
-        params.name = (params.name).toLowerCase()
-        const strings = params.name.split(" ")
-        if(strings.length === 2){
-            condition = {
-                tenant_id: params.tenantId,
-                disabled: 1,
-                fname: {[Op.like]: `%${strings[0]}%`},
-                lname: {[Op.like]: `%${strings[1]}%`}
-            }
-        }
-        else if(strings.length === 3){
-            condition = {
-                tenant_id: params.tenantId,
-                disabled: 1,
-                fname: {[Op.like]: `%${strings[0]}%`},
-                mname: {[Op.like]: `%${strings[1]}%`},
-                lname: {[Op.like]: `%${strings[2]}%`}
-            }
-        }
-        else{
-            condition = {
-                tenant_id: params.tenantId,
-                disabled: 1,
-                [Op.or]: [
-                    {fname: {[Op.like]: `%${params.name}%`}}, 
-                    {lname: {[Op.like]: `%${params.name}%`}},
-                    {mname: {[Op.like]: `%${params.name}%`}}, 
-                    {med_record: {[Op.like]: `%${params.name}%`}},
-                    {phone_contact: {[Op.like]: `%${params.name}%`}}
-                ]
-            }
-        }
-    }
     try {
+        let limit = params.limit
+        let offset = (params.offset - 1) * limit
+        let condition = {}
+        if (params.name) {
+            offset = 0
+            params.name = (params.name).toLowerCase()
+            const strings = params.name.split(" ")
+            if (strings.length === 2) {
+                condition = {
+                    fname: { [Op.like]: `%${strings[0]}%` },
+                    lname: { [Op.like]: `%${strings[1]}%` }
+                }
+            }
+            else if (strings.length === 3) {
+                condition = {
+                    fname: { [Op.like]: `%${strings[0]}%` },
+                    mname: { [Op.like]: `%${strings[1]}%` },
+                    lname: { [Op.like]: `%${strings[2]}%` }
+                }
+            }
+            else {
+                condition = {
+                    [Op.or]: [
+                        { fname: { [Op.like]: `%${params.name}%` } },
+                        { lname: { [Op.like]: `%${params.name}%` } },
+                        { mname: { [Op.like]: `%${params.name}%` } },
+                        { med_record: { [Op.like]: `%${params.name}%` } },
+                        { phone_contact: { [Op.like]: `%${params.name}%` } }
+                    ]
+                }
+            }
+        }
+        
+        condition.tenant_id = params.tenantId,
+        condition.patient_type = params.patientType,
+        condition.disabled = 1
+
         const data = await Patients_Data.findAll({
             where: condition,
             order: [
@@ -546,7 +542,7 @@ async function db_get_patient_inventory(params) {
             ],
             raw: false,
         });
-        return {data: data, count: count.length}
+        return { data: data, count: count.length }
     } catch (error) {
         throw new Error(error)
     }
@@ -850,10 +846,10 @@ async function db_edit_patient(params) {
 }
 
 async function db_add_new_patient(params) {
-    if(!params.patient_type){
-        params.patient_type = 'remote'
-    }
     try {
+        if(!params.patient_type){
+            params.patient_type = 'remote'
+        }
         let data = EDIT_PATIENT(params)
         data.pid = params.pid
         data.tenant_id = params.tenant_id

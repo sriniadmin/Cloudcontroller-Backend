@@ -229,6 +229,14 @@ module.exports = function (sequelize, DataTypes) {
             phone: {
                 type: DataTypes.STRING(45),
                 allowNull: true
+            },
+            scan: {
+                type: DataTypes.TINYINT,
+                allowNull: true
+            },
+            reset: {
+                type: DataTypes.TINYINT,
+                allowNull: true
             }
         },
         {

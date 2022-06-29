@@ -592,6 +592,44 @@ async function db_threshold_by_patient(params) {
     }
 }
 
+
+Patient_Data.hasMany(Patch_Patient_Map, {
+    foreignKey: "pid",
+    sourceKey: "pid"
+})
+
+Patch_Patient_Map.hasMany(Patches, {
+    foreignKey: "patch_uuid",
+    sourceKey: "patch_uuid"
+})
+
+async function db_gateway_by_patient(params) {
+    try {
+        return await Patient_Data.findAll({
+            attributes: ['pid', 'fname', 'lname'],
+            include: [
+                {
+                    model: Patch_Patient_Map,
+                    attributes: ['patch_uuid'],
+                    include: [
+                        {
+                            model: Patches,
+                            attributes: ['patch_type', 'scan', 'reset'],
+                            where: {
+                                patch_type: 'gateway'
+                            }
+                        }
+                    ]
+                }
+            ],
+            raw: true,
+            // order: [['id', 'ASC']],
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 module.exports = {
     db_get_patch_map_list,
     db_create_patch_associate,
@@ -605,5 +643,6 @@ module.exports = {
     db_get_patch_associated,
     db_delete_each_device,
     db_get_pid_associated,
-    db_threshold_by_patient
+    db_threshold_by_patient,
+    db_gateway_by_patient
 };

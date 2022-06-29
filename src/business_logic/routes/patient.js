@@ -3283,116 +3283,6 @@ function clone(a) {
     return JSON.parse(JSON.stringify(a))
 }
 
-// Validated
-async function createPatientPrescription(req, res, next) {
-    let prescription_data = req.body
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let newDrug = req.body.drug
-    logger.debug("the new drug is", newDrug)
-    let result
-    const t = await sequelizeDB.transaction()
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["prescriptionsSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - ",
-        }
-        return next()
-    }
-
-    const promises = []
-    uuidDict = {
-        uuidType: UUID_CONST["prescription"],
-        tenantID: tenant_id,
-    }
-    try {
-        let group_id = ""
-
-        let drugInfo = prescription_data["drug"]
-        let temp_prescription_data = clone(prescription_data)
-        logger.debug(
-            "the prescription body is",
-            temp_prescription_data,
-            typeof temp_prescription_data
-        )
-        logger.debug(
-            "Prescription drug is ",
-            prescription_data["drug"],
-            prescription_data["drug"].length
-        )
-        promises.push(
-            sequelizeDB.transaction(async function (t) {
-                let uuid_result = await getUUID(uuidDict, { transaction: t })
-                temp_prescription_data["prescription_uuid"] = uuid_result
-                logger.debug(
-                    "the precription uuid is",
-                    temp_prescription_data["prescription_uuid"]
-                )
-                temp_prescription_data["tenant_uuid"] = tenant_id
-                temp_prescription_data["pid"] = given_pid
-                logger.debug(
-                    "the final prescription body is",
-                    temp_prescription_data
-                )
-                logger.debug("The uuid result is", uuid_result)
-                logger.debug("the prescription data is", temp_prescription_data)
-                return db_create_prescription(
-                    tenant_id,
-                    temp_prescription_data,
-                    {
-                        transaction: t,
-                    }
-                )
-            })
-        )
-
-        logger.debug("After slice, prescription_data is", promises)
-        await Promise.all(promises).then(async (prescription_data) => {
-            const promises_new = []
-            for (let i = 0; i < prescription_data.length; i++) {
-                logger.debug(
-                    "RESULT prescription_data is",
-                    dbOutput_JSON(prescription_data[i])
-                )
-            }
-        })
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in  prescription catch is ", error)
-        req.apiRes = PRESCRIPTION_CODE["4"]
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN CREATING THE PRESCRIPTION",
-        }
-        return next()
-    }
-
-    // respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = PRESCRIPTION_CODE["3"]
-    req.apiRes["response"] = {
-        patient_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
 
 // Validated
 async function updatePatientPrescription(req, res, next) {
@@ -4481,7 +4371,7 @@ async function updatePatientAllergy(req, res, next) {
 
 async function getPatientProcedure(req, res, next) {
     try {
-        const data = await db_get_procedure_list(req.params)
+        const data = await db_get_procedure_list({pid: req.params.pid, date: req.query.date})
         req.apiRes = PROCEDURE_CODE["2"]
         req.apiRes["response"] = {
             procedure_list: data,
@@ -4542,6 +4432,28 @@ async function updatePatientProcedure(req, res, next) {
     return next()
 }
 
+
+async function createPatientPrescription(req, res, next) {
+    try {
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["prescription"], tenantID: 0 }
+        req.body.procedure_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_create_prescription(req.body)
+        req.apiRes = PRESCRIPTION_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRESCRIPTION_CODE["4"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
 
 module.exports = {
     createPatientInBulk,
