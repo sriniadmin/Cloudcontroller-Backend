@@ -114,6 +114,13 @@ async function db_create_product(params) {
 
 async function db_get_product_list(params) {
     try {
+        let condition = {}
+        if(params.generic_name){
+            condition.generic_name = { [Op.iLike]: `%${params.generic_name}%` }
+        }
+        if(params.generic_name){
+            condition.product_name = { [Op.iLike]: `%${params.product_name}%` }
+        }
         return await Products.findAll({
             attributes: ["route", "product_name", "form", "marketing_status", "generic_name", ["active_ingredient_count", "strength"]],
             where: {
