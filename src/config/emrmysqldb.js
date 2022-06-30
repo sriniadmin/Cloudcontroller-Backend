@@ -13,11 +13,11 @@ module.exports = new Sequelize(
         dialect: process.env.MYSQL_DB_DIALECT,
         operatorsAliases: false,
         logging: true,
-        dialectOptions: {
-            ssl: {
-                ca: fs.readFileSync(__dirname + '/ca.pem')
-            }
-        },
+        // dialectOptions: {
+        //     ssl: {
+        //         ca: fs.readFileSync(__dirname + '/ca.pem')
+        //     }
+        // },
         pool: {
             max: 40,
             min: 0,
