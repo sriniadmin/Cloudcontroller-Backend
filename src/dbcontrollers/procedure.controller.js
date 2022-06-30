@@ -150,10 +150,7 @@ async function db_get_procedure_list(params) {
     try {
         return await Procedure.findAll({
             where: {
-                pid: params.pid,
-                date: {
-                    [Op.like]: moment(params.date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
-                }
+                pid: params.pid
             },
             order: [["id", "DESC"]]
         })
