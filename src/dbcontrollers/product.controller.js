@@ -119,6 +119,7 @@ async function db_get_product_list(params) {
             where: {
                 product_name: { [Op.iLike]: `%${params.product_name}%` },
             },
+            limit: params.limit,
             order: [["product_name", "ASC"]]
         })
     } catch (err) {
