@@ -12,6 +12,7 @@ const {
     db_get_billing_report_summary,
     db_get_patch_data,
     db_search_billing_id,
+    db_update_billing_summary,
     db_updated_task,
 } = require("../dbcontrollers/billing.controller")
 
@@ -126,7 +127,6 @@ const prepareDataForCreateBilling = (postData) => {
             staff_name: postData.add_task_staff_name, task_note: postData.add_task_note, task_time_spend: postData.task_time_spend}]
     }
     if(postData.code == constant.CPT_CODE.CPT_99091){
-        console.log(postData);
         if(!postData.staff_name || !postData.date || !postData.task_time_spend || !postData.task_id){
             return false;
         }
@@ -198,6 +198,40 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
     return JSON.stringify(result);
 }
 
+const prepareDataCreateTaskBillingSummary = (postData) => {
+    let updateData = {};
+    if(postData.code == constant.CPT_CODE.CPT_99453){
+        updateData[`task_${constant.CPT_CODE.CPT_99453}`] = 1;
+    }
+
+    if(postData.code == constant.CPT_CODE.CPT_99457 || postData.code == constant.CPT_CODE.CPT_99458){
+        updateData[`task_${postData.code}`] = postData.task_time_spend;
+    }
+
+    if(postData.code == constant.CPT_CODE.CPT_99091){
+        updateData[`task_${postData.code}`] = postData.task_time_spend;
+    }
+    return updateData;
+}
+
+const prepareDataUpdateTaskBillingSummary = (billingData) => {
+    let updateData = {};
+    if(billingData.code == constant.CPT_CODE.CPT_99453){
+        updateData[`task_${constant.CPT_CODE.CPT_99453}`] = 1;
+    }
+
+    if(billingData.code == constant.CPT_CODE.CPT_99457 || billingData.code == constant.CPT_CODE.CPT_99458 
+        || billingData.code == constant.CPT_CODE.CPT_99091){
+        let taskDataCurrent = JSON.parse(billingData.params);
+        let totalTime = 0;
+        taskDataCurrent.map(item => {
+            totalTime += item.task_time_spend
+        })
+        updateData[`task_${billingData.code}`] = totalTime;
+    }
+    return updateData;
+}
+
 async function createBilling(req, res, next) {
     const t = await sequelizeDB.transaction()
     const pid = req.body.pid;
@@ -230,6 +264,11 @@ async function createBilling(req, res, next) {
             return db_update_billing(tenant_id, billing_data, {
                 transaction: t,
             })
+        })
+        setImmediate(() => {
+            let date = new Date()
+            let dataUpdateBillingSummary = prepareDataCreateTaskBillingSummary(req.body)
+            db_update_billing_summary(pid, date.toISOString(), dataUpdateBillingSummary);
         })
     } catch (err) {
         logger.debug("Billing list error " + err)
@@ -293,6 +332,12 @@ async function updateBillingTask(req, res, next) {
             return db_updated_task(billingTaskData, billingId, {
                 transaction: t,
             })
+        })
+        setImmediate( async () => {
+            let date = new Date()
+            const existBillingSaved = await db_search_billing_id(req.body);
+            let dataUpdateBillingSummary = prepareDataUpdateTaskBillingSummary(existBillingSaved[0])
+            db_update_billing_summary(pid, date.toISOString(), dataUpdateBillingSummary);
         })
     } catch (err) {
         logger.debug("Billing list error " + err)
