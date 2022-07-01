@@ -58,158 +58,6 @@ var Prescription = function (prescriptionobj) {
         (this.tenant_uuid = prescriptionobj.tenant_uuid)
 }
 
-async function db_get_prescription_list(tenant_id, username, params) {
-    prescription_list = ""
-    let { limit, offset, filter, pid } = params
-
-    let where = {}
-    where.active = 1
-
-
-    let limits = {};
-    if (limit) {
-        limits = {
-            offset: (offset) ? parseInt(offset) : 0,
-            limit: parseInt(limit)
-        }
-    }
-
-    //pid = "patient6f5f9749-617f-4e86-98f3-b391d414525f"
-
-    if (pid) {
-        where.pid = pid
-    }
-
-    // if(true) {
-    //     where[Op.and] = Sequelize.fn('DISTINCT', Sequelize.col('prescription_uuid')), 'prescription_uuid', 'date', 'drug', 'pid'
-    // }
-
-    //filter = {}
-    //filter.from = new Date('2021-03-02')
-    //filter.to = new Date('2021-03-03')
-
-    let include = []
-    let whereMedSched = {}
-    if (filter) {
-        /* //XXX - RGHV - LEAVE THIS IN THE CODE - TODO
-        if (filter.hasOwnPropery(period)) {
-            switch (filter.period) {
-                case 'morning':
-                    //where = Sequelize.where(Sequelize.fn('JSON_VALUE', Sequelize.col('drug'), '$.occurrence'), 'after breakfast')
-                    //where.$and = Sequelize.where(Sequelize.fn('ISJSON', Sequelize.col('drug')), 1)
-                    
-                    //where.drug = {}
-                    //where.drug.occurrence = {
-                    //    [Op.or]: ['before breakfast', 'after breakfast']
-                    //}
-                }
-        }*/
-
-        if (filter.hasOwnProperty('prsc_id')) {
-            whereMedSched.prescription_id = filter.prsc_id
-
-            if (filter.hasOwnProperty('from') && filter.hasOwnProperty('to')) {
-                whereMedSched.createdAt = {
-                    [Op.between]: [filter.from, filter.to]
-                }
-            } else if (filter.hasOwnProperty('from')) {
-                whereMedSched.createdAt = {
-                    [Op.between]: [filter.from, Date.now()]
-                }
-            } else if (filter.hasOwnProperty('to')) {
-                whereMedSched.createdAt = {
-                    [Op.lte]: filter.to
-                }
-            }
-
-            include.push({
-                model: MedSched,
-                attributes: [
-                    "endedAt",
-                    "createdAt",
-                    "updatedAt"
-                ],
-                where: whereMedSched
-            })
-        } else {
-            if (filter.hasOwnProperty('from') && filter.hasOwnProperty('to')) {
-                where = {
-                    [Op.and]: [{
-                        end_date: {
-                            [Op.lte]: filter.to
-                        }
-                    }, {
-                        date_added: {
-                            [Op.gte]: filter.from
-                        }
-                    }]
-                }
-            } else if (filter.hasOwnProperty('from')) {
-                where.createdAt = {
-                    [Op.between]: [filter.from, Date.now()]
-                }
-            } else if (filter.hasOwnProperty('to')) {
-                where.createdAt = {
-                    [Op.lte]: filter.to
-                }
-            }
-        }
-    }
-
-    if (pid) {
-        await Prescriptions.findAll({
-            include: include,
-            order: Sequelize.literal('date DESC'),
-            attributes: [Sequelize.fn('DISTINCT', Sequelize.col('prescription_uuid')), 'prescription_uuid', 'date', 'drug', 'pid', 'txDate', 'end_date', 'date_modified'],
-            raw: true,
-            nest: true,
-            where: where,
-            ...limits
-        })
-            .then((prescription_data) => {
-                logger.debug("Prescription list is" + prescription_data)
-                prescription_list = prescription_data
-            })
-            .catch((err) => {
-                logger.debug(
-                    "Prescription list fetch error " +
-                    tenant_id +
-                    "not found Err:" +
-                    err
-                )
-                throw new Error("Prescription list fetch error -  tenant check")
-            })
-        return prescription_list
-    } else {
-
-        await Prescriptions.findAll({
-            include: include,
-            order: ["id"],
-            raw: true,
-            nest: true,
-            where: where,
-            ...limits
-        })
-            .then((prescription_data) => {
-                logger.debug("Prescriptions list is" + prescription_data)
-
-                prescription_list = prescription_data
-            })
-            .catch((err) => {
-                logger.debug(
-                    "Prescriptions list fetch error " +
-                    minrr +
-                    "not found Err:" +
-                    err
-                )
-                throw new Error(
-                    "Prescriptions list fetch error -  tenant check"
-                )
-            })
-
-        return prescription_list
-    }
-}
 
 Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf())
@@ -396,6 +244,19 @@ async function db_create_prescription(params) {
         })
     } catch (error) {
         console.log(error)
+        throw new Error(error)
+    }
+}
+
+
+async function db_get_prescription_list(params) {
+    try {
+        return await Prescriptions.findAll({
+            where: {
+                pid: params.pid
+            }
+        })
+    } catch (error) {
         throw new Error(error)
     }
 }

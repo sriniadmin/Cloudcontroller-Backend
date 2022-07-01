@@ -62,11 +62,12 @@ exports.findAll = async (prsc_id, filter) => {
   }
 
   try {
-    return MedSched.findAll({ 
-      where: where, 
-      order: ["id"],
-      raw: true
-    })
+    return []
+    // return MedSched.findAll({ 
+    //   where: where, 
+    //   order: ["id"],
+    //   raw: true
+    // })
   } catch(err) {
       logger.error('MedSched Info Get error :', err)
       return {}

@@ -99,60 +99,60 @@ async function getPatientInfo(req, res, pid, medSched) {
 }
 
 async function getMedicationInfo(req) {
-    let tenantId = null
-    let username = null
-    let pid = null
-    let params = {}
+    // let tenantId = null
+    // let username = null
+    // let pid = null
+    // let params = {}
 
-    params.limit = undefined
-    params.offset = undefined
-    params.filter = undefined
-    params.pid = undefined
+    // params.limit = undefined
+    // params.offset = undefined
+    // params.filter = undefined
+    // params.pid = undefined
 
-    if (req) {
-        logger.debug('getMedicationInfo :', req.params)
+    // if (req) {
+    //     logger.debug('getMedicationInfo :', req.params)
 
-        tenantId = req.userTenantId
-        username = req.userName
-        if (req.query) {
-            if (req.query.hasOwnProperty('limit')) {
-                params.limit = req.query.limit
-            }
+    //     tenantId = req.userTenantId
+    //     username = req.userName
+    //     if (req.query) {
+    //         if (req.query.hasOwnProperty('limit')) {
+    //             params.limit = req.query.limit
+    //         }
 
-            if (req.query.hasOwnProperty('offset')) {
-                params.offset = req.query.offset
-            }
-        }
+    //         if (req.query.hasOwnProperty('offset')) {
+    //             params.offset = req.query.offset
+    //         }
+    //     }
 
-        if (req.params) {
-            if (req.params.hasOwnProperty('pid')) {
-                params.pid = req.params.pid
-            }
+    //     if (req.params) {
+    //         if (req.params.hasOwnProperty('pid')) {
+    //             params.pid = req.params.pid
+    //         }
 
-            if (req.params.hasOwnProperty('filter')) {
-                params.filter = req.params.filter
-            }
-        }
-    }
+    //         if (req.params.hasOwnProperty('filter')) {
+    //             params.filter = req.params.filter
+    //         }
+    //     }
+    // }
 
-    if (!tenantId) {
-        tenantList = await db_get_tenant_list(null, null)
-        logger.debug(tenantList[0])
-        tenantId = tenantList[0].tenant_uuid
-    }
+    // if (!tenantId) {
+    //     tenantList = await db_get_tenant_list(null, null)
+    //     logger.debug(tenantList[0])
+    //     tenantId = tenantList[0].tenant_uuid
+    // }
 
-    prescriptions = null
-    try {
-        prescriptions = await db_get_prescription_list(
-            tenantId,
-            username,
-            params
-        )
-        //logger.debug(prescriptions)
-    } catch (e) {
-        logger.debug("Exception : %s PID %s", e, pid)
-    }
-    return prescriptions
+    // prescriptions = null
+    // try {
+    //     prescriptions = await db_get_prescription_list(
+    //         tenantId,
+    //         username,
+    //         params
+    //     )
+    //     //logger.debug(prescriptions)
+    // } catch (e) {
+    //     logger.debug("Exception : %s PID %s", e, pid)
+    // }
+    return []
 }
 
 /* Move to common library file */

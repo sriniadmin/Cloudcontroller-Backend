@@ -12,49 +12,6 @@ const RBAC = require("../middleware/rbac")
 const getUUID = require("../lib/system/uuidSystem").getUUID
 const { UUID_CONST } = require("../lib/constants/AppEnum")
 
-async function db_get_role_list(tenant_id, params) {
-    logger.debug("the tenant id  in role is", tenant_id)
-    let { limit, offset, filter, role_name } = params
-    logger.debug("the role name is", params.role_name, typeof params.role_name)
-    let whereStatement = { tenant_id: tenant_id }
-    logger.debug("thw where statemant is", whereStatement)
-    logger.debug("the params are", params)
-    let role
-    if (params.role_name != '0') {
-        role = await Role.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            where: {
-                [Op.or]: [
-                    {
-                        role_name: {
-                            [Op.like]: `${params.role_name}`,
-                        },
-                    },
-                ],
-                [Op.and]: [
-                    {
-                        tenant_id: tenant_id,
-                    },
-                ],
-            },
-            raw: true,
-            //where: whereStatement,
-        })
-
-        return role
-    } else {
-        let role = await Role.findAll({
-            limit: parseInt(limit),
-            offset: parseInt(offset),
-            raw: true,
-            where: whereStatement,
-        })
-
-        return role
-    }
-}
-
 async function db_get_particular_role_list(tenant_id, role) {
     role_list = ""
     logger.debug("tenant is is", tenant_id)
@@ -368,6 +325,34 @@ async function db_role_exist(role_name, tenant_uuid) {
     }
     return role_data
 }
+
+
+async function db_get_role_list(params) {
+    try {
+        return await Role.findAll({
+            limit: parseInt(params.limit),
+            offset: parseInt(params.offset),
+            where: {
+                [Op.or]: [
+                    {
+                        role_name: {
+                            [Op.like]: `${params.role_name}`,
+                        },
+                    },
+                ],
+                [Op.and]: [
+                    {
+                        tenant_id: params.tenant_id,
+                    },
+                ],
+            },
+            raw: true,
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 module.exports = {
     db_get_role_list,

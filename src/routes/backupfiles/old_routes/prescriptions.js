@@ -42,55 +42,55 @@ const Prescriptions=models.prescriptions
 
 //Get Request
 
-router.get("/prescriptionsinventory", function (req, res, next) {
-    logger.debug("User info is ", req.userEmail, req.userRole)
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
+// router.get("/prescriptionsinventory", function (req, res, next) {
+//     logger.debug("User info is ", req.userEmail, req.userRole)
+//     email = req.userEmail
+//     username = email.split("@")[0]
+//     tenant_name = req.userTenant
 
-    tenant_id = db_get_tenant_id(tenant_name)
-        .then((tenant_id_result) => {
-            logger.debug("Tenant uuid outside " + tenant_id_result)
-            tenant_id = tenant_id_result
-            if (!tenant_id) {
-                error = new Error("Fetching Tenant list not working for this Request")
-                return res.status(TENANT_CODE["1"].HttpStatus).json({
-                    result: TENANT_CODE["1"].Code,
-                    response: {},
-                    error: {errMessage: TENANT_CODE["1"].Message},
-                    privilege: {}
-                })
-            }
-            db_get_prescription_list(tenant_id, username)
-                .then((prescriptions) => {
-                    logger.debug("Prescription list is " + prescriptions)
-                    return res.status(PRESCRIPTION_CODE["2"].HttpStatus).json({
-                        result: PRESCRIPTION_CODE["2"].Code,
-                        response: {"prescriptions": [prescriptions]},
-                        error: {},
-                        privilege: {}
-                    })
-                })
-                .catch((err) => {
-                    logger.debug("Prescription list error " + err)
-                    return res.status(PRESCRIPTION_CODE["1"].HttpStatus).json({
-                        result: PRESCRIPTION_CODE["1"].Code,
-                        response: {},
-                        error: {errMessage: PRESCRIPTION_CODE["1"].Message},
-                        privilege: {}
-                    })
-                })
-        })
-        .catch((err) => {
-            logger.error("Tenant Catch - date_added list error : " + err)
-            return res.status(TENANT_CODE["1"].HttpStatus).json({
-                result: TENANT_CODE["1"].Code,
-                response: {},
-                error: {errMessage: TENANT_CODE["1"].Message, errInfo: "Tenant Catch Error"},
-                privilege: {}
-            })
-        })
-})
+//     tenant_id = db_get_tenant_id(tenant_name)
+//         .then((tenant_id_result) => {
+//             logger.debug("Tenant uuid outside " + tenant_id_result)
+//             tenant_id = tenant_id_result
+//             if (!tenant_id) {
+//                 error = new Error("Fetching Tenant list not working for this Request")
+//                 return res.status(TENANT_CODE["1"].HttpStatus).json({
+//                     result: TENANT_CODE["1"].Code,
+//                     response: {},
+//                     error: {errMessage: TENANT_CODE["1"].Message},
+//                     privilege: {}
+//                 })
+//             }
+//             db_get_prescription_list(tenant_id, username)
+//                 .then((prescriptions) => {
+//                     logger.debug("Prescription list is " + prescriptions)
+//                     return res.status(PRESCRIPTION_CODE["2"].HttpStatus).json({
+//                         result: PRESCRIPTION_CODE["2"].Code,
+//                         response: {"prescriptions": [prescriptions]},
+//                         error: {},
+//                         privilege: {}
+//                     })
+//                 })
+//                 .catch((err) => {
+//                     logger.debug("Prescription list error " + err)
+//                     return res.status(PRESCRIPTION_CODE["1"].HttpStatus).json({
+//                         result: PRESCRIPTION_CODE["1"].Code,
+//                         response: {},
+//                         error: {errMessage: PRESCRIPTION_CODE["1"].Message},
+//                         privilege: {}
+//                     })
+//                 })
+//         })
+//         .catch((err) => {
+//             logger.error("Tenant Catch - date_added list error : " + err)
+//             return res.status(TENANT_CODE["1"].HttpStatus).json({
+//                 result: TENANT_CODE["1"].Code,
+//                 response: {},
+//                 error: {errMessage: TENANT_CODE["1"].Message, errInfo: "Tenant Catch Error"},
+//                 privilege: {}
+//             })
+//         })
+// })
 
 
 /**

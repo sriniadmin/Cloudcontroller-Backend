@@ -3358,67 +3358,6 @@ async function updatePatientPrescription(req, res, next) {
     return next()
 }
 
-// Validated
-async function getPatientPrescription(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist, prescriptions
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["5"]
-        req.apiRes["error"] = {
-            errMessage: "PATIENT DOES NOT EXIST ",
-        }
-        return next()
-    }
-
-    req.query.pid = req.params.pid
-    let finalPrescrition = []
-    try {
-        prescriptions = await db_get_prescription_list(
-            tenant_id,
-            username,
-            req.query
-        )
-        let prescriptionUUID = {}
-        for (let i = 0; i < prescriptions.length; i++) {
-            if (
-                Object.keys(prescriptionUUID).includes(
-                    prescriptions[i]["prescription_uuid"]
-                )
-            ) {
-                prescriptionUUID[prescriptions[i]["prescription_uuid"]][
-                    "drug"
-                ].push(prescriptions[i]["drug"][0])
-            } else {
-                prescriptionUUID[prescriptions[i]["prescription_uuid"]] =
-                    prescriptions[i]
-            }
-        }
-        for (const [key, value] of Object.entries(prescriptionUUID)) {
-            finalPrescrition.push(value)
-        }
-    } catch (e) {
-        req.apiRes = PRESCRIPTION_CODE["2"]
-        logger.debug("Exception : %s PID %s", e, given_pid)
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN FETCHING THE PRESCRIPTION ",
-        }
-        return next()
-    }
-    req.apiRes = PRESCRIPTION_CODE["2"]
-    req.apiRes["response"] = {
-        prescriptions: finalPrescrition,
-        count: finalPrescrition.length,
-    }
-
-    return next()
-}
 
 // EWS
 async function getEws(req, res, next) {
@@ -4052,11 +3991,10 @@ async function createPatientProcedure(req, res, next) {
 // }
 
 async function getPatientInventory(req, res, next) {
-    let given_pid = req.body.pid
-    let tenant_id = req.body.tenantId
-    let duration = 3
-
     try {
+        const given_pid = req.body.pid
+        const tenant_id = req.body.tenantId
+        const duration = 3
         const patients_list = await db_get_patient_inventory(req.body)
         const baseLineDict = await grpcCall(given_pid, duration, tenant_id)
         // const totalCount = await db_patient_count(tenant_id)
@@ -4454,6 +4392,28 @@ async function createPatientPrescription(req, res, next) {
     res.response(req.apiRes)
     return next()
 }
+
+
+async function getPatientPrescription(req, res, next) {
+    try {
+        const data = await db_get_prescription_list(req.params)
+        req.apiRes = PRESCRIPTION_CODE["2"]
+        req.apiRes["response"] = {
+            procedure_list: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PRESCRIPTION_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
 
 module.exports = {
     createPatientInBulk,

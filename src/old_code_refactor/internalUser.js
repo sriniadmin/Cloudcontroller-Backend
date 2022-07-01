@@ -1807,32 +1807,6 @@ async function createRole(req, res, next) {
     return next()
 }
 
-async function getRole(req, res, next) {
-    let tenant_id = req.query.tenant_id
-    let updatedTenant = req.userTenant
-    logger.debug('the updated tenant is', updatedTenant)
-    logger.debug("the filter is", req.query.filter)
-    let roles
-    try {
-        roles = await db_get_role_list(tenant_id, req.query)
-    } catch (err) {
-        logger.debug("Role list error " + err)
-        req.apiRes = ROLE_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING Role INVENTORY",
-        }
-        return next()
-    }
-    logger.debug("Role list is " + roles)
-    req.apiRes = ROLE_CODE["2"]
-    req.apiRes["response"] = {
-        roles: [roles],
-        count: roles.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 async function getRoleData(req) {
     logger.debug("the headers  in role are", req.headers)
     logger.debug("the session in role are", req.session)
@@ -2904,7 +2878,27 @@ async function getUserTenant(req, res, next) {
         }
         req.apiRes = USER_CODE["10"]
     }
+    res.response(req.apiRes)
+    return next()
+}
 
+
+async function getRole(req, res, next) {
+    try {
+        const data = await db_get_role_list(req.query)
+
+        req.apiRes = ROLE_CODE["2"]
+        req.apiRes["response"] = {
+            roles: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ROLE_CODE["1"]
+    }
     res.response(req.apiRes)
     return next()
 }
