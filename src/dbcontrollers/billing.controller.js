@@ -110,11 +110,14 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                         },
-                        bill_date: {
-                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
-                        },
+                        [Op.and]:[{
+                            bill_date: {
+                                [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+                            }
+                            }
+                        ]
                     },
                     {
                         billing_uuid: {
@@ -129,7 +132,7 @@ async function db_get_billing_report(tenant_id, params) {
                 ],
             },
             raw: false,
-            
+            logging: console.log
         })
 
         return billing
@@ -155,11 +158,11 @@ async function db_get_billing_report(tenant_id, params) {
                 [Op.and]: [
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                         },
                         [Op.and]:[{
                             bill_date: {
-                                [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                                [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
                             }
                             }
                         ]
@@ -171,7 +174,8 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: false
+            raw: false,
+            logging: console.log
         })
 
         return billing
@@ -204,15 +208,16 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD')
                         },
                         bill_date: {
-                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD')
                         },
                     },
                 ],
             },
             raw: false,
+            logging: console.log
             //where: whereStatement,
         })
 
