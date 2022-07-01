@@ -2,11 +2,13 @@ const Sequelize = require("sequelize")
 const Op = Sequelize.Op
 const moment = require('moment');
 const sequelizeDB = require("../config/emrmysqldb")
+const lodash = require("lodash")
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 var models = initModels(sequelizeDB)
 const logger = require("../config/logger")
 const Billing = models.billing
+const BillingSummary = models.billing_summary
 const PatchPatientMap = models.patch_patient_map
 
 models.billing.belongsTo(models.patch_patient_map, {
@@ -19,6 +21,18 @@ models.billing.belongsTo(models.patient_data, {
     targetKey: "pid",
    
 })
+
+models.billing_summary.belongsTo(models.patient_data, {
+    foreignKey: "pid",
+    targetKey: "pid",
+   
+})
+
+models.billing_summary.belongsTo(models.patch_patient_map, {
+    foreignKey: "pid",
+    targetKey: "pid",
+})
+
 
 models.billing.belongsTo(models.tasks, {
     foreignKey: "pid",
@@ -56,8 +70,7 @@ async function db_get_patch_data(params){
                     },
                 ],
             },
-            raw: true,
-            logging: console.log
+            raw: true
         })
     }
 } catch(err){
@@ -158,8 +171,7 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: false,
-            logging: console.log
+            raw: false
         })
 
         return billing
@@ -250,9 +262,6 @@ async function db_get_billing_report(tenant_id, params) {
     }
 }
 
-
-
-
 async function db_update_billing(tenant_id, billing_data, transaction) {
     let trans = null
     let id= billing_data['id'] ? await db_billing_pid_exist(billing_data['id']) : null;
@@ -316,6 +325,40 @@ async function db_updated_task(params, billing_id) {
       }
 }
 
+async function db_search_billing_summary_id(pid, bill_date){
+    let billing_summary_data
+    let startDate = moment(new Date(bill_date)).startOf('month').set({hour:0,minute:0,second:0}).format('YYYY-MM-DD HH:mm:ss');
+    let endDate = moment(new Date(bill_date)).endOf('month').set({hour:23,minute:59,second:59}).format('YYYY-MM-DD HH:mm:ss');
+    
+    try {
+        billing_summary_data = await BillingSummary.findAll({
+            where: {
+                [Op.and]: [
+                    {
+                        pid: pid
+                    },
+                    {
+                        date: {
+                            [Op.gte]: startDate
+                        },
+                        [Op.and]:[{
+                            date: {
+                                [Op.lte]: endDate
+                            }
+                            }
+                        ]
+                    },
+                ],
+            },
+            raw: true,
+            logging: console.log
+        })
+    } catch (err) {
+        throw new Error("Billing  " + pid + "not found Err:" + err)
+    }
+    return billing_summary_data
+}
+
 async function db_search_billing_id(postData) {
     let billing_data
     try {
@@ -344,8 +387,7 @@ async function db_search_billing_id(postData) {
                     },
                 ],
             },
-            raw: true,
-            logging: console.log
+            raw: true
         })
     } catch (err) {
         throw new Error("Billing  " + postData.pid + "not found Err:" + err)
@@ -355,11 +397,15 @@ async function db_search_billing_id(postData) {
 
 async function db_get_billing_report_summary(params) {
     try{
-    let { limit, offset, filter = null } = params
+    let { limit, offset, filter = null, sort = null, sortdir = 'DESC' } = params
+    let arrSort = ['id', 'ASC'];
     let billing;
+    if(sort){
+        arrSort = [sort, sortdir];
+    }
     if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
     if(!filter){
-    billing = await Billing.findAll({
+    billing = await BillingSummary.findAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
             include: [
@@ -373,22 +419,24 @@ async function db_get_billing_report_summary(params) {
                
             ],
             where: {
-                bill_date: {
+                date: {
                     [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
                 },
                 [Op.and]: [{
-                    bill_date: {
+                    date: {
                         [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
                     }
                 }
                 ]
             },
-            raw: false,
-            logging: console.log
+            order: [
+               arrSort
+            ],
+            raw: false
         })
         return billing
     } else {
-        billing = await Billing.findAll({
+        billing = await BillingSummary.findAll({
             limit: parseInt(limit),
             offset: parseInt(offset),
             include: [
@@ -399,11 +447,11 @@ async function db_get_billing_report_summary(params) {
                
             ],
             where: {
-                bill_date: {
+                date: {
                     [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
                 },
                 [Op.and]: [{
-                    bill_date: {
+                    date: {
                         [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
                     }
                 }
@@ -415,9 +463,10 @@ async function db_get_billing_report_summary(params) {
                     )
                 ]
             },
-            
-            raw: false,
-            logging: console.log
+            order: [
+                arrSort
+             ],
+            raw: false
         })
         return billing
     }
@@ -457,6 +506,28 @@ async function db_update_billing_information(tenant_id, billing_data, given_pid,
     return billing
 }
 
+async function db_update_billing_summary(pid, billDate, params){
+    let billing_summary_record = await db_search_billing_summary_id(pid, billDate);
+    let result = null;
+    if(billing_summary_record && lodash.isArray(billing_summary_record) && billing_summary_record.length > 0){
+        try {
+            result = await BillingSummary.update(
+              params,
+              { where: {id: billing_summary_record[0].id } }
+            )
+            return result;
+          } catch (err) {
+            throw new Error("Billing Summary  " + "not found Err:" + err)
+          }
+    } else {
+        result = await BillingSummary.create({
+            pid: pid,
+            date: billDate,
+            ...params
+        })
+    }
+    return result;
+}
 module.exports = {
     db_update_billing,
     db_get_billing_report,
@@ -466,5 +537,6 @@ module.exports = {
     db_search_billing_id,
     db_updated_task,
     db_get_billing_report_summary,
+    db_update_billing_summary,
     db_get_patch_data
 }

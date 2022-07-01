@@ -103,10 +103,11 @@ async function getPatientInfo(req, res, pid, al) {
  *               type: string
  *            description: From time.
  *          - in: query
- *            name: to
+ *            name: date
  *            schema:
  *               type: string
- *            description: To time.
+ *            description: Date to search.
+ * 
  */
 router.get("/", getAlertData, apiFinalProcess)
 // router.get("/", function (req, res, next) {

@@ -14,6 +14,7 @@ var _background_services = require("./background_services")
 var _batchcom = require("./batchcom")
 var _benefit_eligibility = require("./benefit_eligibility")
 var _billing = require("./billing")
+var _billing_summary = require("./billing_summary")
 var _calendar_external = require("./calendar_external")
 var _categories = require("./categories")
 var _categories_seq = require("./categories_seq")
@@ -292,6 +293,7 @@ function initModels(sequelize) {
     var batchcom = _batchcom(sequelize, DataTypes)
     var benefit_eligibility = _benefit_eligibility(sequelize, DataTypes)
     var billing = _billing(sequelize, DataTypes)
+    var billing_summary = _billing_summary(sequelize, DataTypes)
     var calendar_external = _calendar_external(sequelize, DataTypes)
     var categories = _categories(sequelize, DataTypes)
     var categories_seq = _categories_seq(sequelize, DataTypes)
@@ -610,6 +612,7 @@ function initModels(sequelize) {
         batchcom,
         benefit_eligibility,
         billing,
+        billing_summary,
         calendar_external,
         categories,
         categories_seq,
