@@ -731,7 +731,7 @@ async function db_get_device_id(params) {
     }
 }
 
-async function db_create_device(params) {
+async function db_create_device(params, transaction) {
     try {
         return await Patches.create(
             {
@@ -750,17 +750,20 @@ async function db_create_device(params) {
                 tenant_id: params.body.tenantId,
                 phone: params.body.data[0]["phone"],
             },
+            { transaction: transaction["transaction"] }
         )
     } catch (error) {
         throw new Error(error)
     }
 }
 
-async function db_check_duplicate_device(params) {
+async function db_check_duplicate_device(params, transaction) {
     try {
         return await Patches.findOne({
             where: params
-        })
+        },
+        {transaction: transaction["transacation"]}
+	)
     } catch (error) {
         throw new Error(error)
     }
