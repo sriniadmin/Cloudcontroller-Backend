@@ -845,7 +845,7 @@ async function db_edit_patient(params) {
     }
 }
 
-async function db_add_new_patient(params) {
+async function db_add_new_patient(params, transaction) {
     try {
         if(!params.patient_type){
             params.patient_type = 'remote'
@@ -856,7 +856,7 @@ async function db_add_new_patient(params) {
         data.disabled = 1
         data.status = "active"
         return await Patients_Data.create(
-            data
+            data, {transaction: transaction}
         )
     } catch (err) {
         console.log(err)
