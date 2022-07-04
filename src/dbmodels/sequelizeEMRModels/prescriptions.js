@@ -131,14 +131,14 @@ module.exports = function (sequelize, DataTypes) {
       }
     },
     date_added: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true,
       validate: {
         isDate: true
       }
     },
     date_modified: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true,
       validate: {
         isDate: true
@@ -242,7 +242,7 @@ module.exports = function (sequelize, DataTypes) {
       }
     },
     filled_date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true
     },
     medication: {
@@ -344,7 +344,7 @@ module.exports = function (sequelize, DataTypes) {
       }
     },
     txDate: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     tenant_uuid: {

@@ -43,7 +43,7 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true
         },
         date_of_treatment: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.DATE,
             allowNull: true
         },
         treatment: {
