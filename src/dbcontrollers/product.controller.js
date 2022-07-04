@@ -123,9 +123,7 @@ async function db_get_product_list(params) {
         }
         return await Products.findAll({
             attributes: ["route", "product_name", "form", "marketing_status", "generic_name", ["active_ingredient_count", "strength"]],
-            where: {
-                product_name: { [Op.iLike]: `%${params.product_name}%` },
-            },
+            where: condition,
             limit: params.limit,
             order: [["product_name", "ASC"]]
         })
