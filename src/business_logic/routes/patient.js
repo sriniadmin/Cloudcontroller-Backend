@@ -530,7 +530,7 @@ async function deletePatient(req, res, next) {
 
 // Validated
 async function getUserPatientMap(req, res, next) {
-    logger.debug("User info is ", req.userEmail, req.userRole, req.params)
+    console.log("User info is ", req.userEmail, req.userRole, req.params)
     let username = req.userName
     let given_pid = req.params.pid
     let tenant_id = req.userTenantId
@@ -575,7 +575,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             duration: duration,
             tenantUUID: tenant_id,
         }
-        logger.debug("Patient GRPC calling.. ", tenant_id)
+        console.log("Patient GRPC calling.. ", tenant_id)
         // baselineResult = await patientDetailsGRPC(patientInventoryJSON)
 
         baselineResult = {"status":1,"result":{"code":14,"details":"Name resolution failed for target dns:sensor_consumer:9010","metadata":{}}}
@@ -585,7 +585,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
         tempbaselineResult[0]["patientUUID"] = given_pid
         if (parseInt(baselineResult["status"]) != 0) {
             // patientList will be loaded with error
-            logger.error("Patient List from GRPC is errored")
+            console.log("Patient List from GRPC is errored")
             // req.apiRes = PATIENT_CODE["1"]
             // req.apiRes["error"] = {
             //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
@@ -593,7 +593,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             // return next()
         }
     } catch (err) {
-        logger.debug("Patient Inventory Fetch Error GRPC " + err)
+        console.log("Patient Inventory Fetch Error GRPC " + err)
         // req.apiRes = PATIENT_CODE["1"]
         // req.apiRes["error"] = {
         //     errMessage: "Patient Inventory Fetch Error RPC",
@@ -607,12 +607,12 @@ async function grpcCall(given_pid, duration, tenant_id) {
             .filter((item) => item !== undefined && item !== null)
         pidlist = [given_pid]
     } catch (error) {
-        logger.debug("Pid List failed.. Sorting based on Name")
+        console.log("Pid List failed.. Sorting based on Name")
     }
     if (pidlist.length > 0) {
-        logger.debug("Pid list is ", pidlist.length)
+        console.log("Pid list is ", pidlist.length)
     } else {
-        logger.error(
+        console.log(
             "The Baseline Provided info has no patients - Something went really wrong",
             baselineResult
         )
