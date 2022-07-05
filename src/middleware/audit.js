@@ -39,7 +39,7 @@ auditorLoadCfg = function () {
     fs.readFile('./src/middleware/audit.json', (err, data) => {
         if (err) throw err;
         auditRoutesCfg = JSON.parse(data);
-        console.log("AUDIT]: Config loaded... ", auditRoutesCfg);
+        // console.log("AUDIT]: Config loaded... ", auditRoutesCfg);
         return auditRoutesCfg
     })
 }
@@ -65,18 +65,18 @@ auditor = function (req, res, next) {
     }
 
         
-    console.log("Date ", date)
-    console.log("IP ", ip)
-    console.log("Path ", path)
-    console.log("Params ", params)
-    console.log("Body ", body)
-    console.log("Query ", query)
+    // console.log("Date ", date)
+    // console.log("IP ", ip)
+    // console.log("Path ", path)
+    // console.log("Params ", params)
+    // console.log("Body ", body)
+    // console.log("Query ", query)
 
     _url = path.split('/', 3)
     basePath = '/'+_url[1]+'/'+_url[2]
-    console.log(req.method)
-    console.log(req.userEmail)
-    console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
+    // console.log(req.method)
+    // console.log(req.userEmail)
+    // console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
 
     /*
     let auditLog = Object.create(auditLogCtrlr.AuditLogObj)
@@ -95,10 +95,10 @@ auditor = function (req, res, next) {
         routes = Object.keys(auditRoutesCfg.route)
         for (let i = 0; i < routes.length; ++i) {
             const rt = routes[i]
-            console.log("Route :", rt, path)
+            // console.log("Route :", rt, path)
             let re = new RegExp(rt)
             let match = re.exec(path)
-            console.log(match)
+            // console.log(match)
             if (match) {
                 adRt = auditRoutesCfg.route[rt]
      

@@ -223,7 +223,7 @@ async function getUserInventory(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -270,7 +270,7 @@ async function createUuid(req, res, next) {
         uuid: uuid_result,
         count: uuid_result.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -467,7 +467,7 @@ async function getReport(req, res, next) {
     req.apiRes["response"] = {
         reportData: report,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -493,7 +493,7 @@ async function getImages(req, res, next) {
     req.apiRes["response"] = {
         imagesData: images,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -514,7 +514,7 @@ async function validateModels(req, res, next) {
     req.apiRes["response"] = {
         modelValidation: model_result,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -695,7 +695,7 @@ async function logoutUser(req, res, next) {
         logger.debug(`Alert ERROR : ${err.message}`)
     }
     req.apiRes = SYSTEM_AAA_CODE["7"]
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -712,7 +712,7 @@ async function getSelectBoxPatch(req, res, next) {
         patches: data,
         count: data.length
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -770,7 +770,7 @@ async function getPatchInventory(req, res, next) {
         count: filtered_patches.length,
         patchTotalCount: totalCount,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1035,7 +1035,7 @@ async function getTenant(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1189,7 +1189,7 @@ async function getBed(req, res, next) {
         beds: [beds],
         count: beds.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1237,7 +1237,7 @@ async function createBed(req, res, next) {
         beds: [beds],
         count: beds.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1264,7 +1264,7 @@ async function getConnector(req, res, next) {
         connectors: connectors,
         count: connectors.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1338,7 +1338,7 @@ async function createConnector(req, res, next) {
 //         products: products,
 //         count: products.length,
 //     }
-//     res.response(req.apiRes)
+//     res.send(req.apiRes)
 //     return next()
 // }
 
@@ -1514,7 +1514,7 @@ async function getLocation(req, res, next) {
         count: locations.length,
         locationTotalCount: totalCount,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1535,7 +1535,7 @@ async function getRemoteLocation(req, res, next) {
     req.apiRes["response"] = {
         locations: locations,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1563,7 +1563,7 @@ async function getFacility(req, res, next) {
         facilities: [facilities],
         count: facilities.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1803,7 +1803,7 @@ async function createRole(req, res, next) {
         role_data: newRole,
         count: newRole.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -1919,7 +1919,7 @@ async function checkPatchSerial(req, res, next) {
     req.apiRes["response"] = {
         patches: patch_data,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2146,7 +2146,7 @@ async function createLabReport(req, res, next) {
     req.apiRes["response"] = {
         Lab_Report: reports,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2169,7 +2169,7 @@ async function getLabReport(req, res, next) {
     req.apiRes["response"] = {
         Lab_Report: reports,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2225,7 +2225,7 @@ async function createTasks(req, res, next) {
     req.apiRes["response"] = {
         tasksData: tasks,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2249,7 +2249,7 @@ async function getTask(req, res, next) {
     req.apiRes["response"] = {
         taskData: tasks,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2329,7 +2329,7 @@ async function passwordReset(req, res, next) {
         return next()
     }
     req.apiRes = PASSWORD_CODE["1"]
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2376,7 +2376,7 @@ async function getProfiles(req, res, next) {
     let pidCount = await dbProfileExists(pid)
     if (pidCount === 0) {
         req.apiRes = PROFILE_CODE["5"]
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
     try {
@@ -2387,10 +2387,10 @@ async function getProfiles(req, res, next) {
         logger.debug(`Profile fetch ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["1"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2412,7 +2412,7 @@ async function postProfiles(req, res, next) {
 
     if (pidCount === 1) {
         req.apiRes = PROFILE_CODE["6"]
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
 
@@ -2425,10 +2425,10 @@ async function postProfiles(req, res, next) {
         logger.debug(`Profile create ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["4"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2439,7 +2439,7 @@ async function putProfiles(req, res, next) {
 
     if (pidCount === 0) {
         req.apiRes = PROFILE_CODE["5"]
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
     profileData["profile_data"] = req.body[0]
@@ -2452,10 +2452,10 @@ async function putProfiles(req, res, next) {
         logger.debug(`Profile update ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["8"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2475,10 +2475,10 @@ async function deletePatch(req, res, next) {
         console.log(error)
         req.apiRes = DEVICE_CODE["4"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2491,10 +2491,10 @@ async function getDeviceType(req, res, next) {
         console.log(error)
         req.apiRes = DEVICE_CODE["8"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2517,7 +2517,7 @@ async function getPathSaas(req, res, next) {
         req.apiRes["response"] = {error: error}
     }
     
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2545,7 +2545,7 @@ async function createDevice(req, res, next) {
 
         if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             if (t) {
                 await t.rollback();
             }
@@ -2553,7 +2553,7 @@ async function createDevice(req, res, next) {
         }
         else if(check_number){
             req.apiRes = PATCH_CODE["15"]
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             if (t) {
                 await t.rollback();
             }
@@ -2569,7 +2569,7 @@ async function createDevice(req, res, next) {
                 const check_sim = await db_check_duplicate_device(condition, t)
                 if(check_sim){
                     req.apiRes = PATCH_CODE["18"]
-                    res.response(req.apiRes)
+                    res.send(req.apiRes)
                     if (t) {
                         await t.rollback();
                     }
@@ -2585,7 +2585,7 @@ async function createDevice(req, res, next) {
                 const check_phone = await db_check_duplicate_device(condition, t)
                 if(check_phone){
                     req.apiRes = PATCH_CODE["19"]
-                    res.response(req.apiRes)
+                    res.send(req.apiRes)
                     if (t) {
                         await t.rollback();
                     }
@@ -2605,7 +2605,7 @@ async function createDevice(req, res, next) {
             const data = await db_create_device(req, t)
             req.apiRes = PATCH_CODE["3"]
             req.apiRes["response"] = { data: data }
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             await t.commit()
             return next()
         }
@@ -2613,7 +2613,7 @@ async function createDevice(req, res, next) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         if (t) {
             await t.rollback();
         }
@@ -2633,7 +2633,7 @@ async function recall(length, number, req, res, next, transaction) {
                 HttpStatus: "470",
                 Message: `Tag: "${tags[number]}" is already exist`,
             }
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             await transaction.rollback();
             return next()
         }
@@ -2644,7 +2644,7 @@ async function recall(length, number, req, res, next, transaction) {
             const data = await db_create_device(req,  transaction)
             req.apiRes = PATCH_CODE["3"]
             req.apiRes["response"] = { data: data }
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             await transaction.commit();
             return next()
         }
@@ -2653,7 +2653,7 @@ async function recall(length, number, req, res, next, transaction) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         await transaction.rollback();
         return next()
     }
@@ -2680,7 +2680,7 @@ async function getDevice(req, res, next) {
         req.apiRes = PATCH_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2702,7 +2702,7 @@ async function getProduct(req, res, next) {
         req.apiRes = PRODUCT_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2722,7 +2722,7 @@ async function createProduct(req, res, next) {
         req.apiRes = PRODUCT_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2742,7 +2742,7 @@ async function updatePatch(req, res, next) {
         req.apiRes = PATCH_CODE["17"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2764,7 +2764,7 @@ async function updatePatch(req, res, next) {
 //         req.apiRes = TENANTS_CODE["1"]
 //     }
 
-//     res.response(req.apiRes)
+//     res.send(req.apiRes)
 //     return next()
 // }
 
@@ -2785,7 +2785,7 @@ async function getUserProfile(req, res, next) {
         req.apiRes = USER_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2795,12 +2795,12 @@ async function createUser(req, res, next) {
         const exist = await db_get_user(req.body)
         if(exist && exist.email === req.body.email){
             req.apiRes = USER_CODE["11"]
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             return next()
         }
         else if(exist && exist.username === req.body.username){
             req.apiRes = USER_CODE["12"]
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             return next()
         }
         const t = await sequelizeDB.transaction()
@@ -2819,7 +2819,7 @@ async function createUser(req, res, next) {
         req.apiRes = USER_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2829,12 +2829,12 @@ async function updateUser(req, res, next) {
         // const exist = await db_get_user(req.body)
         // if(exist && exist.email === req.body.email){
         //     req.apiRes = USER_CODE["11"]
-        //     res.response(req.apiRes)
+        //     res.send(req.apiRes)
         //     return next()
         // }
         // else if(exist && exist.username === req.body.username){
         //     req.apiRes = USER_CODE["12"]
-        //     res.response(req.apiRes)
+        //     res.send(req.apiRes)
         //     return next()
         // }
         await db_update_user(req.body)
@@ -2850,7 +2850,7 @@ async function updateUser(req, res, next) {
         req.apiRes = USER_CODE["13"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2878,7 +2878,7 @@ async function resetDevice(req, res, next) {
         }
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2899,7 +2899,7 @@ async function getUserTenant(req, res, next) {
         }
         req.apiRes = USER_CODE["10"]
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -2920,7 +2920,7 @@ async function getRole(req, res, next) {
         }
         req.apiRes = ROLE_CODE["1"]
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 

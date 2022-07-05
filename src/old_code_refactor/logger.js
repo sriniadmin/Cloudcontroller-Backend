@@ -100,7 +100,7 @@ async function getLoggerData(req, res, next) {
         req.apiRes = ALERT_CODE["1"]
         req.apiRes["error"] = { error: error }
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 

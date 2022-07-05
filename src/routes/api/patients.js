@@ -1412,7 +1412,7 @@ function newD(req, res, next) {
         patientMedicationData: medication,
         count: medication.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next();
 }
 /**

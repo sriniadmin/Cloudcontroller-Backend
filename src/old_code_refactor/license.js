@@ -52,7 +52,7 @@ async function createLicense(req, res, next) {
         licenseData: license,
         count: license.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 const redisClient = require("../external_services/redis/cache_service/redis_client")
@@ -87,7 +87,7 @@ async function getLicense(req, res, next) {
         licenseData: license,
         count: license.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
