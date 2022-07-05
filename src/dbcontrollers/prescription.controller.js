@@ -6,7 +6,7 @@ var initModels =
 var models = initModels(sequelizeDB)
 
 const logger = require("../config/logger")
-const uuidAPIKey = require("uuid-apikey")
+const uuidAPIKey = require("uuid-apikey");
 const Tenants = models.tenant
 const MedSched = models.medsched
 const Prescriptions = models.prescriptions
@@ -59,29 +59,32 @@ var Prescription = function (prescriptionobj) {
 }
 
 
-Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf())
-    date.setDate(date.getDate() + days)
-    // logger.debug("Date add ",date, days)
-    return date
-}
+
 
 function get_endDate(presData, startDate) {
-    let tempDate = new Date(startDate)
-    logger.debug('values are', presData, startDate)
-    logger.debug('tempdate is', tempDate)
-    logger.debug('object values are', presData['strength'])
-    freq = presData['frequency']
-    freqPeriod = presData['frequencyPeriod']
-    logger.debug("end date calculation", freq, freqPeriod, tempDate)
-    if (freq.includes('day')) {
-        daysToAdd = freqPeriod
-    } else if (freq.includes('week')) {
-        daysToAdd = freqPeriod * 7
-    } else if (freq.includes('month')) {
-        daysToAdd = freqPeriod * 30
-    }
-    return tempDate.addDays(parseInt(daysToAdd))
+    let daysToAdd = 0
+    presData.forEach(obj => {
+        const freq = obj['frequency']
+        const freqPeriod = parseInt(obj['frequencyPeriod'])
+        if (freq.includes('day')) {
+            const days = freqPeriod
+            if(daysToAdd < days){
+                daysToAdd = days
+            }
+        } else if (freq.includes('week')) {
+            const days = freqPeriod * 7
+            if(daysToAdd < days){
+                daysToAdd = days
+            }
+        } else if (freq.includes('month')) {
+            const days = freqPeriod * 30
+            if(daysToAdd < days){
+                daysToAdd = days
+            }
+        }
+    });
+
+    return new Date(startDate).setDate(new Date(startDate).getDate() + daysToAdd)
 }
 
 
@@ -196,52 +199,55 @@ async function db_delete_prescription(given_pid, transaction) {
 }
 
 
-async function db_create_prescription(params) {
+async function db_create_prescription(params, transaction) {
     try {
-        let endDate = get_endDate(params.drug[0], params["date_added"])
+        let endDate = get_endDate(params.drug, params["date_added"])
 
-        return await Prescriptions.create({
-            prescription_uuid: params["prescription_uuid"],
-            substitute: params["substitute"],
-            site: params["site"],
-            filled_by_id: params["filled_by_id"],
-            pharmacy_id: params["pharmacy_id"],
-            date_added: params["date_added"],
-            date_modified: params["date_modified"],
-            provider_id: params["provider_id"],
-            encounter: params["encounter"],
-            drug: params.drug,
-            drug_uuid: params["drug_uuid"],
-            rxnorm_drugcode: params["rxnorm_drugcode"],
-            form: params["form"],
-            dosage: params["dosage"],
-            quantity: params["quantity"],
-            size: params["size"],
-            unit: params["unit"],
-            route: params["route"],
-            interval: params["interval"],
-            refills: params["refills"],
-            per_refill: params["per_refill"],
-            filled_date: params["filled_date"],
-            medication: params["medication"],
-            note_uuid: params["note_uuid"],
-            active: params["active"],
-            datetime: params["datetime"],
-            prac_uuid: params["prac_uuid"],
-            prescriptionguid: params["prescriptionguid"],
-            erx_source: params["erx_source"],
-            erx_uploaded: params["erx_uploaded"],
-            drug_info_erx: params["drug_info_erx"],
-            external_id: params["external_id"],
-            end_date: endDate,
-            indication: params["indication"],
-            prn: params["prn"],
-            ntx: params["ntx"],
-            rtx: params["rtx"],
-            txDate: params["txDate"],
-            tenant_uuid: params["tenant_uuid"],
-            pid: params["pid"],
-        })
+        return await Prescriptions.create(
+            {
+                prescription_uuid: params["prescription_uuid"],
+                substitute: params["substitute"],
+                site: params["site"],
+                filled_by_id: params["filled_by_id"],
+                pharmacy_id: params["pharmacy_id"],
+                date_added: params["date_added"],
+                date_modified: params["date_modified"],
+                provider_id: params["provider_id"],
+                encounter: params["encounter"],
+                drug: params.drug,
+                drug_uuid: params["drug_uuid"],
+                rxnorm_drugcode: params["rxnorm_drugcode"],
+                form: params["form"],
+                dosage: params["dosage"],
+                quantity: params["quantity"],
+                size: params["size"],
+                unit: params["unit"],
+                route: params["route"],
+                interval: params["interval"],
+                refills: params["refills"],
+                per_refill: params["per_refill"],
+                filled_date: params["filled_date"],
+                medication: params["medication"],
+                note_uuid: params["note_uuid"],
+                active: params["active"],
+                datetime: params["datetime"],
+                prac_uuid: params["prac_uuid"],
+                prescriptionguid: params["prescriptionguid"],
+                erx_source: params["erx_source"],
+                erx_uploaded: params["erx_uploaded"],
+                drug_info_erx: params["drug_info_erx"],
+                external_id: params["external_id"],
+                end_date: endDate,
+                indication: params["indication"],
+                prn: params["prn"],
+                ntx: params["ntx"],
+                rtx: params["rtx"],
+                txDate: params["txDate"],
+                tenant_uuid: params["tenant_uuid"],
+                pid: params["pid"]
+            },
+            { transaction: transaction }
+        )
     } catch (error) {
         console.log(error)
         throw new Error(error)

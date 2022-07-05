@@ -856,7 +856,8 @@ async function db_add_new_patient(params, transaction) {
         data.disabled = 1
         data.status = "active"
         return await Patients_Data.create(
-            data, {transaction: transaction}
+            data, 
+            {transaction: transaction}
         )
     } catch (err) {
         console.log(err)

@@ -3301,7 +3301,7 @@ async function addNewPatient(req, res, next) {
             req.apiRes = PATIENT_CODE["6"]
             req.apiRes["error"] = {
                 isExist: true,
-        error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
             res.response(req.apiRes)
             if (t) {
@@ -3569,11 +3569,11 @@ async function updatePatientProcedure(req, res, next) {
 
 
 async function createPatientPrescription(req, res, next) {
+    const t = await sequelizeDB.transaction()
     try {
-        const t = await sequelizeDB.transaction()
         const uuidDict = { uuidType: UUID_CONST["prescription"], tenantID: 0 }
-        req.body.procedure_uuid = await getUUID(uuidDict, { transaction: t })
-        await db_create_prescription(req.body)
+        req.body.prescription_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_create_prescription(req.body, t)
         req.apiRes = PRESCRIPTION_CODE["3"]
         req.apiRes["response"] = {
             data: req.body
@@ -3587,6 +3587,7 @@ async function createPatientPrescription(req, res, next) {
     }
 
     res.response(req.apiRes)
+    await t.commit()
     return next()
 }
 
