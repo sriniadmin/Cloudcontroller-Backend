@@ -47,7 +47,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: true
         },
         treatment: {
-            type: DataTypes.JSON,
+            type: DataTypes.STRING(255),
             allowNull: true
         },
         hospital_name: {

@@ -1244,6 +1244,18 @@ let MEDICAL_HISTORY_CODE = {
         Message: "Failure in creating the new medical history  information",
         Details: {},
     },
+    5: {
+        Code: "UPDATE_MEDICAL_HISTORY_SUCCESS",
+        HttpStatus: "200",
+        Message: "Success in updating the medical history information",
+        Details: {},
+    },
+    6: {
+        Code: "UPDATE_MEDICAL_HISTORY_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the new medical history  information",
+        Details: {},
+    },
 }
 
 let ALLERGY_CODE = {

@@ -77,48 +77,6 @@ const MedicalHistory = models.medical_history
 
 // }
 
-async function db_update_medical_history(tenant_id, medical_history_data, given_pid, transaction) {
-    let { pid } = given_pid
-    let medical_history_uuid = medical_history_data["medical_history_uuid"]
-    if (!medical_history_data) return
-    let medical_history_list = ""
-    logger.debug("medical History data is " + medical_history_data)
-    console.log(medical_history_data)
-
-    await MedicalHistory.update(
-        {
-            date_of_treatment: medical_history_data["date_of_treatment"],
-            treatment: medical_history_data["treatment"],
-            hospital_name: medical_history_data["hospital_name"],
-            doctor_name: medical_history_data["doctor_name"],
-            note: medical_history_data["note"],
-            date: medical_history_data["date"],
-            tenant_id: medical_history_data["tenant_id"],
-            pid: medical_history_data["pid"],
-            medical_history_uuid: medical_history_data["medical_history_uuid"],
-            symptoms:medical_history_data["symptoms"]
-        },
-        {
-            where: {
-                medical_history_uuid: medical_history_uuid,
-            },
-        },
-        { transaction: transaction["transaction"] }
-    )
-
-        .then((medical_history_data) => {
-            logger.debug("Medical history insert output is" + medical_history_data)
-            medical_history_list = medical_history_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "Medical History insert  error " + tenant_id + " not found Err:" + err
-            )
-            throw new Error("Medical History insert  error -  tenant check")
-        })
-
-    return medical_history_list
-}
 
 async function db_get_medical_history_list(params) {
     try {
@@ -149,6 +107,23 @@ async function db_add_medical_history(params) {
             documents: params["documents"] || null
         }
         return await MedicalHistory.create(obj)
+    } catch (err) {
+        console.log(err)
+        throw new Error(err)
+    }
+}
+
+
+async function db_update_medical_history(params) {
+    try {
+        return await MedicalHistory.update(
+            params,
+            {
+                where: {
+                    medical_history_uuid: params.medical_history_uuid
+                }
+            }
+        )
     } catch (err) {
         console.log(err)
         throw new Error(err)
