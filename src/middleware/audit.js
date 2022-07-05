@@ -76,7 +76,9 @@ auditor = function (req, res, next) {
     basePath = '/'+_url[1]+'/'+_url[2]
     console.log(req.method)
     console.log(req.userEmail)
+    if(basePath.indexOf('liveapi') == -1){
     console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
+    }
 
     /*
     let auditLog = Object.create(auditLogCtrlr.AuditLogObj)
