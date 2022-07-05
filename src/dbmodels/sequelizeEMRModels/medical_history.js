@@ -43,11 +43,11 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true
         },
         date_of_treatment: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.DATE,
             allowNull: true
         },
         treatment: {
-            type: DataTypes.JSON,
+            type: DataTypes.STRING(255),
             allowNull: true
         },
         hospital_name: {

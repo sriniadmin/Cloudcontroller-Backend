@@ -414,7 +414,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: "",
             },
             DOB: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: false,
                 validate: {
                     isDate: true,
@@ -513,7 +513,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: "",
             },
             admission_date: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
                 validate: {
                     isDate: true,
@@ -764,12 +764,12 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: "standard",
             },
             regdate: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
                 comment: "Registration Date",
             },
             contrastart: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
                 comment: "Date contraceptives initially used",
             },
@@ -779,7 +779,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: "NO",
             },
             ad_reviewed: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
             },
             vfc: {
@@ -817,7 +817,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: "",
             },
             deceased_date: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
                 validate: {
                     isDate: true
@@ -963,7 +963,7 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: Sequelize.fn("now"),
             },
             discharge_date: {
-                type: DataTypes.DATEONLY,
+                type: DataTypes.DATE,
                 allowNull: true,
                 // validate: {
                 //     isDate: true,

@@ -148,9 +148,26 @@ const Procedure = models.procedure
 
 async function db_get_procedure_list(params) {
     try {
+        if (!params.date) {
+            return await Procedure.findAll({
+                where: {
+                    pid: params.pid
+                },
+                order: [["id", "DESC"]]
+            })
+        }
         return await Procedure.findAll({
             where: {
-                pid: params.pid
+                pid: params.pid,
+                date: {
+                    [Op.gte]: new Date(moment(params.date).format('YYYY-MM-DD')).setHours(00, 00, 00)
+                },
+                [Op.and]: [{
+                    date: {
+                        [Op.lte]: new Date(moment(params.date).format('YYYY-MM-DD')).setHours(23, 59, 59)
+                    }
+                }
+                ]
             },
             order: [["id", "DESC"]]
         })

@@ -10,6 +10,7 @@ const {
     db_billing_pid_exist,
     db_update_billing_information,
     db_get_billing_report_summary,
+    db_get_billing_report_count,
     db_get_patch_data,
     db_search_billing_id,
     db_update_billing_summary,
@@ -75,6 +76,7 @@ async function getBillingTotalSummary(req, res, next) {
     let patchData = [];
     try {
         billing = await db_get_billing_report_summary(req.query)
+        let billingCount = await db_get_billing_report_count(req.query)
         let listPids = [];
         billing.map(item => {
             if(!listPids.includes(item.pid)){
@@ -99,7 +101,8 @@ async function getBillingTotalSummary(req, res, next) {
     req.apiRes = BILLING_CODE["2"]
     req.apiRes["response"] = {
         billingData: billing,
-        patchData: patchData
+        patchData: patchData,
+        count: billingCount
     }
     res.response(req.apiRes)
     return next()

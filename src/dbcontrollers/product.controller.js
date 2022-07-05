@@ -118,14 +118,12 @@ async function db_get_product_list(params) {
         if(params.generic_name){
             condition.generic_name = { [Op.iLike]: `%${params.generic_name}%` }
         }
-        if(params.generic_name){
+        if(params.product_name){
             condition.product_name = { [Op.iLike]: `%${params.product_name}%` }
         }
         return await Products.findAll({
             attributes: ["route", "product_name", "form", "marketing_status", "generic_name", ["active_ingredient_count", "strength"]],
-            where: {
-                product_name: { [Op.iLike]: `%${params.product_name}%` },
-            },
+            where: condition,
             limit: params.limit,
             order: [["product_name", "ASC"]]
         })

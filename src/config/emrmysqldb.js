@@ -19,11 +19,10 @@ module.exports = new Sequelize(
         //     }
         // },
         pool: {
-            max: 40,
-            min: 0,
-            acquire: 60000,
-            idle: 10000,
-            evict: 20000,
+            max: 5, // maximum connection
+            min: 0, // minimum connection
+            idle: 10000, // release connection
+            evict: 20000, // remove idle connections
         },
     }
 )

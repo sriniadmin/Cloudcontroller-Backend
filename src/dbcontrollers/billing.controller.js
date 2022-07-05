@@ -97,7 +97,7 @@ async function db_get_billing_report(tenant_id, params) {
                 },
                 {
                     model:models.patient_data,
-                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'primary_consultant', 'secondary_consultant']
                 }
                
             ],
@@ -110,11 +110,14 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                         },
-                        bill_date: {
-                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
-                        },
+                        [Op.and]:[{
+                            bill_date: {
+                                [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+                            }
+                            }
+                        ]
                     },
                     {
                         billing_uuid: {
@@ -129,7 +132,7 @@ async function db_get_billing_report(tenant_id, params) {
                 ],
             },
             raw: false,
-            
+            logging: console.log
         })
 
         return billing
@@ -155,11 +158,11 @@ async function db_get_billing_report(tenant_id, params) {
                 [Op.and]: [
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                         },
                         [Op.and]:[{
                             bill_date: {
-                                [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                                [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
                             }
                             }
                         ]
@@ -171,7 +174,8 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                 ],
             },
-            raw: false
+            raw: false,
+            logging: console.log
         })
 
         return billing
@@ -204,15 +208,16 @@ async function db_get_billing_report(tenant_id, params) {
                     },
                     {
                         bill_date: {
-                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD')
                         },
                         bill_date: {
-                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                            [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD')
                         },
                     },
                 ],
             },
             raw: false,
+            logging: console.log
             //where: whereStatement,
         })
 
@@ -395,6 +400,52 @@ async function db_search_billing_id(postData) {
     return billing_data
 }
 
+async function db_get_billing_report_count(params) {
+    try{
+        let { filter = null } = params;
+        if(!filter){
+            billingCount = await BillingSummary.count({
+                where: {
+                    date: {
+                        [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
+                    },
+                    [Op.and]: [{
+                        date: {
+                            [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+                        }
+                    }
+                    ]
+                },
+                raw: false
+            })
+        } else {
+            billing = await BillingSummary.count({
+                where: {
+                    date: {
+                        [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
+                    },
+                    [Op.and]: [{
+                        date: {
+                            [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+                        }
+                    }
+                    ],
+                    [Op.and]: [
+                        Sequelize.where(
+                            Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
+                            { [Op.like]: `%${filter}%` }
+                        )
+                    ]
+                },
+                raw: false
+            })
+            return billing
+        }
+    } catch(err){
+        console.log(err);
+        return false;
+    }
+}
 async function db_get_billing_report_summary(params) {
     try{
     let { limit, offset, filter = null, sort = null, sortdir = 'DESC' } = params
@@ -411,7 +462,7 @@ async function db_get_billing_report_summary(params) {
             include: [
                 {
                     model:models.patient_data,
-                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled'],
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled', 'primary_consultant', 'secondary_consultant'],
                     where: {
                         disabled: 1
                     }
@@ -420,11 +471,11 @@ async function db_get_billing_report_summary(params) {
             ],
             where: {
                 date: {
-                    [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                    [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                 },
                 [Op.and]: [{
                     date: {
-                        [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
                     }
                 }
                 ]
@@ -442,17 +493,17 @@ async function db_get_billing_report_summary(params) {
             include: [
                 {
                     model:models.patient_data,
-                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date']
+                    attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'primary_consultant', 'secondary_consultant']
                 }
                
             ],
             where: {
                 date: {
-                    [Op.gte]: moment(params.bill_date).startOf('month').format('YYYY-MM-DD hh:mm:ss')
+                    [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                 },
                 [Op.and]: [{
                     date: {
-                        [Op.lte]: moment(params.bill_date).endOf('month').format('YYYY-MM-DD hh:mm:ss')
+                        [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
                     }
                 }
                 ],
@@ -537,6 +588,7 @@ module.exports = {
     db_search_billing_id,
     db_updated_task,
     db_get_billing_report_summary,
+    db_get_billing_report_count,
     db_update_billing_summary,
     db_get_patch_data
 }
