@@ -2521,8 +2521,9 @@ async function getPathSaas(req, res, next) {
     return next()
 }
 
-
 async function createDevice(req, res, next) {
+    const t = await sequelizeDB.transaction()
+
     try {
         const params = req.body.data[0]
 
@@ -2540,16 +2541,22 @@ async function createDevice(req, res, next) {
             }
         }
 
-        const check_number = await db_check_duplicate_device(condition)
+        const check_number = await db_check_duplicate_device(condition, t)
 
         if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
             res.response(req.apiRes)
+            if (t) {
+                await t.rollback();
+            }
             return next()
         }
         else if(check_number){
             req.apiRes = PATCH_CODE["15"]
             res.response(req.apiRes)
+            if (t) {
+                await t.rollback();
+            }
             return next()
         }
 
@@ -2559,10 +2566,13 @@ async function createDevice(req, res, next) {
                 condition = {
                     sim: params.sim
                 }
-                const check_sim = await db_check_duplicate_device(condition)
+                const check_sim = await db_check_duplicate_device(condition, t)
                 if(check_sim){
                     req.apiRes = PATCH_CODE["18"]
                     res.response(req.apiRes)
+                    if (t) {
+                        await t.rollback();
+                    }
                     return next()
                 }
             }
@@ -2572,10 +2582,13 @@ async function createDevice(req, res, next) {
                 condition = {
                     phone: params.phone
                 }
-                const check_phone = await db_check_duplicate_device(condition)
+                const check_phone = await db_check_duplicate_device(condition, t)
                 if(check_phone){
                     req.apiRes = PATCH_CODE["19"]
                     res.response(req.apiRes)
+                    if (t) {
+                        await t.rollback();
+                    }
                     return next()
                 }
             }
@@ -2584,15 +2597,16 @@ async function createDevice(req, res, next) {
 
         tags = params.tags
         if(tags.length>0){
-            recallFuntion(params.tags.length, 0, req, res, next)
+            recallFuntion(params.tags.length, 0, req, res, next, t)
         }else{
             const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
-            params["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            params["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
-            const data = await db_create_device(req)
+            const data = await db_create_device(req, t)
             req.apiRes = PATCH_CODE["3"]
             req.apiRes["response"] = { data: data }
             res.response(req.apiRes)
+            await t.commit()
             return next()
         }
     } catch (error) {
@@ -2600,16 +2614,19 @@ async function createDevice(req, res, next) {
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
         res.response(req.apiRes)
+        if (t) {
+            await t.rollback();
+        }
         return next()
     }
 }
 
-async function recall(length, number, req, res, next) {
+async function recall(length, number, req, res, next, transaction) {
     try {
         condition = {
             tags: { [Op.like]: `%"${tags[number]}"%` }
         }
-        const check_tags = await db_check_duplicate_device(condition)
+        const check_tags = await db_check_duplicate_device(condition, transaction)
         if (check_tags) {
             req.apiRes = {
                 Code: "TAGS_IS_ALREADY_EXIST",
@@ -2617,16 +2634,18 @@ async function recall(length, number, req, res, next) {
                 Message: `Tag: "${tags[number]}" is already exist`,
             }
             res.response(req.apiRes)
+            await transaction.rollback();
             return next()
         }
         if (length === number) {
             const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
-            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: sequelizeDB.transaction() })
+            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
             
-            const data = await db_create_device(req)
+            const data = await db_create_device(req,  transaction)
             req.apiRes = PATCH_CODE["3"]
             req.apiRes["response"] = { data: data }
             res.response(req.apiRes)
+            await transaction.commit();
             return next()
         }
         recallFuntion(length, number + 1, req, res, next)
@@ -2635,9 +2654,11 @@ async function recall(length, number, req, res, next) {
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
         res.response(req.apiRes)
+        await transaction.rollback();
         return next()
     }
 }
+
 
 async function getDevice(req, res, next) {
     try {
