@@ -116,10 +116,7 @@ const prepareDataForCreateBilling = (postData) => {
         return false;
     }
     if(postData.code == constant.CPT_CODE.CPT_99453){
-        if(postData.time_spent != null && postData.time_spent != ''){
-            return false;
-        }
-        params = {time_spent: postData.time_spent};
+        params = [];
     }
     if(postData.code == constant.CPT_CODE.CPT_99457 || postData.code == constant.CPT_CODE.CPT_99458){
         if(!postData.add_task_date || !postData.add_task_staff_name || !postData.add_task_note 
@@ -193,6 +190,27 @@ const prepareDataForUpdateBillingTask = (postData, billingData) => {
             const newData = {
                 task_id: date.getTime(), date: postData.date || '', 
         staff_name: postData.staff_name || '', task_note: postData.task_note || '', task_time_spend: postData.task_time_spend || 0
+            }
+            params.push(newData);
+            result = params;
+        }
+    }
+    
+    if(billingData[0].code == CPT_CODE.CPT_99453){
+        if(postData.task_id){
+            const newData = {
+                task_id: postData.task_id, note: postData.note || '', status: postData.status || 0
+            }
+            result = params.map(item => {
+                if(item.task_id == postData.task_id){
+                    return newData
+                } else {
+                    return item
+                }
+            })
+        } else {
+            const newData = {
+                task_id: date.getTime(), note: postData.note || '', status: postData.status || 0
             }
             params.push(newData);
             result = params;
@@ -313,7 +331,6 @@ async function updateBillingTask(req, res, next) {
         }
         return next();
     }
-
     if(!existBilling){
         req.apiRes = BILLING_CODE["4"]
         req.apiRes["error"] = {
@@ -321,7 +338,6 @@ async function updateBillingTask(req, res, next) {
         }
         return next();
     }
-
     let billingTaskData= prepareDataForUpdateBillingTask(req.body, existBilling);
     if(!billingTaskData){
         req.apiRes = BILLING_CODE["4"]
