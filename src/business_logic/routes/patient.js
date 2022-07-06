@@ -3297,7 +3297,6 @@ async function editPatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["8"]
         req.apiRes["error"] = { error: error.message }
-<<<<<<< HEAD
         res.response(req.apiRes)
         if (t) {
             await t.rollback();
@@ -3306,12 +3305,6 @@ async function editPatient(req, res, next) {
     }
     res.response(req.apiRes)
     await t.commit()
-=======
-        res.send(req.apiRes)
-        return next()
-    }
-    res.send(req.apiRes)
->>>>>>> 2c34b251967d7e8273be1c3ef724baf6e4512bbc
     return next()
 }
 
