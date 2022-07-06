@@ -8,7 +8,6 @@ const postgresSequelizeDB = require("../config/emrpostgresdb")
 const RBAC = require("../middleware/rbac")
 var extract = require("pdf-text-extract")
 const { license } = require("../external_services/license/license.json")
-const alerter = require('../alerter/globalAlert')
 const alertEnum = require('../alerter/alertEnum')
 const { v1: uuid } = require('uuid')
 const { createWorker, PSM, createScheduler } = require("tesseract.js")
@@ -638,13 +637,13 @@ async function loginUser(req, res, next) {
                         })
 
                     res.cookie("tokenKey", accessToken)
-                    try {
-                        alerter(loginAlert).then((response) => {
-                            logger.debug(`alertResponse : ${response}`)
-                        })
-                    } catch (err) {
-                        logger.debug(`Alert ERROR : ${err.message}`)
-                    }
+                    // try {
+                    //     alerter(loginAlert).then((response) => {
+                    //         logger.debug(`alertResponse : ${response}`)
+                    //     })
+                    // } catch (err) {
+                    //     logger.debug(`Alert ERROR : ${err.message}`)
+                    // }
                     req.apiRes = SYSTEM_AAA_CODE["6"]
                     req.apiRes["response"] = {
                         userEmail: email,
@@ -688,14 +687,14 @@ async function logoutUser(req, res, next) {
     logoutAlert['text'] = `${username} logged out successfully`
     logoutAlert['service'] = [`${req.userTenant}`]
     logger.debug('alertdata: ', logoutAlert)
-    try {
-        alerter(logoutAlert).then((response) => {
-            logger.debug(`alertResponse : ${response}`)
-        })
-    }
-    catch (err) {
-        logger.debug(`Alert ERROR : ${err.message}`)
-    }
+    // try {
+    //     alerter(logoutAlert).then((response) => {
+    //         logger.debug(`alertResponse : ${response}`)
+    //     })
+    // }
+    // catch (err) {
+    //     logger.debug(`Alert ERROR : ${err.message}`)
+    // }
     req.apiRes = SYSTEM_AAA_CODE["7"]
     res.response(req.apiRes)
     return next()
@@ -921,14 +920,14 @@ async function createPatch(req, res, next) {
             .then((patches) => {
                 logger.debug("PATCH  is" + patches)
 
-                try {
-                    alerter(createPatchAlert).then((response) => {
-                        logger.debug(`alertResponse: ${response} `)
-                    })
-                }
-                catch (err) {
-                    logger.debug(`Alert ERROR: ${err.message} `)
-                }
+                // try {
+                //     alerter(createPatchAlert).then((response) => {
+                //         logger.debug(`alertResponse: ${response} `)
+                //     })
+                // }
+                // catch (err) {
+                //     logger.debug(`Alert ERROR: ${err.message} `)
+                // }
 
                 let data = patches
                 if(req.body.actionType === 'bundle'){

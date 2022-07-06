@@ -195,7 +195,7 @@ const { db_create_user, db_update_patient_user } = require("../../dbcontrollers/
 const { createPatch } = require("../../middleware/rbac")
 
 const { v1: uuid } = require('uuid')
-const alerter = require('../../alerter/globalAlert')
+// const alerter = require('../../alerter/globalAlert')
 const alertEnum = require('../../alerter/alertEnum')
 
 
@@ -972,7 +972,7 @@ async function createPatient(req, res, next) {
     }
 
     try {
-        let response = await alerter(createPatientAlert)
+        // let response = await alerter(createPatientAlert)
         logger.debug(`alertResponse : ${response}`)
     }
     catch (err) {
@@ -1076,7 +1076,7 @@ async function updatePatient(req, res, next) {
 
     if (demographic_map['discharge_date'] !== null ) {
         try {
-            let response = await alerter(dischargePatientAlert)
+            // let response = await alerter(dischargePatientAlert)
             logger.debug(`alertResponse : ${response}`)
         }
         catch (err) {
@@ -3085,7 +3085,7 @@ async function deboardPatientPatch(req, res, next) {
         }
         await patientKafkaRegister(msg)
         try {
-            let response = await alerter(deboardPatientPatchAlert)
+            // let response = await alerter(deboardPatientPatchAlert)
             logger.debug(`alertResponse : ${response}`)
         }
         catch (err) {

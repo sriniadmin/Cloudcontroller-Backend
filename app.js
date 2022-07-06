@@ -62,10 +62,12 @@ app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
 
 app.use(debugging)
 function debugging(req, res, next) {
-    console.log('                                  ');
-    console.log('...........................................................................');
-    console.log('\x1b[33m%s\x1b[0m', `PATH: ${url.parse(req.url,true).pathname}`);
-    console.log('...........................................................................');
+    if(url.parse(req.url,true).pathname !== '/liveapi/gateway/gateway_keepalive'){
+        console.log('                                  ');
+        console.log('...........................................................................');
+        console.log('\x1b[33m%s\x1b[0m', `PATH: ${url.parse(req.url,true).pathname}`);
+        console.log('...........................................................................');
+    }
     next()
 }
 
