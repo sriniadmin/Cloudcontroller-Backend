@@ -64,11 +64,18 @@ auditor = function (req, res, next) {
         params = observeParams.concat(req.Params)
     }
 
+<<<<<<< HEAD
 
     // console.log("Date ", date)
     // console.log("IP ", ip)
     console.log('                                  ');
     console.log('\x1b[33m%s\x1b[0m', `PATH: ${path}`);
+=======
+        
+    // console.log("Date ", date)
+    // console.log("IP ", ip)
+    // console.log("Path ", path)
+>>>>>>> 2c34b251967d7e8273be1c3ef724baf6e4512bbc
     // console.log("Params ", params)
     // console.log("Body ", body)
     // console.log("Query ", query)
@@ -77,9 +84,13 @@ auditor = function (req, res, next) {
     basePath = '/'+_url[1]+'/'+_url[2]
     // console.log(req.method)
     // console.log(req.userEmail)
+<<<<<<< HEAD
     // if(basePath.indexOf('liveapi') == -1){
     // console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
     // }
+=======
+    // console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
+>>>>>>> 2c34b251967d7e8273be1c3ef724baf6e4512bbc
 
     /*
     let auditLog = Object.create(auditLogCtrlr.AuditLogObj)
@@ -98,7 +109,7 @@ auditor = function (req, res, next) {
         routes = Object.keys(auditRoutesCfg.route)
         for (let i = 0; i < routes.length; ++i) {
             const rt = routes[i]
-            console.log("Route :", rt, path)
+            // console.log("Route :", rt, path)
             let re = new RegExp(rt)
             let match = re.exec(path)
             // console.log(match)

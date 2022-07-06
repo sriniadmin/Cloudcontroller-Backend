@@ -73,18 +73,18 @@ app.use(
     })
 )
 
-const beforeAfterInjection = function (req, res, next) {
-    logger.debug("In the before After Injection Function")
-    res.response = function (obj) {
-        req.res = obj
-    }
-    next()
-}
+// const beforeAfterInjection = function (req, res, next) {
+//     logger.debug("In the before After Injection Function")
+//     res.response = function (obj) {
+//         req.res = obj
+//     }
+//     next()
+// }
 
-const { emailer } = require("./src/external_services/email/email")
+// const { emailer } = require("./src/external_services/email/email")
 //emailer("reset@live247.ai", "srivatsa2423@gmail.com", "test", "test", "")
 
-app.use(beforeAfterInjection)
+// app.use(beforeAfterInjection)
 
 app.use(cookieParser())
 // Static files from this will be loaded without checking the token
@@ -94,7 +94,7 @@ app.use(express.static(path.join(__dirname, "public")))
 // app.use('/api/v1', router);
 
 app.use(responseTime())
-app.use(authentication.validateSession) // AAA
+app.use(authentication.validateSession)
 //app.use(validateParams);
 // logger.debug('just above the rvac validate ')
 // app.use(RBAC.RBAC_Validate)
@@ -166,7 +166,7 @@ app.use("/liveapi/gateway", require("./src/routes/liveapi/gateway")) // KEEP THI
 // // Explicit routes
 // app.get("/api-docs.json", (req, res) => {
 //     res.setHeader("Content-Type", "application/json")
-//     res.send(openapiSpecification)
+//     res.response(openapiSpecification)
 // })
 
 // This sends out the response to the client

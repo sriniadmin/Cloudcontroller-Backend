@@ -530,7 +530,7 @@ async function deletePatient(req, res, next) {
 
 // Validated
 async function getUserPatientMap(req, res, next) {
-    console.log("User info is ", req.userEmail, req.userRole, req.params)
+    logger.debug("User info is ", req.userEmail, req.userRole, req.params)
     let username = req.userName
     let given_pid = req.params.pid
     let tenant_id = req.userTenantId
@@ -575,7 +575,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             duration: duration,
             tenantUUID: tenant_id,
         }
-        console.log("Patient GRPC calling.. ", tenant_id)
+        logger.debug("Patient GRPC calling.. ", tenant_id)
         // baselineResult = await patientDetailsGRPC(patientInventoryJSON)
 
         baselineResult = {"status":1,"result":{"code":14,"details":"Name resolution failed for target dns:sensor_consumer:9010","metadata":{}}}
@@ -585,7 +585,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
         tempbaselineResult[0]["patientUUID"] = given_pid
         if (parseInt(baselineResult["status"]) != 0) {
             // patientList will be loaded with error
-            console.log("Patient List from GRPC is errored")
+            logger.error("Patient List from GRPC is errored")
             // req.apiRes = PATIENT_CODE["1"]
             // req.apiRes["error"] = {
             //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
@@ -593,7 +593,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             // return next()
         }
     } catch (err) {
-        console.log("Patient Inventory Fetch Error GRPC " + err)
+        logger.debug("Patient Inventory Fetch Error GRPC " + err)
         // req.apiRes = PATIENT_CODE["1"]
         // req.apiRes["error"] = {
         //     errMessage: "Patient Inventory Fetch Error RPC",
@@ -607,12 +607,12 @@ async function grpcCall(given_pid, duration, tenant_id) {
             .filter((item) => item !== undefined && item !== null)
         pidlist = [given_pid]
     } catch (error) {
-        console.log("Pid List failed.. Sorting based on Name")
+        logger.debug("Pid List failed.. Sorting based on Name")
     }
     if (pidlist.length > 0) {
-        console.log("Pid list is ", pidlist.length)
+        logger.debug("Pid list is ", pidlist.length)
     } else {
-        console.log(
+        logger.error(
             "The Baseline Provided info has no patients - Something went really wrong",
             baselineResult
         )
@@ -2950,7 +2950,7 @@ async function createPatientMedication(req, res, next) {
         patientMedicationData: medication,
         count: medication.length,
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3241,10 +3241,10 @@ async function disablePatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["11"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3269,10 +3269,10 @@ async function unassociatePatient(req, res, next) {
         console.log(error)
         req.apiRes = ASSOCIATE_CODE["0"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3297,6 +3297,7 @@ async function editPatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["8"]
         req.apiRes["error"] = { error: error.message }
+<<<<<<< HEAD
         res.response(req.apiRes)
         if (t) {
             await t.rollback();
@@ -3305,6 +3306,12 @@ async function editPatient(req, res, next) {
     }
     res.response(req.apiRes)
     await t.commit()
+=======
+        res.send(req.apiRes)
+        return next()
+    }
+    res.send(req.apiRes)
+>>>>>>> 2c34b251967d7e8273be1c3ef724baf6e4512bbc
     return next()
 }
 
@@ -3318,7 +3325,7 @@ async function addNewPatient(req, res, next) {
                 isExist: true,
                 error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
-            res.response(req.apiRes)
+            res.send(req.apiRes)
             if (t) {
                 await t.rollback();
             }
@@ -3339,13 +3346,13 @@ async function addNewPatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
+        res.send(req.apiRes)
         if (t) {
             await t.rollback();
         }
         return next()
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     await t.commit()
     return next()
 }
@@ -3365,7 +3372,7 @@ async function getPatientVitalThreashold(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3385,7 +3392,7 @@ async function getPatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3408,7 +3415,7 @@ async function createPatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3429,7 +3436,7 @@ async function getPatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3451,7 +3458,7 @@ async function createPatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3471,7 +3478,7 @@ async function getPatientVital(req, res, next) {
         req.apiRes = VITAL_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3494,7 +3501,7 @@ async function createPatientVital(req, res, next) {
         req.apiRes = VITAL_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3514,7 +3521,7 @@ async function updatePatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["6"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3535,7 +3542,7 @@ async function getPatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3558,7 +3565,7 @@ async function createPatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3578,7 +3585,7 @@ async function updatePatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["6"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3601,7 +3608,7 @@ async function createPatientPrescription(req, res, next) {
         req.apiRes = PRESCRIPTION_CODE["4"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     await t.commit()
     return next()
 }
@@ -3623,7 +3630,7 @@ async function getPatientPrescription(req, res, next) {
         req.apiRes = PRESCRIPTION_CODE["1"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
@@ -3643,7 +3650,7 @@ async function updatePatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["6"]
     }
 
-    res.response(req.apiRes)
+    res.send(req.apiRes)
     return next()
 }
 
