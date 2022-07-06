@@ -67,8 +67,7 @@ auditor = function (req, res, next) {
 
     // console.log("Date ", date)
     // console.log("IP ", ip)
-    console.log('                                  ');
-    console.log('\x1b[33m%s\x1b[0m', `PATH: ${path}`);
+    // console.log('\x1b[33m%s\x1b[0m', `PATH: ${path}`);
     // console.log("Params ", params)
     // console.log("Body ", body)
     // console.log("Query ", query)

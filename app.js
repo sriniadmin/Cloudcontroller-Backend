@@ -43,6 +43,7 @@ const Users_Secure = models.users_secure
 const pathRouter = "./src/routes/api/"
 
 const { medRouter, medCron } = require(pathRouter + "medication")
+const url = require('url')
 
 
 // XXX - this needs to be generic prestart checks
@@ -58,6 +59,15 @@ const cors = require('cors')
 
 app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
+
+app.use(debugging)
+function debugging(req, res, next) {
+    console.log('                                  ');
+    console.log('...........................................................................');
+    console.log('\x1b[33m%s\x1b[0m', `PATH: ${url.parse(req.url,true).pathname}`);
+    console.log('...........................................................................');
+    next()
+}
 
 // view engine setup - Can we removed once the Frontend React UI and Mobile App is available
 // app.set('views', path.join(__dirname, 'views'));
