@@ -2519,17 +2519,11 @@ async function createDevice(req, res, next) {
         if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
             res.response(req.apiRes)
-            if (t) {
-                await t.rollback();
-            }
             return next()
         }
         else if(check_number){
             req.apiRes = PATCH_CODE["15"]
             res.response(req.apiRes)
-            if (t) {
-                await t.rollback();
-            }
             return next()
         }
 
@@ -2543,9 +2537,6 @@ async function createDevice(req, res, next) {
                 if(check_sim){
                     req.apiRes = PATCH_CODE["18"]
                     res.response(req.apiRes)
-                    if (t) {
-                        await t.rollback();
-                    }
                     return next()
                 }
             }
@@ -2559,9 +2550,6 @@ async function createDevice(req, res, next) {
                 if(check_phone){
                     req.apiRes = PATCH_CODE["19"]
                     res.response(req.apiRes)
-                    if (t) {
-                        await t.rollback();
-                    }
                     return next()
                 }
             }
@@ -2587,9 +2575,7 @@ async function createDevice(req, res, next) {
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
         res.response(req.apiRes)
-        if (t) {
-            await t.rollback();
-        }
+        await t.rollback();
         return next()
     }
 }

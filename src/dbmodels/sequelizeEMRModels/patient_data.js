@@ -444,10 +444,7 @@ module.exports = function (sequelize, DataTypes) {
             state: {
                 type: DataTypes.STRING(255),
                 allowNull: true,
-                defaultValue: "",
-                validate: {
-                    is: /^$|[a-z ,.'-]+$/i,
-                },
+                defaultValue: ""
             },
             country_code: {
                 type: DataTypes.STRING(255),

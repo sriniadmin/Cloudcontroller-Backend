@@ -102,32 +102,6 @@ app.use(cookieParser())
 // Static files from this will be loaded without checking the token
 app.use(express.static(path.join(__dirname, "public")))
 
-
-// app.use('/api/v1', router);
-
-app.use(responseTime())
-app.use(authentication.validateSession)
-//app.use(validateParams);
-// logger.debug('just above the rvac validate ')
-// app.use(RBAC.RBAC_Validate)
-// logger.debug('after the rbac validate')
-
-// Middleware for audit trail
-// console.log("\n\n[AUDIT]\n\n", auditor, auditorLoadCfg)
-app.use(auditor)
-
-// Swagger - After Auth to not expose the Api
-// Swagger Route
-// https://blog.cloudboost.io/adding-swagger-to-existing-node-js-project-92a6624b855b
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-app.use( // KEEP THIS
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(openapiSpecification, { explorer: true })
-)
-
-
 //a-z All WebApp Routes // KEEP THIS
 const routes = {
     //'/':				'index',
@@ -165,6 +139,31 @@ rt.forEach((k) => {
     logger.debug("Registering %s : %s", k, rpath)
     app.use(k, require(rpath))
 })
+
+
+// app.use('/api/v1', router);
+
+app.use(responseTime())
+app.use(authentication.validateSession)
+//app.use(validateParams);
+// logger.debug('just above the rvac validate ')
+// app.use(RBAC.RBAC_Validate)
+// logger.debug('after the rbac validate')
+
+// Middleware for audit trail
+// console.log("\n\n[AUDIT]\n\n", auditor, auditorLoadCfg)
+app.use(auditor)
+
+// Swagger - After Auth to not expose the Api
+// Swagger Route
+// https://blog.cloudboost.io/adding-swagger-to-existing-node-js-project-92a6624b855b
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.use( // KEEP THIS
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(openapiSpecification, { explorer: true })
+)
 
 // XXX - Ugly to fix
 // app.use("/api/medication", medRouter)
