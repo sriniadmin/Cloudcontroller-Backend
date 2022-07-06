@@ -83,18 +83,18 @@ app.use(
     })
 )
 
-// const beforeAfterInjection = function (req, res, next) {
-//     logger.debug("In the before After Injection Function")
-//     res.response = function (obj) {
-//         req.res = obj
-//     }
-//     next()
-// }
+const beforeAfterInjection = function (req, res, next) {
+    logger.debug("In the before After Injection Function")
+    res.response = function (obj) {
+        req.res = obj
+    }
+    next()
+}
 
 // const { emailer } = require("./src/external_services/email/email")
 //emailer("reset@live247.ai", "srivatsa2423@gmail.com", "test", "test", "")
 
-// app.use(beforeAfterInjection)
+app.use(beforeAfterInjection)
 
 app.use(cookieParser())
 // Static files from this will be loaded without checking the token
