@@ -1,7 +1,7 @@
 //This handles patch inventory
 var express = require("express")
 var router = express.Router()
-var { createRole, getRole, deleteRole, updateRole } = require("../../old_code_refactor/internalUser")
+var { createRole, getRoleList, deleteRole, updateRole, getRole } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 /**
@@ -49,7 +49,7 @@ const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 //Get Request
 
-router.get("/", getRole, apiFinalProcess)
+router.get("/", getRoleList, apiFinalProcess)
 
 /**
  * @openapi
@@ -116,6 +116,49 @@ router.put("/", updateRole, apiFinalProcess)
 router.delete("/", deleteRole, apiFinalProcess)
 
 
+/**
+ *  /api/role/{pid}:
+ *   get:
+ *       tags:
+ *         - Role
+ *       summary: fetch all ROLE
+ *       responses:
+ *         '201':
+ *           description: ROLE  Information is provided.
+ *       parameters:
+ *          - in: query
+ *            name: tenant_id
+ *            default: 0
+ *            schema:
+ *               type: uuid
+ *            description: The tenant_id of specific license patient
+ *          - in: query
+ *            name: role_name
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: The tenant_id of specific license patient
+ *          - in: query
+ *            name: limit
+ *            default: 10
+ *            schema:
+ *               type: integer
+ *            description: The number of items to return
+ *          - in: query
+ *            name: offset
+ *            default: 0
+ *            schema:
+ *               type: integer
+ *            description: The number of items to skip before starting to collect the result set
+ *          - in: query
+ *            name: filter
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: Filter on the roles
+ */
+
+ router.get("/:pid", getRole, apiFinalProcess)
 
 
 module.exports = router

@@ -794,7 +794,7 @@ async function db_get_device(params) {
                     include:[
                         {
                             model:models.patient_data,
-                            attributes:['fname','lname','pid', 'med_record', 'primary_consultant']
+                            attributes:['fname','lname','pid', 'med_record', 'primary_consultant', 'secondary_consultant']
                         }
                     ],
                     required: false,

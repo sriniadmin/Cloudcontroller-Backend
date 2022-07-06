@@ -762,7 +762,7 @@ async function db_delete_patient(given_pid, transaction) {
 
 async function db_med_record_exist(params) {
     try {
-        return await Patients_Data.count({
+        return await Patients_Data.findOne({
             where: {
                 med_record: params,
             },

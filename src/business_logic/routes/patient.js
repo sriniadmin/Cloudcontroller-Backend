@@ -3277,7 +3277,19 @@ async function unassociatePatient(req, res, next) {
 }
 
 async function editPatient(req, res, next) {
+    const t = await sequelizeDB.transaction()
     try {
+        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
+        if (medical_record && medical_record.pid !== req.body.demographic_map.pid) {
+            req.apiRes = PATIENT_CODE["8"]
+            req.apiRes["error"] = {
+                isExist: true,
+                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+
         await db_edit_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["7"]
         req.apiRes["response"] = req.body
@@ -3286,15 +3298,18 @@ async function editPatient(req, res, next) {
         req.apiRes = PATIENT_CODE["8"]
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
+        if (t) {
+            await t.rollback();
+        }
         return next()
     }
     res.response(req.apiRes)
+    await t.commit()
     return next()
 }
 
 async function addNewPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
-
     try {
         const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
         if (medical_record) {

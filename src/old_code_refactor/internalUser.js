@@ -78,6 +78,7 @@ const {
     db_get_facility_list,
     db_create_facility,
     db_update_facility,
+    db_get_facility
 } = require("../dbcontrollers/facility.controller")
 
 const {
@@ -96,6 +97,7 @@ const {
     db_update_role,
     db_role_exist,
     db_bulk_create_role,
+    db_get_role
 } = require("../dbcontrollers/role.controller")
 
 const modelsInfo = require("../utils/scripts/Models_fields_info")
@@ -1539,34 +1541,6 @@ async function getRemoteLocation(req, res, next) {
     return next()
 }
 
-//FACILITY ROUTES
-
-async function getFacility(req, res, next) {
-    logger.debug("Facility info is ", req.userEmail, req.userRole)
-    username = req.userName
-    tenant_id = req.userTenantId
-    tenant_id = req.query.tenant_uuid
-    let facilities
-    try {
-        facilities = await db_get_facility_list(tenant_id, username)
-    } catch (err) {
-        logger.debug("Facility list error " + err)
-        req.apiRes = FACILITY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING FACILITY INVENTORY",
-        }
-        return next()
-    }
-    logger.debug("Facility list is " + facilities)
-    req.apiRes = FACILITY_CODE["2"]
-    req.apiRes["response"] = {
-        facilities: [facilities],
-        count: facilities.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 // Validated
 async function createFacility(req, res, next) {
     logger.debug("Facility  header output is ", req.headers)
@@ -2648,7 +2622,7 @@ async function recall(length, number, req, res, next, transaction) {
             await transaction.commit();
             return next()
         }
-        recallFuntion(length, number + 1, req, res, next)
+        recallFuntion(length, number + 1, req, res, next, transaction)
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
@@ -2904,9 +2878,50 @@ async function getUserTenant(req, res, next) {
 }
 
 
-async function getRole(req, res, next) {
+async function getRoleList(req, res, next) {
     try {
         const data = await db_get_role_list(req.query)
+
+        req.apiRes = ROLE_CODE["2"]
+        req.apiRes["response"] = {
+            roles: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ROLE_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getFacility(req, res, next) {
+    try {
+        const data = await db_get_facility(req.query)
+
+        req.apiRes = FACILITY_CODE["2"]
+        req.apiRes["response"] = {
+            facilities: data
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = FACILITY_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getRole(req, res, next) {
+    try {
+        const data = await db_get_role(req.params)
 
         req.apiRes = ROLE_CODE["2"]
         req.apiRes["response"] = {
@@ -2956,7 +2971,7 @@ module.exports = {
     updateFacility,
     updateTenant,
     createRole,
-    getRole,
+    getRoleList,
     deleteRole,
     updateRole,
     updateAllergy,
@@ -2985,5 +3000,6 @@ module.exports = {
     getPathSaas,
     createDevice,
     getDevice,
-    resetDevice
+    resetDevice,
+    getRole
 }
