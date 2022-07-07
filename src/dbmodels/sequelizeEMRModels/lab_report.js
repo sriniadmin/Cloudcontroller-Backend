@@ -28,27 +28,26 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false,
                 primaryKey: true,
             },
-            report: {
-                type: DataTypes.JSON,
-                allowNull: false,
-            },
             tenant_id: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
             },
-            date: {
-                type: DataTypes.DATE(255),
-                allowNull: true,
-                defaultValue: Sequelize.fn("now"),
-            },
-            report_uuid: {
+            pid: {
                 type: DataTypes.STRING(255),
                 allowNull: false,
             },
             name: {
-                type: DataTypes.STRING(255),  
-                allowNull: true,
+                type: DataTypes.STRING(255),
+                allowNull: false,
             },
+            data: {
+                type: DataTypes.BLOB('medium'),
+                allowNull: false,
+            },
+            date: {
+                type: DataTypes.DATE,
+                defaultValue: Sequelize.fn("now"),
+            }
         },
         {
             sequelize,

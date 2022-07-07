@@ -2094,35 +2094,6 @@ async function updateAllergy(req, res, next) {
     return next()
 }
 
-async function createLabReport(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let tenant_id = req.userTenantId
-    let lab_report_data = req.body
-    let reports
-    try {
-        reports = await sequelizeDB.transaction(async function (t) {
-            lab_report_data["tenant_id"] = tenant_id
-            return db_create_lab_report(tenant_id, lab_report_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("Lab report list error " + err)
-        req.apiRes = LAB_REPORT_CODE["4"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING THE LAB REPORT",
-        }
-        return next()
-    }
-    logger.debug("Lab report list is " + reports)
-    req.apiRes = LAB_REPORT_CODE["3"]
-    req.apiRes["response"] = {
-        Lab_Report: reports,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 
 async function createTasks(req, res, next) {
     const t = await sequelizeDB.transaction()
@@ -2887,7 +2858,7 @@ async function getRole(req, res, next) {
 
         req.apiRes = ROLE_CODE["2"]
         req.apiRes["response"] = {
-            roles: data,
+            data: data,
             count: data.length
         }
     } catch (error) {
@@ -2905,7 +2876,7 @@ async function getRole(req, res, next) {
 async function getLabReport(req, res, next) {
     const t = await sequelizeDB.transaction()
     try {
-        const data = await db_get_lab_report(req.params)
+        const data = await db_get_lab_report(req.query, t)
 
         req.apiRes = LAB_REPORT_CODE["2"]
         req.apiRes["response"] = {
@@ -2918,34 +2889,69 @@ async function getLabReport(req, res, next) {
             error: error
         }
         req.apiRes = LAB_REPORT_CODE["1"]
+        await t.rollback()
     }
     res.response(req.apiRes)
+    await t.commit()
     return next()
 }
 
 
-// async function getLabReport(req, res, next) {
-//     let tenant_id = req.userTenantId
-//     let reports
-//     try {
-//         reports = await db_get_lab_report(tenant_id)
-//     } catch (err) {
-//         logger.debug("BED list error " + err)
-//         req.apiRes = LAB_REPORT_CODE["1"]
-//         req.apiRes["error"] = {
-//             error: "ERROR IN FETCHING THE LAB REPORT",
-//         }
-//         return next()
-//     }
+async function createLabReport(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = req.files['many-files']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
+        }
 
-//     logger.debug("Lab report list is " + reports)
-//     req.apiRes = LAB_REPORT_CODE["2"]
-//     req.apiRes["response"] = {
-//         Lab_Report: reports,
-//     }
-//     res.response(req.apiRes)
-//     return next()
-// }
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+        if(list.length > 10){
+            return res.status(470).json({ message: 'Maximum is 10 files' })
+        }
+
+        let flg = 0
+        for (const obj of list) {
+            const spl = obj.name.split('.')
+            if(spl[spl.length-1] !== 'png'){
+                flg = 1
+                break
+            }
+            if(obj.size > 10485760){
+                flg = 2
+                break
+            }
+        }
+        if(flg === 1){
+            return res.status(470).json({ message: 'File type must be image' })
+        }
+        if(flg === 2){
+            return res.status(470).json({ message: 'File size must be smaller than 10MB' })
+        }
+
+        list.forEach(obj => {
+            db_create_lab_report({
+                data: obj.data,
+                name: obj.name,
+                pid: req.body.pid,
+                tenant_id: req.body.tenant_id
+            })
+        });
+        await t.commit()
+        return res.status(200).json({ message: 'Sucessful' })
+    } catch (error) {
+        if (error.code === "LIMIT_UNEXPECTED_FILE") {
+            return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
+        }
+        await t.rollback()
+        return res.status(500).json({ error: error })
+    }
+}
 
 
 module.exports = {
