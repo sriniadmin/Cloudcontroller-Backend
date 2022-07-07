@@ -2538,7 +2538,7 @@ async function createDevice(req, res, next) {
         if(tags.length>0){
             recallFuntion(params.tags.length, 0, req, res, next, t)
         }else{
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: params.body.tenantId}
             params["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
             const data = await db_create_device(req, t)
@@ -2571,7 +2571,6 @@ async function recall(length, number, req, res, next, transaction) {
                 Message: `Tag: "${tags[number]}" is already exist`,
             }
             res.response(req.apiRes)
-            await transaction.rollback();
             return next()
         }
         if (length === number) {
