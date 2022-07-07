@@ -256,6 +256,7 @@ const prepareDataUpdateTaskBillingSummary = (billingData) => {
 async function createBilling(req, res, next) {
     const t = await sequelizeDB.transaction()
     const pid = req.body.pid;
+    const tenant_id = req.body.tenant_id || null;
     if(!pid){
         req.apiRes = BILLING_CODE["4"]
         req.apiRes["error"] = {
