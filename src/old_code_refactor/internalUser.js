@@ -2887,8 +2887,7 @@ async function getRole(req, res, next) {
 
         req.apiRes = ROLE_CODE["2"]
         req.apiRes["response"] = {
-            roles: data,
-            count: data.length
+            roles: data
         }
     } catch (error) {
         console.log(error)
