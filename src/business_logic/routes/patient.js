@@ -1775,63 +1775,7 @@ async function getPatientPractitioner(req, res, next) {
     return next()
 }
 
-// Validated
-async function createPatientVitalThreshold(req, res, next) {
-    // let vital_threshold_data = req.body
-    // let given_pid = vital_threshold_data.pid
-    // let tenant_id = vital_threshold_data.tenant_uuid
-    // let patient_exist
-    let result
-    const t = await sequelizeDB.transaction()
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["vitalthresholdMapSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed",
-        }
-        return next()
-    }
 
-    // try {
-    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
-    //     if (!validate_patient_exist(patient_exist, req)) return next()
-    // } catch (error) {
-    //     logger.debug("Exception : %s PID %s", error, given_pid)
-    //     logger.debug("The error in catch is ", error)
-    //     req.apiRes = PATIENT_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         errMessage: "Patient - ",
-    //     }
-    //     return next()
-    // }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            // vital_threshold_data["tenant_uuid"] = tenant_id
-            // vital_threshold_data["pid"] = given_pid
-            return db_create_vital_threshold(tenant_id, req.body, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        logger.debug("ERROR IN CREATING VITAL THRESHOLD" + error)
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        patient_data: respResult,
-        count: respResult.length,
-    }
-    global_variable.threshold_list = db_threshold_by_patient()
-    console.log(global_variable.threshold_list)
-    return next()
-}
 
 //report Generator
 async function getPatientDeboardReport(req, res, next) {
@@ -3637,6 +3581,30 @@ async function updatePatientMedicalHistory(req, res, next) {
     }
 
     res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientVitalThreshold(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        await db_create_vital_threshold(req.body, t)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            medical_history_data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+        await t.rollback()
+    }
+    res.response(req.apiRes)
+    global_variable.threshold_list = db_threshold_by_patient()
+    console.log(global_variable.threshold_list)
+    await t.commit()
     return next()
 }
 
