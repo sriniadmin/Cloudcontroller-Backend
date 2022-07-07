@@ -356,7 +356,7 @@ async function db_get_role_list(params) {
 
 async function db_get_role(params) {
     try {
-        return await Role.findOne({
+        return await Role.findAll({
             where: {
                 tenant_id: params.pid
             }
