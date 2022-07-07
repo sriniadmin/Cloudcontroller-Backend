@@ -2937,9 +2937,9 @@ async function createLabReport(req, res, next) {
         list.forEach(obj => {
             db_create_lab_report({
                 data: obj.data,
-                name: obj.name,
-                pid: req.body.pid,
-                tenant_id: req.body.tenant_id
+                name: obj.name, 
+                pid: req.query.pid,
+                tenant_id: req.query.tenant_id
             })
         });
         await t.commit()
