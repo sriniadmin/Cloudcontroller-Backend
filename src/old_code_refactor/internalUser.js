@@ -2123,28 +2123,6 @@ async function createLabReport(req, res, next) {
     return next()
 }
 
-async function getLabReport(req, res, next) {
-    let tenant_id = req.userTenantId
-    let reports
-    try {
-        reports = await db_get_lab_report(tenant_id)
-    } catch (err) {
-        logger.debug("BED list error " + err)
-        req.apiRes = LAB_REPORT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE LAB REPORT",
-        }
-        return next()
-    }
-
-    logger.debug("Lab report list is " + reports)
-    req.apiRes = LAB_REPORT_CODE["2"]
-    req.apiRes["response"] = {
-        Lab_Report: reports,
-    }
-    res.response(req.apiRes)
-    return next()
-}
 
 async function createTasks(req, res, next) {
     const t = await sequelizeDB.transaction()
@@ -2597,7 +2575,7 @@ async function recall(length, number, req, res, next, transaction) {
             return next()
         }
         if (length === number) {
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: params.body.tenantId}
             req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
             
             const data = await db_create_device(req,  transaction)
@@ -2923,6 +2901,52 @@ async function getRole(req, res, next) {
     res.response(req.apiRes)
     return next()
 }
+
+
+async function getLabReport(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await db_get_lab_report(req.params)
+
+        req.apiRes = LAB_REPORT_CODE["2"]
+        req.apiRes["response"] = {
+            roles: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = LAB_REPORT_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+// async function getLabReport(req, res, next) {
+//     let tenant_id = req.userTenantId
+//     let reports
+//     try {
+//         reports = await db_get_lab_report(tenant_id)
+//     } catch (err) {
+//         logger.debug("BED list error " + err)
+//         req.apiRes = LAB_REPORT_CODE["1"]
+//         req.apiRes["error"] = {
+//             error: "ERROR IN FETCHING THE LAB REPORT",
+//         }
+//         return next()
+//     }
+
+//     logger.debug("Lab report list is " + reports)
+//     req.apiRes = LAB_REPORT_CODE["2"]
+//     req.apiRes["response"] = {
+//         Lab_Report: reports,
+//     }
+//     res.response(req.apiRes)
+//     return next()
+// }
 
 
 module.exports = {
