@@ -2538,7 +2538,7 @@ async function createDevice(req, res, next) {
         if(tags.length>0){
             recallFuntion(params.tags.length, 0, req, res, next, t)
         }else{
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: params.body.tenantId}
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             params["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
             const data = await db_create_device(req, t)
@@ -2574,7 +2574,7 @@ async function recall(length, number, req, res, next, transaction) {
             return next()
         }
         if (length === number) {
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: params.body.tenantId}
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
             
             const data = await db_create_device(req,  transaction)
