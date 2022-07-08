@@ -629,59 +629,7 @@ async function patientList(req, res, next) {
     }
     return next()
 }
-// Validated
-async function getPatientDetail(req, res, next) {
-    // This API gets the username and tenant and other HTTP Headers info
-    // let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.query.tenantId
-    // let patient_exist, patients_list
-    let duration = 3
-    // // let duration = req.query.duration
-    // let baseLineDict
-    // try {
-    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
-    //     if (!validate_patient_exist(patient_exist, req)) return next()
-    // } catch (error) {
-    //     logger.debug("Exception : %s PID %s", error, given_pid)
-    //     req.apiRes = PATIENT_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         errMessage: "Patient - Check failed",
-    //     }
-    //     return next()
-    // }
-    // let query_param = {
-    //     ...req.params,
-    //     ...req.query,
-    // }
-    try {
-        baseLineDict = await grpcCall(given_pid, duration, tenant_id)
-        logger.debug("BASELINE DICT", baseLineDict)
-        req.query["pidlist"] = baseLineDict["pidlist"]
-    } catch (error) {
-        logger.debug("Error in GRPC Call is ", error)
-    }
-    try {
-        patients_list = await db_get_patient_details(req.params.pid)
-    } catch (e) {
-        req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
-        return next()
-    }
-    // patients_list = JSON.stringify(patients_list)
-    // patients_list = JSON.parse(patients_list)
 
-    // let patients = patients_list
-    //let patch_ref = patients["patch_patient_map"]
-    //let location_ref = patients["location"]
-    patients_list["baselineResult"] = baseLineDict["baselineResult"]
-    let listPatient = await genPatientRespData([patients_list])
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        patient: listPatient[0]
-    }
-    return next()
-}
 
 async function patientKafkaRegister(msg) {
     logger.debug("Kafka Test")
@@ -3271,7 +3219,7 @@ async function addNewPatient(req, res, next) {
         req.body.demographic_map.tenant_id = req.body.tenantId
         req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
         req.body.demographic_map.associated_list = "[]"
-        await db_add_new_patient(req.body.demographic_map, t)
+        await db_add_new_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["3"]
         req.apiRes["response"] = { patient_data: req.body }
     } catch (error) {
@@ -3279,11 +3227,9 @@ async function addNewPatient(req, res, next) {
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
-        await t.rollback();
         return next()
     }
     res.response(req.apiRes)
-    await t.commit()
     return next()
 }
 
@@ -3605,6 +3551,29 @@ async function createPatientVitalThreshold(req, res, next) {
     global_variable.threshold_list = db_threshold_by_patient()
     console.log(global_variable.threshold_list)
     await t.commit()
+    return next()
+}
+
+
+async function getPatientDetail(req, res, next) {
+    try {
+        const result = await db_get_patient_details(req.params)
+        baseLineDict = await grpcCall(req.params.pid, 3, null)
+        result.data["baselineResult"] = baseLineDict["baselineResult"]
+        let listPatient = await genPatientRespData([result.data])
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            patient: listPatient[0]
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+
+    res.response(req.apiRes)
     return next()
 }
 

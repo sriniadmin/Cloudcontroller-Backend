@@ -589,9 +589,9 @@ async function db_threshold_by_patient(transaction) {
             // order: [['id', 'ASC']],
         },
         { transaction: t })
-        data.length = data.length
+        const result = { data: data }
         await t.commit()
-        return data
+        return result
     } catch (error) {
         await t.rollback()
         throw new Error(error)
@@ -633,9 +633,9 @@ async function db_gateway_by_patient() {
             // order: [['id', 'ASC']],
         },
         { transaction: t})
-        data.length = data.length
+        const result = { data: data }
         await t.commit()
-        return data
+        return result
     } catch (error) {
         await t.rollback()
         throw new Error(error)

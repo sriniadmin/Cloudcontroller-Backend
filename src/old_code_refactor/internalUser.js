@@ -2569,15 +2569,15 @@ async function recall(length, number, req, res, next, transaction) {
 
 async function getDevice(req, res, next) {
     try {
-        const data = await db_get_device(req.body)
+        const result = await db_get_device(req.body)
 
         const count = await db_count_device(req.body)
 
         req.apiRes = PATCH_CODE["2"]
         req.apiRes["response"] = {
-            patches: data,
-            count: data.length,
-            patchTotalCount: count,
+            patches: result.data,
+            count: result.data.length,
+            patchTotalCount: count.data,
         }
     } catch (error) {
         console.log(error)
@@ -2586,7 +2586,6 @@ async function getDevice(req, res, next) {
         }
         req.apiRes = PATCH_CODE["1"]
     }
-
     res.response(req.apiRes)
     return next()
 }

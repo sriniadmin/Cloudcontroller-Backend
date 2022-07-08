@@ -510,6 +510,7 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         writeApi.writePoint(point3)
 
         let list = await global_variable.gateway_list
+        list = list.data
 
         let result = {
             Command: 'softkill'
@@ -1032,6 +1033,7 @@ function vv330(writeApi, data) {
 
 async function CheckingThreshold(params) {
     let list = await global_variable.threshold_list
+    list = list.data
 
     const sensor_type = {
         temperature: {
