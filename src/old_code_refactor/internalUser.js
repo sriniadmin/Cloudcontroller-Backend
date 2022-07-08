@@ -2445,7 +2445,6 @@ async function getPathSaas(req, res, next) {
 
 async function createDevice(req, res, next) {
     const t = await sequelizeDB.transaction()
-
     try {
         const params = req.body.data[0]
 
@@ -2578,6 +2577,10 @@ async function getDevice(req, res, next) {
             patches: result.data,
             count: result.data.length,
             patchTotalCount: count.data,
+        }
+
+        if(req.body.search){
+            req.apiRes["response"].patchTotalCount = result.data.length
         }
     } catch (error) {
         console.log(error)
