@@ -772,6 +772,7 @@ async function db_check_duplicate_device(params, transaction) {
 async function db_get_device(params) {
     const t = await sequelizeDB.transaction()
     try {
+        let numb = params.limit
         let limit = params.limit
         let offset = (params.offset - 1) * limit
         let condition_device = {
@@ -782,6 +783,7 @@ async function db_get_device(params) {
         }
         
         if (params.search) {
+            limit = 1000000
             offset = 0
             params.search = (params.search).toLowerCase()
             const strings = params.search.split(" ")
@@ -847,7 +849,7 @@ async function db_get_device(params) {
         { transaction: t })
 
         if(data_by_device.length > 0){
-            const result = { data: data_by_device }
+            const result = { data: getDataByLimit(data_by_device, numb) }
             await t.commit()
             return result
         }
@@ -881,13 +883,26 @@ async function db_get_device(params) {
         },
         { transaction: t })
 
-        const result = { data: data_by_patient }
+        const result = { data: getDataByLimit(data_by_patient, numb) }
         await t.commit()
         return result
     } catch (error) {
         await t.rollback()
         throw error
     }
+}
+
+function getDataByLimit(data, limit) {
+    let result = []
+    for (let index = 0; index <limit+1; index++) {
+        if(data[index] && index<limit){
+            result.push(data[index])
+        }
+        else {
+            return result
+        }
+    }
+
 }
 
 
