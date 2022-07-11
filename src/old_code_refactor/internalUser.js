@@ -2900,7 +2900,7 @@ async function getLabReport(req, res, next) {
 async function createLabReport(req, res, next) {
     const doc = 'jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg'
     try {
-        const data = Buffer.from(req.body[0].base64, 'base64');
+        const data = Buffer(req.body[0].base64, 'base64');
         if (!data) {
             return res.status(470).json({ message: 'You must select file' })
         }

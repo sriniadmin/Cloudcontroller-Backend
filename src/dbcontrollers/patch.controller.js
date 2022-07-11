@@ -681,6 +681,7 @@ async function db_update_patch_unRegister(params) {
         promises.push(
             Patches.update(
                 {
+                    patch_status: 'Inactive',
                     in_use: 'false',
                     patch_serial: null
                 },
@@ -704,7 +705,10 @@ async function db_update_patch_register(params) {
     params.list.forEach(obj => {
         promises.push(
             Patches.update(
-                { patch_serial: params.gateway },
+                { 
+                    patch_serial: params.gateway,
+                    patch_status: 'Active' 
+                },
                 { where: {patch_uuid: obj}}
             )
         )
