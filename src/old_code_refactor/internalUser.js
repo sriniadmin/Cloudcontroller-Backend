@@ -172,6 +172,7 @@ const { info } = require("console")
 const {
     db_create_lab_report,
     db_get_lab_report,
+    db_get_lab_report_by_id
 } = require("../dbcontrollers/lab_report.controller")
 const { getLicenseData } = require("./license")
 const { db_create_license } = require("../dbcontrollers/license.controller")
@@ -2876,14 +2877,13 @@ async function getRole(req, res, next) {
 
 
 async function getLabReport(req, res, next) {
-    const t = await sequelizeDB.transaction()
     try {
-        const data = await db_get_lab_report(req.query, t)
+        const data = await db_get_lab_report(req.query)
 
         req.apiRes = LAB_REPORT_CODE["2"]
         req.apiRes["response"] = {
-            roles: data,
-            count: data.length
+            labReports: data.data,
+            count: data.data.length
         }
     } catch (error) {
         console.log(error)
@@ -2891,68 +2891,64 @@ async function getLabReport(req, res, next) {
             error: error
         }
         req.apiRes = LAB_REPORT_CODE["1"]
-        await t.rollback()
     }
     res.response(req.apiRes)
-    await t.commit()
     return next()
 }
 
 
 async function createLabReport(req, res, next) {
-    const t = await sequelizeDB.transaction()
+    const doc = 'jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg'
     try {
-        const data = req.files['many-files']
-        if (!data && !data[0]) {
-            return res.status(470).json({ message: 'You must select at least 1 file' })
+        const data = Buffer.from(req.body[0].base64, 'base64');
+        if (!data) {
+            return res.status(470).json({ message: 'You must select file' })
         }
 
-        let list = data
-        if (!data[0]) {
-            list = []
-            list.push(data)
-        }
-
-        if(list.length > 10){
-            return res.status(470).json({ message: 'Maximum is 10 files' })
-        }
-
-        let flg = 0
-        for (const obj of list) {
-            const spl = obj.name.split('.')
-            if(spl[spl.length-1] !== 'png'){
-                flg = 1
-                break
-            }
-            if(obj.size > 10485760){
-                flg = 2
-                break
-            }
-        }
-        if(flg === 1){
+        const spl = req.body[0].nameFile.split('.')
+        if(spl[spl.length-1] !== 'png'){
             return res.status(470).json({ message: 'File type must be image' })
         }
-        if(flg === 2){
-            return res.status(470).json({ message: 'File size must be smaller than 10MB' })
+
+        let type = 'doc'
+        if(doc.includes(spl[spl.length-1])){
+            type = 'image'
         }
 
-        list.forEach(obj => {
-            db_create_lab_report({
-                data: obj.data,
-                name: obj.name, 
-                pid: req.query.pid,
-                tenant_id: req.query.tenant_id
-            })
-        });
-        await t.commit()
+        db_create_lab_report({
+            data: data,
+            name: req.body[0].name, 
+            pid: req.query.pid,
+            tenant_id: req.query.tenant_id,
+            type: type
+        })
+
         return res.status(200).json({ message: 'Sucessful' })
     } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
             return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
         }
-        await t.rollback()
         return res.status(500).json({ error: error })
     }
+}
+
+
+async function getLabReportById(req, res, next) {
+    try {
+        const data = await db_get_lab_report_by_id(req.params)
+        req.apiRes = LAB_REPORT_CODE["2"]
+        req.apiRes["response"] = {
+            labReport: data.data
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = LAB_REPORT_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
 }
 
 
@@ -3017,5 +3013,6 @@ module.exports = {
     createDevice,
     getDevice,
     resetDevice,
-    getRole
+    getRole,
+    getLabReportById
 }

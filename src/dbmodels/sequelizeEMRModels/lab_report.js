@@ -44,6 +44,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.BLOB('medium'),
                 allowNull: false,
             },
+            type: {
+                type: DataTypes.STRING(10),
+                allowNull: false,
+            },
             date: {
                 type: DataTypes.DATE,
                 defaultValue: Sequelize.fn("now"),

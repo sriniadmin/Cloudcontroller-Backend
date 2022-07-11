@@ -4,7 +4,7 @@ var express = require("express")
 var router = express.Router()
 const upload = require("../../middleware/upload")
 
-var {createUuid,textToSpeech,imageUpload,validateModels, getImages, reportUpload, getLabReport, createLabReport, getReport, updateImageUpload}=require("../../old_code_refactor/internalUser")
+var {createUuid,textToSpeech,imageUpload,validateModels, getImages, reportUpload, getLabReport, createLabReport, getReport, updateImageUpload, getLabReportById}=require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 
@@ -253,6 +253,21 @@ router.post("/lab_report",createLabReport,apiFinalProcess)
  
  */
  router.get("/lab_report", getLabReport,apiFinalProcess)
+
+
+ /**
+ * @openapi
+ *  /api/internal/lab_report/:id:
+ *   get:
+ *       tags:
+ *         - Internal
+ *       summary: Get Lab report
+ *       responses:
+ *         '201':
+ *            description: Lab report  Information is provided.
+ 
+ */
+  router.get("/lab_report/:id", getLabReportById,apiFinalProcess)
 
 
  /**
