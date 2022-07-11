@@ -753,19 +753,6 @@ async function db_delete_patient(given_pid, transaction) {
         })
 }
 
-async function db_med_record_exist(params) {
-    try {
-        return await Patients_Data.findOne({
-            where: {
-                med_record: params,
-            },
-            raw: true,
-        })
-    } catch (err) {
-        throw new Error("Patient  " + params + "not found Err:" + err)
-    }
-}
-
 async function db_disable_patient(params) {
     let data
     let promises = []
@@ -880,6 +867,37 @@ async function db_get_patient_details(params) {
 }
 
 
+async function db_med_record_exist(params) {
+    try {
+        return await Patients_Data.findOne({
+            where: {
+                med_record: params,
+            },
+            raw: true,
+        })
+    } catch (error) {
+        throw error
+    }
+}
+
+
+async function db_check_duplicate_patient(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Patients_Data.findOne({
+            where: params
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        error
+    }
+}
+
+
 module.exports = {
     db_get_patient_list,
     db_get_patient_list_new,
@@ -897,5 +915,6 @@ module.exports = {
     db_check_patient_exist,
     db_update_patient_associated_list,
     db_edit_patient,
-    db_add_new_patient
+    db_add_new_patient,
+    db_check_duplicate_patient
 }

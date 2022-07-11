@@ -7,6 +7,8 @@ totp.options = {
 }
 const logger = require("../../config/logger")
 const sequelizeDB = require("../../config/emrmysqldb")
+const Sequelize = require("sequelize")
+const Op = Sequelize.Op
 
 const {
     client,
@@ -67,6 +69,7 @@ const db_update_patient = patient_controller.db_update_patient
 const db_delete_patient = patient_controller.db_delete_patient
 const db_patient_count = patient_controller.db_patient_count
 const db_med_record_exist = patient_controller.db_med_record_exist
+const db_check_duplicate_patient = patient_controller.db_check_duplicate_patient
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 const db_disable_patient = patient_controller.db_disable_patient
@@ -198,6 +201,8 @@ const { v1: uuid } = require('uuid')
 // const alerter = require('../../alerter/globalAlert')
 const alertEnum = require('../../alerter/alertEnum')
 
+const recallFuntion = recall
+let tags
 
 // const {
 //     client,
@@ -3212,16 +3217,24 @@ async function addNewPatient(req, res, next) {
             return next()
         }
 
-        let uuidDict = {
-            uuidType: UUID_CONST["patient"],
-            tenantID: req.body.tenantId,
+        tags = req.body.demographic_map.tags
+        if(tags.length > 0){
+            recallFuntion(req.body.demographic_map.tags.length, 0, req, res, next, t)
         }
-        req.body.demographic_map.tenant_id = req.body.tenantId
-        req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
-        req.body.demographic_map.associated_list = "[]"
-        await db_add_new_patient(req.body.demographic_map)
-        req.apiRes = PATIENT_CODE["3"]
-        req.apiRes["response"] = { patient_data: req.body }
+        else{
+            let uuidDict = {
+                uuidType: UUID_CONST["patient"],
+                tenantID: req.body.tenantId,
+            }
+            req.body.demographic_map.tenant_id = req.body.tenantId
+            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            req.body.demographic_map.associated_list = "[]"
+            await db_add_new_patient(req.body.demographic_map)
+            req.apiRes = PATIENT_CODE["3"]
+            req.apiRes["response"] = { patient_data: req.body }
+            res.response(req.apiRes)
+            return next()
+        }
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
@@ -3229,9 +3242,50 @@ async function addNewPatient(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
 }
+
+
+async function recall(length, number, req, res, next, transaction) {
+    const t = await sequelizeDB.transaction()
+    try {
+        condition = {
+            tags: { [Op.like]: `%"${tags[number].label}"%` }
+        }
+        const check_tags = await db_check_duplicate_patient(condition)
+        if (check_tags) {
+            req.apiRes = {
+                Code: "TAGS_IS_ALREADY_EXIST",
+                HttpStatus: "470",
+                Message: `Tag: "${tags[number].label}" is already exist`,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+        if (length === number+1) {
+            let uuidDict = {
+                uuidType: UUID_CONST["patient"],
+                tenantID: req.body.tenantId,
+            }
+            req.body.demographic_map.tenant_id = req.body.tenantId
+            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            req.body.demographic_map.associated_list = "[]"
+            await db_add_new_patient(req.body.demographic_map)
+            req.apiRes = PATIENT_CODE["3"]
+            req.apiRes["response"] = { patient_data: req.body }
+            res.response(req.apiRes)
+            await transaction.commit();
+            return next()
+        }
+        recallFuntion(length, number + 1, req, res, next, transaction)
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["4"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+}
+
 
 async function getPatientVitalThreashold(req, res, next) {
     try {

@@ -2544,7 +2544,7 @@ async function recall(length, number, req, res, next, transaction) {
             res.response(req.apiRes)
             return next()
         }
-        if (length === number) {
+        if (length === number+1) {
             const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
             
@@ -2905,12 +2905,12 @@ async function createLabReport(req, res, next) {
             return res.status(470).json({ message: 'You must select file' })
         }
 
-        const spl = req.body[0].nameFile.split('.')
+        const spl = req.body[0].name.split('.')
         if(spl[spl.length-1] !== 'png'){
             return res.status(470).json({ message: 'File type must be image' })
         }
 
-        let type = 'doc'
+        let type = 'document'
         if(doc.includes(spl[spl.length-1])){
             type = 'image'
         }
