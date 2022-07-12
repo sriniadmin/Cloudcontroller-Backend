@@ -11,7 +11,7 @@ async function db_get_lab_report(params) {
   const t = await sequelizeDB.transaction()
   try {
     const data = await Lab_Report.findAll({
-      attributes: ['id', 'name', 'date', 'type'],
+      attributes: ['id', 'name', 'date', 'type', 'isShow'],
       where: {
         pid: params.pid
       }
