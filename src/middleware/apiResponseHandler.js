@@ -14,7 +14,7 @@ const apiResponseHandler = async function(err, req, res, next){
         .json(req.apiRes)
   }
   catch(error){
-    throw new Error('CATCH ALL ERROR CALLED', error);
+    return res.send(500, {message: error.message});
   }
 }
 

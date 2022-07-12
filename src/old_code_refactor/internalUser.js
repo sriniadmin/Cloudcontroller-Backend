@@ -2898,32 +2898,48 @@ async function getLabReport(req, res, next) {
 
 
 async function createLabReport(req, res, next) {
-    const doc = 'jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg'
+    const doc = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg'
     try {
-        const data = Buffer(req.body[0].base64, 'base64');
-        if (!data) {
-            return res.status(470).json({ message: 'You must select file' })
+        const data = req.files['file']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
         }
 
-        const spl = req.body[0].name.split('.')
-        if(spl[spl.length-1] !== 'png'){
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+
+        let flg = false
+        for (const obj of list) {
+            const spl = obj.name.split('.')
+            if(!doc.includes(spl[spl.length-1])){
+                flg = true
+                break
+            }
+        }
+        if(flg){
             return res.status(470).json({ message: 'File type must be image' })
         }
 
-        let type = 'document'
-        if(doc.includes(spl[spl.length-1])){
-            type = 'image'
-        }
-
-        db_create_lab_report({
-            data: data,
-            name: req.body[0].name, 
-            pid: req.query.pid,
-            tenant_id: req.query.tenant_id,
-            type: type
-        })
-
+        list.forEach(obj => {
+            const spl = obj.name.split('.')
+            let type = 'document'
+            if(doc.includes(spl[spl.length-1])){
+                type = 'image'
+            }
+            db_create_lab_report({
+                data:  obj.data,
+                name: obj.name, 
+                pid: req.query.pid,
+                tenant_id: req.query.tenant_id,
+                type: type
+            })
+        });
         return res.status(200).json({ message: 'Sucessful' })
+
     } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
             return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
