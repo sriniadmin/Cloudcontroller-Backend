@@ -2979,15 +2979,16 @@ async function download(req, res, next) {
         }
         const data = await db_download_data(req.query)
 
-        const fileContents = Buffer.from(data.data.data, "base64");
+        // const fileContents = Buffer.from(data.data.data, "base64");
 
-        const readStream = new stream.PassThrough();
-        readStream.end(fileContents);
+        // const readStream = new stream.PassThrough();
+        // readStream.end(fileContents);
 
-        res.set('Content-disposition', 'attachment; filename=' + data.data.name);
-        res.set('Content-Type', 'text/plain');
+        // res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        // res.set('Content-Type', 'text/plain');
 
-        return readStream.pipe(res);
+        // return readStream.pipe(res);
+        return res.status(200).json({ data: data.data })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: error })
