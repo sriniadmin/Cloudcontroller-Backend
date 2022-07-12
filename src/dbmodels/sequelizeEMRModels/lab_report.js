@@ -48,6 +48,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(10),
                 allowNull: false,
             },
+            isShow: {
+                type: DataTypes.STRING(10),
+                allowNull: false,
+            },
             date: {
                 type: DataTypes.DATE,
                 defaultValue: Sequelize.fn("now"),

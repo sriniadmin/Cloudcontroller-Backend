@@ -62,8 +62,28 @@ async function db_create_lab_report(params) {
   }
 }
 
+
+async function db_download_data(params) {
+  const t = await sequelizeDB.transaction()
+  try {
+    const data = await Lab_Report.findOne({
+      where: {
+        id: params.id
+      }
+    },
+    { transaction: t })
+    const result = { data: data }
+    await t.commit()
+    return result
+  } catch (error) {
+    await t.rollback()
+    throw error
+  }
+}
+
 module.exports = { 
   db_create_lab_report, 
   db_get_lab_report,
-  db_get_lab_report_by_id
+  db_get_lab_report_by_id,
+  db_download_data
 }

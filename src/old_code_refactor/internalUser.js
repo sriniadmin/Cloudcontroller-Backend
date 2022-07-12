@@ -15,6 +15,7 @@ const lodash = require("lodash")
 let tags
 const Sequelize = require("sequelize")
 const Op = Sequelize.Op
+const stream = require('stream');
 
 const recallFuntion = recall
 var initModels =
@@ -172,7 +173,8 @@ const { info } = require("console")
 const {
     db_create_lab_report,
     db_get_lab_report,
-    db_get_lab_report_by_id
+    db_get_lab_report_by_id,
+    db_download_data
 } = require("../dbcontrollers/lab_report.controller")
 const { getLicenseData } = require("./license")
 const { db_create_license } = require("../dbcontrollers/license.controller")
@@ -2898,7 +2900,7 @@ async function getLabReport(req, res, next) {
 
 
 async function createLabReport(req, res, next) {
-    const doc = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg'
+    const doc = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg, .pdf'
     try {
         const data = req.files['file']
         if (!data && !data[0]) {
@@ -2926,16 +2928,17 @@ async function createLabReport(req, res, next) {
 
         list.forEach(obj => {
             const spl = obj.name.split('.')
-            let type = 'document'
+            let isShow = 'false'
             if(doc.includes(spl[spl.length-1])){
-                type = 'image'
+                isShow = 'true'
             }
             db_create_lab_report({
                 data:  obj.data,
                 name: obj.name, 
                 pid: req.query.pid,
                 tenant_id: req.query.tenant_id,
-                type: type
+                type: obj.mimetype,
+                isShow: isShow
             })
         });
         return res.status(200).json({ message: 'Sucessful' })
@@ -2967,6 +2970,29 @@ async function getLabReportById(req, res, next) {
     return next()
 }
 
+
+async function download(req, res, next) {
+    try {
+
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
+        }
+        const data = await db_download_data(req.query)
+
+        const fileContents = Buffer.from(data.data.data, "base64");
+
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
+
+        res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        res.set('Content-Type', 'text/plain');
+
+        return readStream.pipe(res);
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: error })
+    }
+}
 
 module.exports = {
     getUserInventory,
@@ -3030,5 +3056,6 @@ module.exports = {
     getDevice,
     resetDevice,
     getRole,
-    getLabReportById
+    getLabReportById,
+    download
 }
