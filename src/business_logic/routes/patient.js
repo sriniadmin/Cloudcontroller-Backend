@@ -3252,7 +3252,7 @@ async function recall(length, number, req, res, next, transaction) {
             tags: { [Op.like]: `%"${tags[number].label}"%` }
         }
         const check_tags = await db_check_duplicate_patient(condition)
-        if (check_tags) {
+        if (check_tags.data) {
             req.apiRes = {
                 Code: "TAGS_IS_ALREADY_EXIST",
                 HttpStatus: "470",
