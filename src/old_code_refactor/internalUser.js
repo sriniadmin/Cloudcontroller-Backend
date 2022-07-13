@@ -2900,7 +2900,8 @@ async function getLabReport(req, res, next) {
 
 
 async function createLabReport(req, res, next) {
-    const doc = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg, .pdf'
+    const accept = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg, .pdf'
+    const doc = '.doc .docx'
     try {
         const data = req.files['file']
         if (!data && !data[0]) {
@@ -2917,20 +2918,20 @@ async function createLabReport(req, res, next) {
         let flg = false
         for (const obj of list) {
             const spl = obj.name.split('.')
-            if(!doc.includes(spl[spl.length-1])){
+            if(!accept.includes(spl[spl.length-1])){
                 flg = true
                 break
             }
         }
         if(flg){
-            return res.status(470).json({ message: 'File type must be image' })
+            return res.status(470).json({ message: 'File type must be image, pdf, doc or docx' })
         }
 
         list.forEach(obj => {
             const spl = obj.name.split('.')
-            let isShow = 'false'
+            let isShow = 'true'
             if(doc.includes(spl[spl.length-1])){
-                isShow = 'true'
+                isShow = 'false'
             }
             db_create_lab_report({
                 data:  obj.data,
@@ -2979,16 +2980,15 @@ async function download(req, res, next) {
         }
         const data = await db_download_data(req.query)
 
-        // const fileContents = Buffer.from(data.data.data, "base64");
+        const fileContents = Buffer.from(data.data.data, "base64");
 
-        // const readStream = new stream.PassThrough();
-        // readStream.end(fileContents);
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
 
-        // res.set('Content-disposition', 'attachment; filename=' + data.data.name);
-        // res.set('Content-Type', 'text/plain');
+        res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        res.set('Content-Type', 'text/plain');
 
-        // return readStream.pipe(res);
-        return res.status(200).json({ data: data.data })
+        return readStream.pipe(res);
     } catch (error) {
         console.log(error)
         return res.status(500).json({ error: error })

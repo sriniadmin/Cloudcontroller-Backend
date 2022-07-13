@@ -1336,108 +1336,6 @@ async function getPatientOTP(req, res, next) {
     next()
 }
 
-// Validated
-async function createPatientNotes(req, res, next) {
-    let notes_data = req.body
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let result
-
-    const t = await sequelizeDB.transaction()
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["notesSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient Does Not Exist ",
-        }
-        return next()
-    }
-    uuidDictNote = {
-        uuidType: UUID_CONST["note"],
-        tenantID: 0,
-    }
-    // logger.debug("THE UUID DICT IS", uuidDict["uuidType"])
-    logger.debug("NOTES IS", notes_data)
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_note_result = await getUUID(uuidDictNote, {
-                transaction: t,
-            })
-            notes_data["note_uuid"] = uuid_note_result
-            notes_data["pid"] = given_pid
-            notes_data["tenant_id"] = tenant_id
-            return db_create_notes(tenant_id, notes_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        logger.debug("The error in notes create  is ", error)
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN CREATING THE NOTES ",
-        }
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        patient_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
-
-// Validated
-async function getPatientNotes(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist, notes
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - check failed",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        notes = await db_get_notes_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = "Patient Notes cannot be fetched"
-        logger.debug("Exception Notes: %s", e)
-        return next()
-    }
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        notes: notes,
-        count: notes.length,
-    }
-    next()
-}
 
 // Validated
 
@@ -3627,6 +3525,58 @@ async function getPatientDetail(req, res, next) {
         req.apiRes = PATIENT_CODE["1"]
     }
 
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientNotes(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        uuidDictNote = {
+            uuidType: UUID_CONST["note"],
+            tenantID: 0,
+        }
+
+        req.body["note_uuid"] = await getUUID(uuidDictNote, {
+            transaction: t,
+        })
+        
+        req.body.tenant_id = 'no need'
+        await db_create_notes(req.body)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+        await t.rollback()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getPatientNotes(req, res, next) {
+    try {
+        req.query.pid = req.params.pid
+        const result = await db_get_notes_list(req.query)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            notes: result.data,
+            count: result.data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error.message
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
     res.response(req.apiRes)
     return next()
 }

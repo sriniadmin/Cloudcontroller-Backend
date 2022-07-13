@@ -20,62 +20,6 @@ models.notes.hasMany(models.users, {
 })
 
 
-
-async function db_get_notes_list(tenant_id, username, params) {
-    let notes
-    let { limit, offset, note, pid } = params
-    let whereStatement = { pid: pid }
-    logger.debug("THE PID IS", pid)
-    if (note) {
-        whereStatement.note = { [Op.like]: "%" + note + "%" }
-    }
-
-    try {
-        notes = await Notes.findAll({
-            include: [
-                {
-                    model: models.users,
-                    as: "useruuid",
-                    attributes: ["fname", "lname", "username", "user_uuid"],
-                    raw: false,
-                },
-                {
-                    model: models.users,
-                    as: "pracuuid",
-                    attributes: ["fname", "lname", "username", "user_uuid"],
-                    raw: false,
-                },
-            ],
-            where: whereStatement,
-        })
-    } catch (err) {
-        throw new Error("Failure in fetching the notes" + err)
-    }
-    return notes
-}
-
-async function db_create_notes(tenant_id, notes_data, transaction) {
-    notes_data = JSON.stringify(notes_data)
-    notes_data = JSON.parse(notes_data)
-    logger.debug("the notes data is", notes_data)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    let notes
-    try {
-        notes = await Notes.create(notes_data, { transaction: trans })
-        logger.debug("Notes insert output is" + notes)
-    } catch (err) {
-        logger.debug(
-            "Notes insert  error " + tenant_id + " not found Err:" + err
-        )
-        throw new Error("Notes insert  error -  tenant check" + err)
-    }
-    return notes
-}
-
 async function db_update_notes(tenant_id, notes_data, given_pid, transaction) {
     let { pid } = given_pid
     notes_data = JSON.stringify(notes_data)
@@ -135,6 +79,68 @@ async function db_delete_notes(given_pid, transaction) {
             throw new Error("Could not delete note with pid", given_pid)
         })
 }
+
+
+async function db_create_notes(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const obj = {
+            note: params.note,
+            note_type: params.note_type,
+            note_uuid: params.note_uuid,
+            pid: params.pid,
+            prac_uuid: params.prac_uuid,
+            user_uuid: params.user_uuid,
+            tenant_id: params.tenant_id
+        }
+        const data = await Notes.create(
+            obj,
+            { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw new Error(error)
+    }
+}
+
+
+async function db_get_notes_list(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        let condition = { pid: params.pid }
+        if (params.note) {
+            condition.note = { [Op.like]: "%" + params.note + "%" }
+        }
+      const data = await Notes.findAll({
+        include: [
+            {
+                model: models.users,
+                as: "useruuid",
+                attributes: ["fname", "lname", "username", "user_uuid"],
+                raw: false,
+            },
+            {
+                model: models.users,
+                as: "pracuuid",
+                attributes: ["fname", "lname", "username", "user_uuid"],
+                raw: false,
+            },
+        ],
+        where: condition,
+      },
+      { transaction: t })
+      const result = { data: data }
+      await t.commit()
+      return result
+    } catch (error) {
+      await t.rollback()
+      throw error
+    }
+  }
+
+
 module.exports = {
     db_get_notes_list,
     db_create_notes,
