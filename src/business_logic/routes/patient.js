@@ -111,6 +111,8 @@ const {
     db_create_notes,
     db_get_notes_list,
     db_update_notes,
+    db_create_notes_attachment,
+    db_download_attachment
 } = require("../../dbcontrollers/note.controller")
 //Location
 const {
@@ -200,6 +202,7 @@ const { createPatch } = require("../../middleware/rbac")
 const { v1: uuid } = require('uuid')
 // const alerter = require('../../alerter/globalAlert')
 const alertEnum = require('../../alerter/alertEnum')
+const stream = require('stream');
 
 const recallFuntion = recall
 let tags
@@ -3554,7 +3557,44 @@ async function createPatientNotes(req, res, next) {
             error: error
         }
         req.apiRes = TRANSACTION_CODE["1"]
-        await t.rollback()
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientNoteAttachment(req, res, next) {
+    try {
+        const data = req.files['file']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
+        }
+
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+        list.forEach(obj => {
+            db_create_notes_attachment({
+                note_uuid:  'req.query.note_uuid',
+                name: 'obj.name', 
+                data: obj.data,
+                type: 'obj.type'
+            })
+        });
+        
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
     }
     res.response(req.apiRes)
     return next()
@@ -3579,6 +3619,30 @@ async function getPatientNotes(req, res, next) {
     }
     res.response(req.apiRes)
     return next()
+}
+
+
+async function downloadNoteAttachment(req, res, next) {
+    try {
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
+        }
+        const data = await db_download_attachment(req.query)
+
+        // const fileContents = Buffer.from(data.data.data, "base64");
+
+        // const readStream = new stream.PassThrough();
+        // readStream.end(fileContents);
+
+        // res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        // res.set('Content-Type', 'text/plain');
+
+        // return readStream.pipe(res);
+        return res.status(200).json({ data: data.data })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: error })
+    }
 }
 
 
@@ -3635,5 +3699,7 @@ module.exports = {
     getPatientInventory,
     patientActions,
     editPatient,
-    addNewPatient
+    addNewPatient,
+    createPatientNoteAttachment,
+    downloadNoteAttachment
 }

@@ -2901,7 +2901,7 @@ async function getLabReport(req, res, next) {
 
 async function createLabReport(req, res, next) {
     const accept = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg, .pdf'
-    const doc = '.doc .docx'
+    // const doc = '.doc .docx'
     try {
         const data = req.files['file']
         if (!data && !data[0]) {
@@ -2915,22 +2915,22 @@ async function createLabReport(req, res, next) {
         }
 
 
-        let flg = false
-        for (const obj of list) {
-            const spl = obj.name.split('.')
-            if(!accept.includes(spl[spl.length-1])){
-                flg = true
-                break
-            }
-        }
-        if(flg){
-            return res.status(470).json({ message: 'File type must be image, pdf, doc or docx' })
-        }
+        // let flg = false
+        // for (const obj of list) {
+        //     const spl = obj.name.split('.')
+        //     if(!accept.includes(spl[spl.length-1])){
+        //         flg = true
+        //         break
+        //     }
+        // }
+        // if(flg){
+        //     return res.status(470).json({ message: 'File type must be image, pdf, doc or docx' })
+        // }
 
         list.forEach(obj => {
             const spl = obj.name.split('.')
             let isShow = 'true'
-            if(doc.includes(spl[spl.length-1])){
+            if(!accept.includes(spl[spl.length-1])){
                 isShow = 'false'
             }
             db_create_lab_report({

@@ -51,7 +51,9 @@ const {
     updatePatientProcedure,
     patientActions,
     editPatient,
-    addNewPatient
+    addNewPatient,
+    createPatientNoteAttachment,
+    downloadNoteAttachment
 } = require("../../business_logic/routes/patient")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse");
 
@@ -402,6 +404,36 @@ router.post("/:pid/notes", createPatientNotes, apiFinalProcess)
 
 /**
  * @openapi
+ * /api/patients/{pid}/notes/upload:
+ *   post:
+ *       tags:
+ *         - Patient
+ *       summary: Create patient note
+ *       requestBody:
+ *         description: New patient is created with all the necessary information
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Notes_create'
+ *       responses:
+ *         '201':
+ *           description: Patient Note Information is added.
+ *
+ *       parameters:
+ *          - in: path
+ *            name: pid
+ *            default: 0
+ *            schema:
+ *               type: uuid
+ *            description: The uuid of specific notes
+ */
+
+ router.post("/:pid/notes/upload", createPatientNoteAttachment, apiFinalProcess)
+
+
+/**
+ * @openapi
  * /api/patients/{pid}/notes:
  *   get:
  *       tags:
@@ -437,6 +469,9 @@ router.post("/:pid/notes", createPatientNotes, apiFinalProcess)
  *            description: Search the note
  */
 router.get("/:pid/notes", getPatientNotes, apiFinalProcess);
+
+
+router.get("/:pid/notes/download", downloadNoteAttachment, apiFinalProcess);
 
 /**
  * @openapi
