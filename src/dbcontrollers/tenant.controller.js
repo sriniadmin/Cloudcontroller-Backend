@@ -169,7 +169,7 @@ async function db_get_tenant_list(params) {
             where: {
                 tenant_name: {[Op.not]: ''}
             },
-            order: ["id", "DESC"],
+            order: [["id", "DESC"]]
         },
         { transaction: t })
         let result = { data: data }
