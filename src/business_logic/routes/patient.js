@@ -3565,7 +3565,7 @@ async function createPatientNotes(req, res, next) {
 
 async function createPatientNoteAttachment(req, res, next) {
     try {
-        const data = req.files['file']
+        const data = req.files['data']
         if (!data && !data[0]) {
             return res.status(470).json({ message: 'You must select at least 1 file' })
         }
@@ -3578,10 +3578,10 @@ async function createPatientNoteAttachment(req, res, next) {
 
         list.forEach(obj => {
             db_create_notes_attachment({
-                note_uuid:  'req.query.note_uuid',
-                name: 'obj.name', 
+                note_uuid: req.body.template_uuid,
+                name: obj.name, 
                 data: obj.data,
-                type: 'obj.type'
+                type: req.body.template_type
             })
         });
         

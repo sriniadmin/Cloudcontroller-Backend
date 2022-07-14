@@ -14,7 +14,8 @@ async function db_get_lab_report(params) {
       attributes: ['id', 'name', 'date', 'type', 'isShow'],
       where: {
         pid: params.pid
-      }
+      },
+      order: [["id", "DESC"]]
     },
     { transaction: t })
     const result = { data: data }
