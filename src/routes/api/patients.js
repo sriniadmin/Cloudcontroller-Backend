@@ -1447,8 +1447,7 @@ function newD(req, res, next) {
         patientMedicationData: medication,
         count: medication.length,
     }
-    res.response(req.apiRes)
-    return next();
+    return responseAPI(res, req.apiRes);
 }
 /**
  * @openapi

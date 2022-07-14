@@ -52,8 +52,7 @@ async function createLicense(req, res, next) {
         licenseData: license,
         count: license.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 const redisClient = require("../external_services/redis/cache_service/redis_client")
 const { db_get_tenant_name } = require("../dbcontrollers/tenant.controller")
@@ -87,8 +86,7 @@ async function getLicense(req, res, next) {
         licenseData: license,
         count: license.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 //this is for getting the response and use it in the patch check based on the license

@@ -2748,8 +2748,7 @@ async function createPatientMedication(req, res, next) {
         patientMedicationData: medication,
         count: medication.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function deboardPatientPatch(req, res, next) {
@@ -3042,8 +3041,7 @@ async function disablePatient(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function unassociatePatient(req, res, next) {
@@ -3070,8 +3068,7 @@ async function unassociatePatient(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function editPatient(req, res, next) {
@@ -3203,8 +3200,7 @@ async function getPatientVitalThreashold(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getPatientMedicalHistory(req, res, next) {
@@ -3223,8 +3219,7 @@ async function getPatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3246,8 +3241,7 @@ async function createPatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3267,8 +3261,7 @@ async function getPatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function createPatientAllergy(req, res, next) {
@@ -3289,8 +3282,7 @@ async function createPatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getPatientVital(req, res, next) {
@@ -3309,8 +3301,7 @@ async function getPatientVital(req, res, next) {
         req.apiRes = VITAL_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3332,8 +3323,7 @@ async function createPatientVital(req, res, next) {
         req.apiRes = VITAL_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3352,8 +3342,7 @@ async function updatePatientAllergy(req, res, next) {
         req.apiRes = ALLERGY_CODE["6"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3373,8 +3362,7 @@ async function getPatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3396,8 +3384,7 @@ async function createPatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3416,8 +3403,7 @@ async function updatePatientProcedure(req, res, next) {
         req.apiRes = PROCEDURE_CODE["6"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3461,8 +3447,7 @@ async function getPatientPrescription(req, res, next) {
         req.apiRes = PRESCRIPTION_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3481,8 +3466,7 @@ async function updatePatientMedicalHistory(req, res, next) {
         req.apiRes = MEDICAL_HISTORY_CODE["6"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3528,8 +3512,7 @@ async function getPatientDetail(req, res, next) {
         req.apiRes = PATIENT_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3558,8 +3541,7 @@ async function createPatientNotes(req, res, next) {
         }
         req.apiRes = TRANSACTION_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3609,8 +3591,7 @@ async function getPatientNotes(req, res, next) {
         }
         req.apiRes = PATIENT_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 

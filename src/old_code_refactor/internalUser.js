@@ -227,8 +227,7 @@ async function getUserInventory(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getSelfUserAlert(req, next) {
@@ -274,8 +273,7 @@ async function createUuid(req, res, next) {
         uuid: uuid_result,
         count: uuid_result.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 // Validated
@@ -471,8 +469,7 @@ async function getReport(req, res, next) {
     req.apiRes["response"] = {
         reportData: report,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getImages(req, res, next) {
@@ -497,8 +494,7 @@ async function getImages(req, res, next) {
     req.apiRes["response"] = {
         imagesData: images,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 // Validated
@@ -518,8 +514,7 @@ async function validateModels(req, res, next) {
     req.apiRes["response"] = {
         modelValidation: model_result,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function passwordCheck(password, hash) {
@@ -699,8 +694,7 @@ async function logoutUser(req, res, next) {
     //     logger.debug(`Alert ERROR : ${err.message}`)
     // }
     req.apiRes = SYSTEM_AAA_CODE["7"]
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -716,8 +710,7 @@ async function getSelectBoxPatch(req, res, next) {
         patches: data,
         count: data.length
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 //Patch Function
@@ -774,8 +767,7 @@ async function getPatchInventory(req, res, next) {
         count: filtered_patches.length,
         patchTotalCount: totalCount,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 //validated
@@ -1039,8 +1031,7 @@ async function getTenant(req, res, next) {
             error: error,
         }
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function createTenant(req, res, next) {
@@ -1193,8 +1184,7 @@ async function getBed(req, res, next) {
         beds: [beds],
         count: beds.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 // Validated
@@ -1241,8 +1231,7 @@ async function createBed(req, res, next) {
         beds: [beds],
         count: beds.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 //CONNECTOR ROUTES
@@ -1268,8 +1257,7 @@ async function getConnector(req, res, next) {
         connectors: connectors,
         count: connectors.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function createConnector(req, res, next) {
@@ -1518,8 +1506,7 @@ async function getLocation(req, res, next) {
         count: locations.length,
         locationTotalCount: totalCount,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getRemoteLocation(req, res, next) {
@@ -1539,8 +1526,7 @@ async function getRemoteLocation(req, res, next) {
     req.apiRes["response"] = {
         locations: locations,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 // Validated
@@ -1779,8 +1765,7 @@ async function createRole(req, res, next) {
         role_data: newRole,
         count: newRole.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getRoleData(req) {
@@ -1895,8 +1880,7 @@ async function checkPatchSerial(req, res, next) {
     req.apiRes["response"] = {
         patches: patch_data,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function updateRole(req, res, next) {
@@ -2150,8 +2134,7 @@ async function createTasks(req, res, next) {
     req.apiRes["response"] = {
         tasksData: tasks,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getTask(req, res, next) {
@@ -2174,8 +2157,7 @@ async function getTask(req, res, next) {
     req.apiRes["response"] = {
         taskData: tasks,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getTaskData(req, next) {
@@ -2254,8 +2236,7 @@ async function passwordReset(req, res, next) {
         return next()
     }
     req.apiRes = PASSWORD_CODE["1"]
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 // async function createUserTenant(req, res, next) {
@@ -2315,8 +2296,7 @@ async function getProfiles(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function postProfiles(req, res, next) {
@@ -2353,8 +2333,7 @@ async function postProfiles(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function putProfiles(req, res, next) {
@@ -2380,8 +2359,7 @@ async function putProfiles(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function deletePatch(req, res, next) {
@@ -2403,8 +2381,7 @@ async function deletePatch(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getDeviceType(req, res, next) {
@@ -2419,8 +2396,7 @@ async function getDeviceType(req, res, next) {
         res.response(req.apiRes)
         return next()
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getPathSaas(req, res, next) {
@@ -2442,8 +2418,7 @@ async function getPathSaas(req, res, next) {
         req.apiRes["response"] = {error: error}
     }
     
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function createDevice(req, res, next) {
@@ -2592,8 +2567,7 @@ async function getDevice(req, res, next) {
         }
         req.apiRes = PATCH_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2614,8 +2588,7 @@ async function getProduct(req, res, next) {
         req.apiRes = PRODUCT_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2634,8 +2607,7 @@ async function createProduct(req, res, next) {
         req.apiRes = PRODUCT_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2654,8 +2626,7 @@ async function updatePatch(req, res, next) {
         req.apiRes = PATCH_CODE["17"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2697,8 +2668,7 @@ async function getUserProfile(req, res, next) {
         req.apiRes = USER_CODE["1"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2731,8 +2701,7 @@ async function createUser(req, res, next) {
         req.apiRes = USER_CODE["4"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2762,8 +2731,7 @@ async function updateUser(req, res, next) {
         req.apiRes = USER_CODE["13"]
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2790,8 +2758,7 @@ async function resetDevice(req, res, next) {
         }
     }
 
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2811,8 +2778,7 @@ async function getUserTenant(req, res, next) {
         }
         req.apiRes = USER_CODE["10"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2832,8 +2798,7 @@ async function getRoleList(req, res, next) {
         }
         req.apiRes = ROLE_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2852,8 +2817,7 @@ async function getFacility(req, res, next) {
         }
         req.apiRes = FACILITY_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2873,8 +2837,7 @@ async function getRole(req, res, next) {
         }
         req.apiRes = ROLE_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2894,8 +2857,7 @@ async function getLabReport(req, res, next) {
         }
         req.apiRes = LAB_REPORT_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -2927,28 +2889,39 @@ async function createLabReport(req, res, next) {
         //     return res.status(470).json({ message: 'File type must be image, pdf, doc or docx' })
         // }
 
-        list.forEach(obj => {
-            const spl = obj.name.split('.')
-            let isShow = 'true'
-            if(!accept.includes(spl[spl.length-1])){
-                isShow = 'false'
+        for (let index = 0; index < list.length; index++) {
+            const spl = list[index].name.split('.')
+            list[index].isShow = 'true'
+            if (!accept.includes(spl[spl.length - 1])) {
+                list[index].isShow = 'false'
             }
-            db_create_lab_report({
-                data:  obj.data,
-                name: obj.name, 
-                pid: req.query.pid,
-                tenant_id: req.query.tenant_id,
-                type: obj.mimetype,
-                isShow: isShow
-            })
-        });
-        return res.status(200).json({ message: 'Sucessful' })
+            if (index + 1 === list.length) {
+                return loopCreator(list[index], req, res, true)
+            }
+            loopCreator(list[index], req, res, false)
+        }
+
 
     } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
             return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
         }
         return res.status(500).json({ error: error })
+    }
+}
+
+
+async function loopCreator(obj, req, res, stop) {
+    await db_create_lab_report({
+        data:  obj.data,
+        name: obj.name, 
+        pid: req.query.pid,
+        tenant_id: req.query.tenant_id,
+        type: obj.mimetype,
+        isShow: obj.isShow
+    })
+    if(stop){
+        return res.status(200).json({ message: 'Sucessful' })
     }
 }
 
@@ -2967,8 +2940,7 @@ async function getLabReportById(req, res, next) {
         }
         req.apiRes = LAB_REPORT_CODE["1"]
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 

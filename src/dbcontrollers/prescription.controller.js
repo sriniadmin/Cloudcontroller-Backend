@@ -84,7 +84,7 @@ function get_endDate(presData, startDate) {
         }
     });
 
-    return new Date(startDate).setDate(new Date(startDate).getDate() + daysToAdd)
+    return new Date(startDate).setDate(new Date(startDate).getDate() + (daysToAdd-1))
 }
 
 

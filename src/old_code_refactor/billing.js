@@ -49,8 +49,7 @@ async function getBilling(req, res, next) {
         patchData: patch_data,
         count: billing.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getBillingData(req,next) {
@@ -104,8 +103,7 @@ async function getBillingTotalSummary(req, res, next) {
         patchData: patchData,
         count: billingCount
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 const prepareDataForCreateBilling = (postData) => {
@@ -307,8 +305,7 @@ async function createBilling(req, res, next) {
         billingData: billing,
         count: billing.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function updateBillingTask(req, res, next) {
@@ -372,8 +369,7 @@ async function updateBillingTask(req, res, next) {
     req.apiRes["response"] = {
         billingData: result
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 let code=[]

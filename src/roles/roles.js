@@ -142,8 +142,7 @@ async function createRole(req, res, next) {
         role_data: newRole,
         count: newRole.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function getRole(req, res, next) {
@@ -166,8 +165,7 @@ async function getRole(req, res, next) {
         roles: [roles],
         count: roles.length,
     }
-    res.response(req.apiRes)
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function deleteRole(req, res, next) {

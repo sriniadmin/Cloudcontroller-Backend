@@ -45,6 +45,8 @@ const pathRouter = "./src/routes/api/"
 const { medRouter, medCron } = require(pathRouter + "medication")
 const url = require('url')
 
+global.responseAPI = require('./globle-config/responseAPI')
+
 
 // XXX - this needs to be generic prestart checks
 // Validate all the system checks before launching the API endpoints
