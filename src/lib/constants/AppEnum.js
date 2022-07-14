@@ -768,6 +768,12 @@ let TENANTS_CODE = {
         Message: "Failure in creating the new tenants information",
         Details: {},
     },
+    5: {
+        Code: "TENANTS_IS_ALREADY_EXISTS",
+        HttpStatus: "470",
+        Message: "Tenant is already exists",
+        Details: {},
+    },
 }
 let NOTES_CODE = {
     1: {

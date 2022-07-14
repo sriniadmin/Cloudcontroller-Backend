@@ -111,6 +111,7 @@ const {
     db_update_tenant,
     db_create_tenant,
     db_get_tenant_name,
+    db_check_tenant
 } = require("../dbcontrollers/tenant.controller")
 
 const {
@@ -1021,8 +1022,8 @@ async function getTenant(req, res, next) {
         const data = await db_get_tenant_list(req.query)
         req.apiRes = TENANTS_CODE["2"]
         req.apiRes["response"] = {
-            tenants: data,
-            count: data.length,
+            tenants: data.data,
+            count: data.data.length,
         }
     } catch (error) {
         console.log(error)
@@ -1032,87 +1033,6 @@ async function getTenant(req, res, next) {
         }
     }
     return responseAPI(res, req.apiRes)
-}
-
-async function createTenant(req, res, next) {
-    username = req.userName
-    const t = await sequelizeDB.transaction()
-    logger.debug("the license data is", license)
-    let license_data = {
-        license: license,
-    }
-    //JSON SChema logic
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["tenantsSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed " + error,
-        }
-        return next()
-    }
-
-    let tenant_data = req.body
-    let tenants
-    uuidLicense = { uuidType: UUID_CONST["license"], tenantID: tenant_id }
-    let uuidLicenseuuid = await getUUID(uuidLicense, { transaction: t })
-    logger.debug("the license uuid is", uuidLicense)
-    uuidDict = { uuidType: UUID_CONST["tenant"], tenantID: 0 }
-    try {
-        tenants = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            tenant_data["tenant_uuid"] = uuid_result
-            let tenantCreateRes = null
-            logger.debug('tenant create res is', tenantCreateRes)
-            await db_create_tenant(tenant_id, tenant_data, {
-                transaction: t,
-            })
-                .then((res) => {
-                    tenantCreateRes = res
-                    logger.debug(
-                        "respomse of creating tenant",
-                        res.dataValues.tenant_uuid
-                    )
-                    return db_bulk_create_role(res.dataValues.tenant_uuid, {
-                        transaction: t,
-                    })
-                })
-                .then((role_data) => {
-                    logger.debug("the role data is", role_data)
-                    logger.debug(
-                        "the roles data tenant_id is",
-                        role_data[0].dataValues.tenant_id
-                    )
-                    logger.debug("the license uuid is", uuidLicense)
-                    license_data["license_uuid"] = uuidLicenseuuid
-                    license_data["tenant_id"] =
-                        role_data[0].dataValues.tenant_id
-                    return db_create_license(tenant_id, license_data, {
-                        transaction: t,
-                    })
-                })
-            return tenantCreateRes
-        })
-    } catch (err) {
-        logger.debug("tenant Create error " + err)
-        req.apiRes = TENANTS_CODE["4"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING THE NEW TENANT",
-        }
-        return next()
-    }
-
-    logger.debug("tenant  is" + tenants)
-    tenants = dbOutput_JSON(tenants)
-    req.apiRes = TENANTS_CODE["3"]
-    req.apiRes["response"] = {
-        tenants: [tenants],
-        count: tenants.length,
-    }
-    return next()
 }
 
 async function updateTenant(req, res, next) {
@@ -2966,6 +2886,33 @@ async function download(req, res, next) {
         return res.status(500).json({ error: error })
     }
 }
+
+
+async function createTenant(req, res, next) {
+    try {
+        const result = await db_check_tenant(req.body)
+        if(result.data){
+            req.apiRes = TENANTS_CODE["5"]
+            return responseAPI(res, req.apiRes)
+        }
+        const t = await sequelizeDB.transaction()
+        const uuidDict = { uuidType: UUID_CONST["tenant"], tenantID: 0 }
+        req.body.tenant_uuid = await getUUID(uuidDict, { transaction: t })
+        await db_create_tenant(req.body)
+        req.apiRes = TENANTS_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TENANTS_CODE["4"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
 
 module.exports = {
     getUserInventory,

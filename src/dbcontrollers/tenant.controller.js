@@ -5,45 +5,12 @@ var initModels = require("../dbmodels/sequelizeEMRModels/init-models").initModel
 var models = initModels(sequelizeDB)
 const logger = require("../config/logger")
 const Tenants = models.tenant
-
+const { Op } = require("sequelize")
 
 var Tenant = function (tenantobj) {
     // Basic Details
     this.tenant_name = tenantobj.tenant_name,
         this.tenant_uuid = tenantobj.tenant_uuid
-}
-
-async function db_create_tenant(tenant_id, tenant_data, transaction) {
-    //This route created new patch in the db
-    tenant_list = ""
-    let pdata = new Tenant(tenant_data)
-    logger.debug("tenant data is " + tenant_data)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    await Tenants.create({
-
-        tenant_name: tenant_data['tenant_name'],
-        tenant_uuid: tenant_data['tenant_uuid'],
-
-    }, { transaction: trans })
-        .then((tenant_data) => {
-            logger.debug("tenant insert output is" + tenant_data)
-            tenant_list = tenant_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "tenant insert  error " +
-                tenant_id +
-                " not found Err:" +
-                err
-            )
-            throw new Error("tenant insert  error -  tenant check")
-        })
-
-    return tenant_list
 }
 
 
@@ -196,24 +163,67 @@ async function db_get_tenant_name(tenant_id) {
 
 
 async function db_get_tenant_list(params) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Tenants.findAll()
+        const data = await Tenants.findAll({
+            where: {
+                tenant_name: {[Op.not]: ''}
+            },
+            order: ["id", "DESC"],
+        },
+        { transaction: t })
+        let result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
-        throw new Error(error)
+        await t.rollback()
+        throw error
     }
 }
 
 
-// async function db_get_tenant_list(params) {
-//     try {
-//         return await Tenants.findAll({
-//             order: [["tenant_name", "ASC"]]
-//         })
-//     } catch (err) {
-//         console.log(err)
-//         throw new Error(err)
-//     }
-// }
+async function db_check_tenant(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Tenants.findOne({
+            where: {
+                tenant_name: params.tenant_name
+            }
+        },
+        { transaction: t })
+        let result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
 
 
-module.exports = { db_get_tenant_id, db_get_tenant_list, db_create_tenant, db_tenant_exist, db_update_tenant, db_tenant_exist_trans,db_get_tenant_name }
+async function db_create_tenant(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+      const data = await Tenants.create(
+      params,
+      { transaction: t })
+      const result = { data: data }
+      await t.commit()
+      return result
+    } catch (error) {
+      await t.rollback()
+      throw error
+    }
+  }
+
+
+module.exports = { 
+    db_get_tenant_id, 
+    db_get_tenant_list, 
+    db_create_tenant, 
+    db_tenant_exist, 
+    db_update_tenant, 
+    db_tenant_exist_trans,
+    db_get_tenant_name,
+    db_check_tenant
+}
