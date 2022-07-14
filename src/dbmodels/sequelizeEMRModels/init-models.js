@@ -169,6 +169,7 @@ var _modules_hooks_settings = require("./modules_hooks_settings")
 var _modules_settings = require("./modules_settings")
 var _multiple_db = require("./multiple_db")
 var _notes = require("./notes")
+var _note_attachment = require("./note_attachment")
 var _notification_log = require("./notification_log")
 var _notification_settings = require("./notification_settings")
 var _onotes = require("./onotes")
@@ -469,6 +470,7 @@ function initModels(sequelize) {
     var modules_settings = _modules_settings(sequelize, DataTypes)
     var multiple_db = _multiple_db(sequelize, DataTypes)
     var notes = _notes(sequelize, DataTypes)
+    var note_attachment = _note_attachment(sequelize, DataTypes)
     var notification_log = _notification_log(sequelize, DataTypes)
     var notification_settings = _notification_settings(sequelize, DataTypes)
     var onotes = _onotes(sequelize, DataTypes)
@@ -869,7 +871,8 @@ function initModels(sequelize) {
         medical_illness_map,
         device_type,
         alert_data,
-        logger_data
+        logger_data,
+        note_attachment
     }
 }
 //Relations

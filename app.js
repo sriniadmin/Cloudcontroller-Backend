@@ -43,8 +43,66 @@ const Users_Secure = models.users_secure
 const pathRouter = "./src/routes/api/"
 
 const { medRouter, medCron } = require(pathRouter + "medication")
+const url = require('url')
 
-//a-z All WebApp Routes
+
+// XXX - this needs to be generic prestart checks
+// Validate all the system checks before launching the API endpoints
+// For now only DB check is present - all the requirements should be validated
+// as a health check of System using healthstatus Api
+systemChecks.dbValidate()
+
+let app = express()
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+const cors = require('cors')
+
+app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
+app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
+
+app.use(debugging)
+function debugging(req, res, next) {
+    if(url.parse(req.url,true).pathname !== '/liveapi/gateway/gateway_keepalive'){
+        console.log('                                  ');
+        console.log('...........................................................................');
+        console.log('\x1b[33m%s\x1b[0m', `PATH: ${url.parse(req.url,true).pathname}`);
+        console.log('...........................................................................');
+    }
+    next()
+}
+
+// view engine setup - Can we removed once the Frontend React UI and Mobile App is available
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'ejs');
+
+auditorLoadCfg()
+
+// Register Middleware
+app.use(express.json())
+app.use(
+    express.urlencoded({
+        extended: false,
+    })
+)
+
+const beforeAfterInjection = function (req, res, next) {
+    logger.debug("In the before After Injection Function")
+    res.response = function (obj) {
+        req.res = obj
+    }
+    next()
+}
+
+// const { emailer } = require("./src/external_services/email/email")
+//emailer("reset@live247.ai", "srivatsa2423@gmail.com", "test", "test", "")
+
+app.use(beforeAfterInjection)
+
+app.use(cookieParser())
+// Static files from this will be loaded without checking the token
+app.use(express.static(path.join(__dirname, "public")))
+
+//a-z All WebApp Routes // KEEP THIS
 const routes = {
     //'/':				'index',
     "/api/alerts": "alerts",
@@ -74,60 +132,23 @@ const routes = {
     "/api/logger": "logger"
 }
 
-// XXX - this needs to be generic prestart checks
-// Validate all the system checks before launching the API endpoints
-// For now only DB check is present - all the requirements should be validated
-// as a health check of System using healthstatus Api
-systemChecks.dbValidate()
-
-let app = express()
-const fileUpload = require('express-fileupload');
-app.use(fileUpload());
-const cors = require('cors')
-
-app.options("*", cors({ origin: '*', optionsSuccessStatus: 200 }))
-app.use(cors({ origin: '*', optionsSuccessStatus: 200 }))
-
-// view engine setup - Can we removed once the Frontend React UI and Mobile App is available
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
-
-auditorLoadCfg()
-
-// Register Middleware
-app.use(express.json())
-app.use(
-    express.urlencoded({
-        extended: false,
-    })
-)
-
-const beforeAfterInjection = function (req, res, next) {
-    logger.debug("In the before After Injection Function")
-    res.response = function (obj) {
-        req.res = obj
-    }
-    next()
-}
-
-const { emailer } = require("./src/external_services/email/email")
-//emailer("reset@live247.ai", "srivatsa2423@gmail.com", "test", "test", "")
-
-app.use(beforeAfterInjection)
-
-app.use(cookieParser())
-// Static files from this will be loaded without checking the token
-app.use(express.static(path.join(__dirname, "public")))
+// Register WebApp Routes
+let rt = Object.keys(routes) // KEEP THIS
+rt.forEach((k) => {
+    let rpath = pathRouter + routes[k]
+    logger.debug("Registering %s : %s", k, rpath)
+    app.use(k, require(rpath))
+})
 
 
 // app.use('/api/v1', router);
 
 app.use(responseTime())
-app.use(authentication.validateSession) // AAA
+app.use(authentication.validateSession)
 //app.use(validateParams);
-logger.debug('just above the rvac validate ')
-app.use(RBAC.RBAC_Validate)
-logger.debug('after the rbac validate')
+// logger.debug('just above the rvac validate ')
+// app.use(RBAC.RBAC_Validate)
+// logger.debug('after the rbac validate')
 
 // Middleware for audit trail
 // console.log("\n\n[AUDIT]\n\n", auditor, auditorLoadCfg)
@@ -138,42 +159,34 @@ app.use(auditor)
 // https://blog.cloudboost.io/adding-swagger-to-existing-node-js-project-92a6624b855b
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(
+app.use( // KEEP THIS
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(openapiSpecification, { explorer: true })
 )
 
-// Register WebApp Routes
-let rt = Object.keys(routes)
-rt.forEach((k) => {
-    let rpath = pathRouter + routes[k]
-    logger.debug("Registering %s : %s", k, rpath)
-    app.use(k, require(rpath))
-})
-
 // XXX - Ugly to fix
-app.use("/api/medication", medRouter)
-medCron()
+// app.use("/api/medication", medRouter)
+// medCron()
 
 // This is for the Sensors - Needs to be moved out later
-app.use("/liveapi/gateway", require("./src/routes/liveapi/gateway"))
+app.use("/liveapi/gateway", require("./src/routes/liveapi/gateway")) // KEEP THIS
 
-app.use("/video/guide", require("./src/routes/video/guide"))
+// app.use("/video/guide", require("./src/routes/video/guide"))
 
-// Explicit routes
-app.get("/api-docs.json", (req, res) => {
-    res.setHeader("Content-Type", "application/json")
-    res.send(openapiSpecification)
-})
+// // Explicit routes
+// app.get("/api-docs.json", (req, res) => {
+//     res.setHeader("Content-Type", "application/json")
+//     res.response(openapiSpecification)
+// })
 
-// // This sends out the response to the client
-app.use(apiResponseHandler)
+// This sends out the response to the client
+app.use(apiResponseHandler) // KEEP THIS
 
-app.use(function (err, req, res, next) {
-    console.log("This is the invalid field ->", err.field, err)
-    next(err)
-})
+// app.use(function (err, req, res, next) {
+//     console.log("This is the invalid field ->", err.field, err)
+//     next(err)
+// })
 //app.use(apiResponseHandler)
 
 // catch 404 and forward to error handler
@@ -201,17 +214,17 @@ app.use(function (err, req, res, next) {
 //   console.log(`Express server listening on port ${app.get('port')}`);
 // })
 
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const server = require('http').Server(app) // KEEP THIS
+const io = require('socket.io')(server) // KEEP THIS
 
-global.global_variable = require('./globle-config/global-variable')
+global.global_variable = require('./globle-config/global-variable') // KEEP THIS
 
-io.on('connection', (socket) => {
+io.on('connection', (socket) => { // KEEP THIS
     global_variable.socket = socket
     global_variable.io = io
-});
+})
 
-server.listen(process.env.WEB_APP_PORT);
+server.listen(process.env.WEB_APP_PORT) // KEEP THIS
 
 // app.listen(port, function () {
 //     logger.debug("Server running on port => ", port)

@@ -8,7 +8,6 @@ const postgresSequelizeDB = require("../config/emrpostgresdb")
 const RBAC = require("../middleware/rbac")
 var extract = require("pdf-text-extract")
 const { license } = require("../external_services/license/license.json")
-const alerter = require('../alerter/globalAlert')
 const alertEnum = require('../alerter/alertEnum')
 const { v1: uuid } = require('uuid')
 const { createWorker, PSM, createScheduler } = require("tesseract.js")
@@ -16,6 +15,7 @@ const lodash = require("lodash")
 let tags
 const Sequelize = require("sequelize")
 const Op = Sequelize.Op
+const stream = require('stream');
 
 const recallFuntion = recall
 var initModels =
@@ -78,6 +78,7 @@ const {
     db_get_facility_list,
     db_create_facility,
     db_update_facility,
+    db_get_facility
 } = require("../dbcontrollers/facility.controller")
 
 const {
@@ -96,6 +97,7 @@ const {
     db_update_role,
     db_role_exist,
     db_bulk_create_role,
+    db_get_role
 } = require("../dbcontrollers/role.controller")
 
 const modelsInfo = require("../utils/scripts/Models_fields_info")
@@ -171,6 +173,8 @@ const { info } = require("console")
 const {
     db_create_lab_report,
     db_get_lab_report,
+    db_get_lab_report_by_id,
+    db_download_data
 } = require("../dbcontrollers/lab_report.controller")
 const { getLicenseData } = require("./license")
 const { db_create_license } = require("../dbcontrollers/license.controller")
@@ -636,13 +640,13 @@ async function loginUser(req, res, next) {
                         })
 
                     res.cookie("tokenKey", accessToken)
-                    try {
-                        alerter(loginAlert).then((response) => {
-                            logger.debug(`alertResponse : ${response}`)
-                        })
-                    } catch (err) {
-                        logger.debug(`Alert ERROR : ${err.message}`)
-                    }
+                    // try {
+                    //     alerter(loginAlert).then((response) => {
+                    //         logger.debug(`alertResponse : ${response}`)
+                    //     })
+                    // } catch (err) {
+                    //     logger.debug(`Alert ERROR : ${err.message}`)
+                    // }
                     req.apiRes = SYSTEM_AAA_CODE["6"]
                     req.apiRes["response"] = {
                         userEmail: email,
@@ -686,14 +690,14 @@ async function logoutUser(req, res, next) {
     logoutAlert['text'] = `${username} logged out successfully`
     logoutAlert['service'] = [`${req.userTenant}`]
     logger.debug('alertdata: ', logoutAlert)
-    try {
-        alerter(logoutAlert).then((response) => {
-            logger.debug(`alertResponse : ${response}`)
-        })
-    }
-    catch (err) {
-        logger.debug(`Alert ERROR : ${err.message}`)
-    }
+    // try {
+    //     alerter(logoutAlert).then((response) => {
+    //         logger.debug(`alertResponse : ${response}`)
+    //     })
+    // }
+    // catch (err) {
+    //     logger.debug(`Alert ERROR : ${err.message}`)
+    // }
     req.apiRes = SYSTEM_AAA_CODE["7"]
     res.response(req.apiRes)
     return next()
@@ -919,14 +923,14 @@ async function createPatch(req, res, next) {
             .then((patches) => {
                 logger.debug("PATCH  is" + patches)
 
-                try {
-                    alerter(createPatchAlert).then((response) => {
-                        logger.debug(`alertResponse: ${response} `)
-                    })
-                }
-                catch (err) {
-                    logger.debug(`Alert ERROR: ${err.message} `)
-                }
+                // try {
+                //     alerter(createPatchAlert).then((response) => {
+                //         logger.debug(`alertResponse: ${response} `)
+                //     })
+                // }
+                // catch (err) {
+                //     logger.debug(`Alert ERROR: ${err.message} `)
+                // }
 
                 let data = patches
                 if(req.body.actionType === 'bundle'){
@@ -1539,34 +1543,6 @@ async function getRemoteLocation(req, res, next) {
     return next()
 }
 
-//FACILITY ROUTES
-
-async function getFacility(req, res, next) {
-    logger.debug("Facility info is ", req.userEmail, req.userRole)
-    username = req.userName
-    tenant_id = req.userTenantId
-    tenant_id = req.query.tenant_uuid
-    let facilities
-    try {
-        facilities = await db_get_facility_list(tenant_id, username)
-    } catch (err) {
-        logger.debug("Facility list error " + err)
-        req.apiRes = FACILITY_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING FACILITY INVENTORY",
-        }
-        return next()
-    }
-    logger.debug("Facility list is " + facilities)
-    req.apiRes = FACILITY_CODE["2"]
-    req.apiRes["response"] = {
-        facilities: [facilities],
-        count: facilities.length,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
 // Validated
 async function createFacility(req, res, next) {
     logger.debug("Facility  header output is ", req.headers)
@@ -2121,57 +2097,6 @@ async function updateAllergy(req, res, next) {
     return next()
 }
 
-async function createLabReport(req, res, next) {
-    const t = await sequelizeDB.transaction()
-    let tenant_id = req.userTenantId
-    let lab_report_data = req.body
-    let reports
-    try {
-        reports = await sequelizeDB.transaction(async function (t) {
-            lab_report_data["tenant_id"] = tenant_id
-            return db_create_lab_report(tenant_id, lab_report_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("Lab report list error " + err)
-        req.apiRes = LAB_REPORT_CODE["4"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING THE LAB REPORT",
-        }
-        return next()
-    }
-    logger.debug("Lab report list is " + reports)
-    req.apiRes = LAB_REPORT_CODE["3"]
-    req.apiRes["response"] = {
-        Lab_Report: reports,
-    }
-    res.response(req.apiRes)
-    return next()
-}
-
-async function getLabReport(req, res, next) {
-    let tenant_id = req.userTenantId
-    let reports
-    try {
-        reports = await db_get_lab_report(tenant_id)
-    } catch (err) {
-        logger.debug("BED list error " + err)
-        req.apiRes = LAB_REPORT_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING THE LAB REPORT",
-        }
-        return next()
-    }
-
-    logger.debug("Lab report list is " + reports)
-    req.apiRes = LAB_REPORT_CODE["2"]
-    req.apiRes["response"] = {
-        Lab_Report: reports,
-    }
-    res.response(req.apiRes)
-    return next()
-}
 
 async function createTasks(req, res, next) {
     const t = await sequelizeDB.transaction()
@@ -2523,7 +2448,6 @@ async function getPathSaas(req, res, next) {
 
 async function createDevice(req, res, next) {
     const t = await sequelizeDB.transaction()
-
     try {
         const params = req.body.data[0]
 
@@ -2546,17 +2470,11 @@ async function createDevice(req, res, next) {
         if(check_number && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
             res.response(req.apiRes)
-            if (t) {
-                await t.rollback();
-            }
             return next()
         }
         else if(check_number){
             req.apiRes = PATCH_CODE["15"]
             res.response(req.apiRes)
-            if (t) {
-                await t.rollback();
-            }
             return next()
         }
 
@@ -2570,9 +2488,6 @@ async function createDevice(req, res, next) {
                 if(check_sim){
                     req.apiRes = PATCH_CODE["18"]
                     res.response(req.apiRes)
-                    if (t) {
-                        await t.rollback();
-                    }
                     return next()
                 }
             }
@@ -2586,9 +2501,6 @@ async function createDevice(req, res, next) {
                 if(check_phone){
                     req.apiRes = PATCH_CODE["19"]
                     res.response(req.apiRes)
-                    if (t) {
-                        await t.rollback();
-                    }
                     return next()
                 }
             }
@@ -2599,7 +2511,7 @@ async function createDevice(req, res, next) {
         if(tags.length>0){
             recallFuntion(params.tags.length, 0, req, res, next, t)
         }else{
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             params["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
             const data = await db_create_device(req, t)
@@ -2614,9 +2526,7 @@ async function createDevice(req, res, next) {
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
         res.response(req.apiRes)
-        if (t) {
-            await t.rollback();
-        }
+        await t.rollback();
         return next()
     }
 }
@@ -2634,11 +2544,10 @@ async function recall(length, number, req, res, next, transaction) {
                 Message: `Tag: "${tags[number]}" is already exist`,
             }
             res.response(req.apiRes)
-            await transaction.rollback();
             return next()
         }
-        if (length === number) {
-            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: tenant_id}
+        if (length === number+1) {
+            const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
             
             const data = await db_create_device(req,  transaction)
@@ -2648,7 +2557,7 @@ async function recall(length, number, req, res, next, transaction) {
             await transaction.commit();
             return next()
         }
-        recallFuntion(length, number + 1, req, res, next)
+        recallFuntion(length, number + 1, req, res, next, transaction)
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
@@ -2662,15 +2571,19 @@ async function recall(length, number, req, res, next, transaction) {
 
 async function getDevice(req, res, next) {
     try {
-        const data = await db_get_device(req.body)
+        const result = await db_get_device(req.body)
 
         const count = await db_count_device(req.body)
 
         req.apiRes = PATCH_CODE["2"]
         req.apiRes["response"] = {
-            patches: data,
-            count: data.length,
-            patchTotalCount: count,
+            patches: result.data,
+            count: result.data.length,
+            patchTotalCount: count.data,
+        }
+
+        if(req.body.search){
+            req.apiRes["response"].patchTotalCount = result.data.length
         }
     } catch (error) {
         console.log(error)
@@ -2679,7 +2592,6 @@ async function getDevice(req, res, next) {
         }
         req.apiRes = PATCH_CODE["1"]
     }
-
     res.response(req.apiRes)
     return next()
 }
@@ -2904,7 +2816,7 @@ async function getUserTenant(req, res, next) {
 }
 
 
-async function getRole(req, res, next) {
+async function getRoleList(req, res, next) {
     try {
         const data = await db_get_role_list(req.query)
 
@@ -2924,6 +2836,164 @@ async function getRole(req, res, next) {
     return next()
 }
 
+
+async function getFacility(req, res, next) {
+    try {
+        const data = await db_get_facility(req.query)
+
+        req.apiRes = FACILITY_CODE["2"]
+        req.apiRes["response"] = {
+            facilities: data
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = FACILITY_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getRole(req, res, next) {
+    try {
+        const data = await db_get_role(req.params)
+
+        req.apiRes = ROLE_CODE["2"]
+        req.apiRes["response"] = {
+            data: data,
+            count: data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = ROLE_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getLabReport(req, res, next) {
+    try {
+        const data = await db_get_lab_report(req.query)
+
+        req.apiRes = LAB_REPORT_CODE["2"]
+        req.apiRes["response"] = {
+            labReports: data.data,
+            count: data.data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = LAB_REPORT_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createLabReport(req, res, next) {
+    const accept = '.jpg , .jpeg , .jfif , .pjpeg , .pjp, .png, .svg, .pdf'
+    // const doc = '.doc .docx'
+    try {
+        const data = req.files['file']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
+        }
+
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+
+        // let flg = false
+        // for (const obj of list) {
+        //     const spl = obj.name.split('.')
+        //     if(!accept.includes(spl[spl.length-1])){
+        //         flg = true
+        //         break
+        //     }
+        // }
+        // if(flg){
+        //     return res.status(470).json({ message: 'File type must be image, pdf, doc or docx' })
+        // }
+
+        list.forEach(obj => {
+            const spl = obj.name.split('.')
+            let isShow = 'true'
+            if(!accept.includes(spl[spl.length-1])){
+                isShow = 'false'
+            }
+            db_create_lab_report({
+                data:  obj.data,
+                name: obj.name, 
+                pid: req.query.pid,
+                tenant_id: req.query.tenant_id,
+                type: obj.mimetype,
+                isShow: isShow
+            })
+        });
+        return res.status(200).json({ message: 'Sucessful' })
+
+    } catch (error) {
+        if (error.code === "LIMIT_UNEXPECTED_FILE") {
+            return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
+        }
+        return res.status(500).json({ error: error })
+    }
+}
+
+
+async function getLabReportById(req, res, next) {
+    try {
+        const data = await db_get_lab_report_by_id(req.params)
+        req.apiRes = LAB_REPORT_CODE["2"]
+        req.apiRes["response"] = {
+            labReport: data.data
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = LAB_REPORT_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function download(req, res, next) {
+    try {
+
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
+        }
+        const data = await db_download_data(req.query)
+
+        const fileContents = Buffer.from(data.data.data, "base64");
+
+        const readStream = new stream.PassThrough();
+        readStream.end(fileContents);
+
+        res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        res.set('Content-Type', 'text/plain');
+
+        return readStream.pipe(res);
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: error })
+    }
+}
 
 module.exports = {
     getUserInventory,
@@ -2956,7 +3026,7 @@ module.exports = {
     updateFacility,
     updateTenant,
     createRole,
-    getRole,
+    getRoleList,
     deleteRole,
     updateRole,
     updateAllergy,
@@ -2985,5 +3055,8 @@ module.exports = {
     getPathSaas,
     createDevice,
     getDevice,
-    resetDevice
+    resetDevice,
+    getRole,
+    getLabReportById,
+    download
 }

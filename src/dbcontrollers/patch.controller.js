@@ -681,6 +681,7 @@ async function db_update_patch_unRegister(params) {
         promises.push(
             Patches.update(
                 {
+                    patch_status: 'Inactive',
                     in_use: 'false',
                     patch_serial: null
                 },
@@ -704,7 +705,10 @@ async function db_update_patch_register(params) {
     params.list.forEach(obj => {
         promises.push(
             Patches.update(
-                { patch_serial: params.gateway },
+                { 
+                    patch_serial: params.gateway,
+                    patch_status: 'Active' 
+                },
                 { where: {patch_uuid: obj}}
             )
         )
@@ -770,62 +774,156 @@ async function db_check_duplicate_device(params, transaction) {
 }
 
 async function db_get_device(params) {
-    let limit = params.limit
-    let offset = (params.offset - 1) * limit
-    let condition = {
-        tenant_id: params.tenantId
-    }
-    if (params.search) {
-        offset = 0
-        params.search = (params.search).toLowerCase()
-        condition = {
-            tenant_id: params.tenantId,
-            [Op.or]: [
-                { patch_mac: { [Op.like]: "%" + params.search + "%"} },
-                { device_serial: { [Op.like]: "%" + params.search + "%"} }
-            ]
-        }
-    }
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patches.findAll({
+        let numb = params.limit
+        let limit = params.limit
+        let offset = (params.offset - 1) * limit
+        let condition_device = {
+            tenant_id: params.tenantId
+        }
+        let condition_patient = { 
+            tenant_id: params.tenantId
+        }
+        
+        if (params.search) {
+            limit = 1000000
+            offset = 0
+            params.search = (params.search).toLowerCase()
+            const strings = params.search.split(" ")
+            if (strings.length === 2) {
+                condition_patient = {
+                    tenant_id: params.tenantId,
+                    fname: { [Op.like]: `%${strings[0]}%` },
+                    lname: { [Op.like]: `%${strings[1]}%` }
+                }
+            }
+            else if (strings.length === 3) {
+                condition_patient = {
+                    tenant_id: params.tenantId,
+                    fname: { [Op.like]: `%${strings[0]}%` },
+                    mname: { [Op.like]: `%${strings[1]}%` },
+                    lname: { [Op.like]: `%${strings[2]}%` }
+                }
+            }
+            else {
+                condition_patient = {
+                    tenant_id: params.tenantId,
+                    [Op.or]: [
+                        { fname: { [Op.like]: `%${params.search}%` } },
+                        { lname: { [Op.like]: `%${params.search}%` } },
+                        { mname: { [Op.like]: `%${params.search}%` } }
+                    ]
+                }
+            }
+
+            condition_device = {
+                tenant_id: params.tenantId,
+                [Op.or]: [
+                    { patch_mac: { [Op.like]: "%" + params.search + "%" } },
+                    { device_serial: { [Op.like]: "%" + params.search + "%" } }
+                ]
+            }
+        }
+
+        const data_by_device = await Patches.findAll({
             include: [
                 {
                     model: models.patch_patient_map,
-                    include:[
+                    include: [
                         {
-                            model:models.patient_data,
-                            attributes:['fname','lname','pid', 'med_record', 'primary_consultant']
+                            model: models.patient_data,
+                            attributes: ['fname', 'lname', 'pid', 'med_record', 'primary_consultant', 'secondary_consultant']
                         }
                     ],
                     required: false,
                     where: {
                         tenant_id: params.tenantId
-                    },
+                    }
                 },
-    
+
             ],
-            where: condition,
+            where: condition_device,
             limit: limit,
             offset: offset,
             required: false,
             order: [["date", "DESC"]],
             raw: false,
-        })
+        },
+        { transaction: t })
+
+        if(data_by_device.length > 0){
+            const result = { data: getDataByLimit(data_by_device, numb) }
+            await t.commit()
+            return result
+        }
+
+        const data_by_patient = await Patches.findAll({
+            include: [
+                {
+                    model: models.patch_patient_map,
+                    include: [
+                        {
+                            model: models.patient_data,
+                            attributes: ['fname', 'lname', 'pid', 'med_record', 'primary_consultant', 'secondary_consultant'],
+                            where: condition_patient
+                        }
+                    ],
+                    required: false,
+                    where: {
+                        tenant_id: params.tenantId
+                    }
+                },
+
+            ],
+            where: {
+                tenant_id: params.tenantId
+            },
+            limit: limit,
+            offset: offset,
+            required: false,
+            order: [["date", "DESC"]],
+            raw: false,
+        },
+        { transaction: t })
+
+        const result = { data: getDataByLimit(data_by_patient, numb) }
+        await t.commit()
+        return result
     } catch (error) {
-        throw new Error(error)
+        await t.rollback()
+        throw error
     }
+}
+
+function getDataByLimit(data, limit) {
+    let result = []
+    for (let index = 0; index <limit+1; index++) {
+        if(data[index] && index<limit){
+            result.push(data[index])
+        }
+        else {
+            return result
+        }
+    }
+
 }
 
 
 async function db_count_device(params) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patches.count({
+        const data = await Patches.count({
             where: {
                 tenant_id: params.tenantId
             }
         })
+        let result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
-        throw new Error(error)
+        await t.rollback()
+        throw error
     }
 }
 

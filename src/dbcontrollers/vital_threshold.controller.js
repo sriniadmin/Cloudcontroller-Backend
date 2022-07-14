@@ -17,34 +17,7 @@ var Vital_threshold = function (vital_thresholdobj) {
             (this.maxrr = vital_thresholdobj.maxrr)
 }
 
-async function db_create_vital_threshold(
-    tenant_id,
-    vital_threshold_data,
-    transaction
-) {
-    // vital_threshold_data = JSON.stringify(vital_threshold_data)
-    // vital_threshold_data = JSON.parse(vital_threshold_data)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    let vitals = await VitalThreshold.create(vital_threshold_data, {
-        transaction: trans,
-    })
-    try {
-        logger.debug("vital threshold insert output is" + vitals)
-    } catch (err) {
-        logger.debug(
-            "Vital Threshold insert  error " +
-            tenant_id +
-            " not found Err:" +
-            err
-        )
-        throw new Error("Vital threshold insert  error -  tenant check" + err)
-    }
-    return vitals
-}
+
 //This route created new patch in the db
 //     vital_threshold_list = ""
 //     let pdata = new Vital_threshold(vital_threshold_data)
@@ -130,6 +103,19 @@ async function db_get_vital_threshold_list(params) {
         throw new Error(error)
     }
 }
+
+
+async function db_create_vital_threshold(params, transaction) {
+    try {
+        return await VitalThreshold.create(
+            params,
+            { transaction: transaction }
+        )
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 
 module.exports = {
     db_get_vital_threshold_list,

@@ -39,7 +39,7 @@ auditorLoadCfg = function () {
     fs.readFile('./src/middleware/audit.json', (err, data) => {
         if (err) throw err;
         auditRoutesCfg = JSON.parse(data);
-        console.log("AUDIT]: Config loaded... ", auditRoutesCfg);
+        // console.log("AUDIT]: Config loaded... ", auditRoutesCfg);
         return auditRoutesCfg
     })
 }
@@ -64,32 +64,32 @@ auditor = function (req, res, next) {
         params = observeParams.concat(req.Params)
     }
 
-        
-    console.log("Date ", date)
-    console.log("IP ", ip)
-    console.log("Path ", path)
-    console.log("Params ", params)
-    console.log("Body ", body)
-    console.log("Query ", query)
+
+    // console.log("Date ", date)
+    // console.log("IP ", ip)
+    // console.log('\x1b[33m%s\x1b[0m', `PATH: ${path}`);
+    // console.log("Params ", params)
+    // console.log("Body ", body)
+    // console.log("Query ", query)
 
     _url = path.split('/', 3)
     basePath = '/'+_url[1]+'/'+_url[2]
-    console.log(req.method)
-    console.log(req.userEmail)
-    if(basePath.indexOf('liveapi') == -1){
-    console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
-    }
+    // console.log(req.method)
+    // console.log(req.userEmail)
+    // if(basePath.indexOf('liveapi') == -1){
+    // console.log("[AUDIT]: BasePath, Array", basePath, Object.keys(auditRoutesCfg.route))
+    // }
 
     /*
     let auditLog = Object.create(auditLogCtrlr.AuditLogObj)
-    
+
     auditLog['pid'] = ""
     auditLog['userEmail'] = req.userEmail.toLowerCase()
     auditLog['userRole'] = req.userRole.toLowerCase()
     auditLog['tenant'] = req.tenant.toLowerCase()
     auditLog['reqBody'] = ""
     console.log("Audit Log", auditLog)
-    
+
     auditLogCtrlr.create(req, res, auditLog)
     */
 
@@ -97,16 +97,16 @@ auditor = function (req, res, next) {
         routes = Object.keys(auditRoutesCfg.route)
         for (let i = 0; i < routes.length; ++i) {
             const rt = routes[i]
-            console.log("Route :", rt, path)
+            // console.log("Route :", rt, path)
             let re = new RegExp(rt)
             let match = re.exec(path)
-            console.log(match)
+            // console.log(match)
             if (match) {
                 adRt = auditRoutesCfg.route[rt]
-     
+
                 if (adRt.verb.includes(req.method)) {
                     let auditLog = Object.create(auditLogCtrlr.AuditLogObj)
-    
+
                     if (req) {
                         auditLog['userEmail'] = req.userEmail ? req.userEmail.toLowerCase() : 'empty email'
                         auditLog['userRole'] = req.userRole ? req.userRole.toLowerCase() : 'empty role'
@@ -127,7 +127,7 @@ auditor = function (req, res, next) {
                     //console.log("Audit Log", auditLog)
 
                     auditLogCtrlr.create(req, res, auditLog)
-    
+
                     if (adRt.hasOwnProperty('logMethod')) {
                         adRt.logMethod(req, res, match, auditLog)
                     }
@@ -147,6 +147,6 @@ auditor = function (req, res, next) {
 }
 
 module.exports = {
-    auditor: auditor, 
+    auditor: auditor,
     auditorLoadCfg: auditorLoadCfg
 };

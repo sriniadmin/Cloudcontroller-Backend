@@ -7,6 +7,8 @@ totp.options = {
 }
 const logger = require("../../config/logger")
 const sequelizeDB = require("../../config/emrmysqldb")
+const Sequelize = require("sequelize")
+const Op = Sequelize.Op
 
 const {
     client,
@@ -67,6 +69,7 @@ const db_update_patient = patient_controller.db_update_patient
 const db_delete_patient = patient_controller.db_delete_patient
 const db_patient_count = patient_controller.db_patient_count
 const db_med_record_exist = patient_controller.db_med_record_exist
+const db_check_duplicate_patient = patient_controller.db_check_duplicate_patient
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 const db_disable_patient = patient_controller.db_disable_patient
@@ -108,6 +111,8 @@ const {
     db_create_notes,
     db_get_notes_list,
     db_update_notes,
+    db_create_notes_attachment,
+    db_download_attachment
 } = require("../../dbcontrollers/note.controller")
 //Location
 const {
@@ -195,9 +200,12 @@ const { db_create_user, db_update_patient_user } = require("../../dbcontrollers/
 const { createPatch } = require("../../middleware/rbac")
 
 const { v1: uuid } = require('uuid')
-const alerter = require('../../alerter/globalAlert')
+// const alerter = require('../../alerter/globalAlert')
 const alertEnum = require('../../alerter/alertEnum')
+const stream = require('stream');
 
+const recallFuntion = recall
+let tags
 
 // const {
 //     client,
@@ -530,7 +538,7 @@ async function deletePatient(req, res, next) {
 
 // Validated
 async function getUserPatientMap(req, res, next) {
-    console.log("User info is ", req.userEmail, req.userRole, req.params)
+    logger.debug("User info is ", req.userEmail, req.userRole, req.params)
     let username = req.userName
     let given_pid = req.params.pid
     let tenant_id = req.userTenantId
@@ -575,7 +583,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             duration: duration,
             tenantUUID: tenant_id,
         }
-        console.log("Patient GRPC calling.. ", tenant_id)
+        logger.debug("Patient GRPC calling.. ", tenant_id)
         // baselineResult = await patientDetailsGRPC(patientInventoryJSON)
 
         baselineResult = {"status":1,"result":{"code":14,"details":"Name resolution failed for target dns:sensor_consumer:9010","metadata":{}}}
@@ -585,7 +593,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
         tempbaselineResult[0]["patientUUID"] = given_pid
         if (parseInt(baselineResult["status"]) != 0) {
             // patientList will be loaded with error
-            console.log("Patient List from GRPC is errored")
+            logger.error("Patient List from GRPC is errored")
             // req.apiRes = PATIENT_CODE["1"]
             // req.apiRes["error"] = {
             //     errMessage: "Patient Inventory Fetch Error RPC " + JSON.stringify(baselineResult)
@@ -593,7 +601,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             // return next()
         }
     } catch (err) {
-        console.log("Patient Inventory Fetch Error GRPC " + err)
+        logger.debug("Patient Inventory Fetch Error GRPC " + err)
         // req.apiRes = PATIENT_CODE["1"]
         // req.apiRes["error"] = {
         //     errMessage: "Patient Inventory Fetch Error RPC",
@@ -607,12 +615,12 @@ async function grpcCall(given_pid, duration, tenant_id) {
             .filter((item) => item !== undefined && item !== null)
         pidlist = [given_pid]
     } catch (error) {
-        console.log("Pid List failed.. Sorting based on Name")
+        logger.debug("Pid List failed.. Sorting based on Name")
     }
     if (pidlist.length > 0) {
-        console.log("Pid list is ", pidlist.length)
+        logger.debug("Pid list is ", pidlist.length)
     } else {
-        console.log(
+        logger.error(
             "The Baseline Provided info has no patients - Something went really wrong",
             baselineResult
         )
@@ -629,59 +637,7 @@ async function patientList(req, res, next) {
     }
     return next()
 }
-// Validated
-async function getPatientDetail(req, res, next) {
-    // This API gets the username and tenant and other HTTP Headers info
-    // let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.query.tenantId
-    // let patient_exist, patients_list
-    let duration = 3
-    // // let duration = req.query.duration
-    // let baseLineDict
-    // try {
-    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
-    //     if (!validate_patient_exist(patient_exist, req)) return next()
-    // } catch (error) {
-    //     logger.debug("Exception : %s PID %s", error, given_pid)
-    //     req.apiRes = PATIENT_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         errMessage: "Patient - Check failed",
-    //     }
-    //     return next()
-    // }
-    // let query_param = {
-    //     ...req.params,
-    //     ...req.query,
-    // }
-    try {
-        baseLineDict = await grpcCall(given_pid, duration, tenant_id)
-        logger.debug("BASELINE DICT", baseLineDict)
-        req.query["pidlist"] = baseLineDict["pidlist"]
-    } catch (error) {
-        logger.debug("Error in GRPC Call is ", error)
-    }
-    try {
-        patients_list = await db_get_patient_details(req.params.pid)
-    } catch (e) {
-        req.apiRes = PATIENT_CODE["1"]
-        logger.debug("Exception : %s", e)
-        return next()
-    }
-    // patients_list = JSON.stringify(patients_list)
-    // patients_list = JSON.parse(patients_list)
 
-    // let patients = patients_list
-    //let patch_ref = patients["patch_patient_map"]
-    //let location_ref = patients["location"]
-    patients_list["baselineResult"] = baseLineDict["baselineResult"]
-    let listPatient = await genPatientRespData([patients_list])
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        patient: listPatient[0]
-    }
-    return next()
-}
 
 async function patientKafkaRegister(msg) {
     logger.debug("Kafka Test")
@@ -972,7 +928,7 @@ async function createPatient(req, res, next) {
     }
 
     try {
-        let response = await alerter(createPatientAlert)
+        // let response = await alerter(createPatientAlert)
         logger.debug(`alertResponse : ${response}`)
     }
     catch (err) {
@@ -1076,7 +1032,7 @@ async function updatePatient(req, res, next) {
 
     if (demographic_map['discharge_date'] !== null ) {
         try {
-            let response = await alerter(dischargePatientAlert)
+            // let response = await alerter(dischargePatientAlert)
             logger.debug(`alertResponse : ${response}`)
         }
         catch (err) {
@@ -1383,108 +1339,6 @@ async function getPatientOTP(req, res, next) {
     next()
 }
 
-// Validated
-async function createPatientNotes(req, res, next) {
-    let notes_data = req.body
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist
-    let result
-
-    const t = await sequelizeDB.transaction()
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["notesSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        logger.debug("The error in catch is ", error)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient Does Not Exist ",
-        }
-        return next()
-    }
-    uuidDictNote = {
-        uuidType: UUID_CONST["note"],
-        tenantID: 0,
-    }
-    // logger.debug("THE UUID DICT IS", uuidDict["uuidType"])
-    logger.debug("NOTES IS", notes_data)
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            let uuid_note_result = await getUUID(uuidDictNote, {
-                transaction: t,
-            })
-            notes_data["note_uuid"] = uuid_note_result
-            notes_data["pid"] = given_pid
-            notes_data["tenant_id"] = tenant_id
-            return db_create_notes(tenant_id, notes_data, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        logger.debug("The error in notes create  is ", error)
-        req.apiRes["error"] = {
-            errMessage: "ERROR IN CREATING THE NOTES ",
-        }
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        patient_data: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
-
-// Validated
-async function getPatientNotes(req, res, next) {
-    let username = req.userName
-    let given_pid = req.params.pid
-    let tenant_id = req.userTenantId
-    let patient_exist, notes
-    try {
-        patient_exist = await db_patient_exist(tenant_id, given_pid)
-        if (!validate_patient_exist(patient_exist, req)) return next()
-    } catch (error) {
-        logger.debug("Exception : %s PID %s", error, given_pid)
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = {
-            errMessage: "Patient - check failed",
-        }
-        return next()
-    }
-    req.query.pid = req.params.pid
-    try {
-        notes = await db_get_notes_list(tenant_id, username, req.query)
-    } catch (e) {
-        req.apiRes = PATIENT_CODE["1"]
-        req.apiRes["error"] = "Patient Notes cannot be fetched"
-        logger.debug("Exception Notes: %s", e)
-        return next()
-    }
-    req.apiRes = PATIENT_CODE["2"]
-    req.apiRes["response"] = {
-        notes: notes,
-        count: notes.length,
-    }
-    next()
-}
 
 // Validated
 
@@ -1775,63 +1629,7 @@ async function getPatientPractitioner(req, res, next) {
     return next()
 }
 
-// Validated
-async function createPatientVitalThreshold(req, res, next) {
-    // let vital_threshold_data = req.body
-    // let given_pid = vital_threshold_data.pid
-    // let tenant_id = vital_threshold_data.tenant_uuid
-    // let patient_exist
-    let result
-    const t = await sequelizeDB.transaction()
-    //JSON SCHEMA VALIDATION
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["vitalthresholdMapSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed",
-        }
-        return next()
-    }
 
-    // try {
-    //     patient_exist = await db_patient_exist(tenant_id, given_pid)
-    //     if (!validate_patient_exist(patient_exist, req)) return next()
-    // } catch (error) {
-    //     logger.debug("Exception : %s PID %s", error, given_pid)
-    //     logger.debug("The error in catch is ", error)
-    //     req.apiRes = PATIENT_CODE["1"]
-    //     req.apiRes["error"] = {
-    //         errMessage: "Patient - ",
-    //     }
-    //     return next()
-    // }
-    try {
-        result = await sequelizeDB.transaction(async function (t) {
-            // vital_threshold_data["tenant_uuid"] = tenant_id
-            // vital_threshold_data["pid"] = given_pid
-            return db_create_vital_threshold(tenant_id, req.body, {
-                transaction: t,
-            })
-        })
-    } catch (error) {
-        req.apiRes = TRANSACTION_CODE["1"]
-        logger.debug("ERROR IN CREATING VITAL THRESHOLD" + error)
-        return next()
-    }
-    respResult = dbOutput_JSON(result)
-    respResult = req.body
-    req.apiRes = TRANSACTION_CODE["0"]
-    req.apiRes["response"] = {
-        patient_data: respResult,
-        count: respResult.length,
-    }
-    global_variable.threshold_list = db_threshold_by_patient()
-    console.log(global_variable.threshold_list)
-    return next()
-}
 
 //report Generator
 async function getPatientDeboardReport(req, res, next) {
@@ -3085,7 +2883,7 @@ async function deboardPatientPatch(req, res, next) {
         }
         await patientKafkaRegister(msg)
         try {
-            let response = await alerter(deboardPatientPatchAlert)
+            // let response = await alerter(deboardPatientPatchAlert)
             logger.debug(`alertResponse : ${response}`)
         }
         catch (err) {
@@ -3277,7 +3075,19 @@ async function unassociatePatient(req, res, next) {
 }
 
 async function editPatient(req, res, next) {
+    const t = await sequelizeDB.transaction()
     try {
+        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
+        if (medical_record && medical_record.pid !== req.body.demographic_map.pid) {
+            req.apiRes = PATIENT_CODE["8"]
+            req.apiRes["error"] = {
+                isExist: true,
+                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+
         await db_edit_patient(req.body.demographic_map)
         req.apiRes = PATIENT_CODE["7"]
         req.apiRes["response"] = req.body
@@ -3286,15 +3096,16 @@ async function editPatient(req, res, next) {
         req.apiRes = PATIENT_CODE["8"]
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
+        await t.rollback();
         return next()
     }
     res.response(req.apiRes)
+    await t.commit()
     return next()
 }
 
 async function addNewPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
-
     try {
         const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
         if (medical_record) {
@@ -3304,36 +3115,78 @@ async function addNewPatient(req, res, next) {
                 error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
             res.response(req.apiRes)
-            if (t) {
-                await t.rollback();
-            }
             return next()
         }
 
-        let uuidDict = {
-            uuidType: UUID_CONST["patient"],
-            tenantID: req.body.tenantId,
+        tags = req.body.demographic_map.tags
+        if(tags.length > 0){
+            recallFuntion(req.body.demographic_map.tags.length, 0, req, res, next, t)
         }
-        req.body.demographic_map.tenant_id = req.body.tenantId
-        req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
-        req.body.demographic_map.associated_list = "[]"
-        await db_add_new_patient(req.body.demographic_map, t)
-        req.apiRes = PATIENT_CODE["3"]
-        req.apiRes["response"] = { patient_data: req.body }
+        else{
+            let uuidDict = {
+                uuidType: UUID_CONST["patient"],
+                tenantID: req.body.tenantId,
+            }
+            req.body.demographic_map.tenant_id = req.body.tenantId
+            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            req.body.demographic_map.associated_list = "[]"
+            await db_add_new_patient(req.body.demographic_map)
+            req.apiRes = PATIENT_CODE["3"]
+            req.apiRes["response"] = { patient_data: req.body }
+            res.response(req.apiRes)
+            return next()
+        }
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = { error: error.message }
         res.response(req.apiRes)
-        if (t) {
-            await t.rollback();
-        }
         return next()
     }
-    res.response(req.apiRes)
-    await t.commit()
-    return next()
 }
+
+
+async function recall(length, number, req, res, next, transaction) {
+    const t = await sequelizeDB.transaction()
+    try {
+        condition = {
+            tags: { [Op.like]: `%"${tags[number].label}"%` }
+        }
+        const check_tags = await db_check_duplicate_patient(condition)
+        if (check_tags.data) {
+            req.apiRes = {
+                Code: "TAGS_IS_ALREADY_EXIST",
+                HttpStatus: "470",
+                Message: `Tag: "${tags[number].label}" is already exist`,
+            }
+            res.response(req.apiRes)
+            return next()
+        }
+        if (length === number+1) {
+            let uuidDict = {
+                uuidType: UUID_CONST["patient"],
+                tenantID: req.body.tenantId,
+            }
+            req.body.demographic_map.tenant_id = req.body.tenantId
+            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            req.body.demographic_map.associated_list = "[]"
+            await db_add_new_patient(req.body.demographic_map)
+            req.apiRes = PATIENT_CODE["3"]
+            req.apiRes["response"] = { patient_data: req.body }
+            res.response(req.apiRes)
+            await transaction.commit();
+            return next()
+        }
+        recallFuntion(length, number + 1, req, res, next, transaction)
+    } catch (error) {
+        console.log(error)
+        req.apiRes = PATIENT_CODE["4"]
+        req.apiRes["error"] = { error: error.message }
+        res.response(req.apiRes)
+        return next()
+    }
+}
+
 
 async function getPatientVitalThreashold(req, res, next) {
     try {
@@ -3633,6 +3486,166 @@ async function updatePatientMedicalHistory(req, res, next) {
 }
 
 
+async function createPatientVitalThreshold(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        await db_create_vital_threshold(req.body, t)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            medical_history_data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+        await t.rollback()
+    }
+    res.response(req.apiRes)
+    global_variable.threshold_list = db_threshold_by_patient()
+    console.log(global_variable.threshold_list)
+    await t.commit()
+    return next()
+}
+
+
+async function getPatientDetail(req, res, next) {
+    try {
+        const result = await db_get_patient_details(req.params)
+        baseLineDict = await grpcCall(req.params.pid, 3, null)
+        result.data["baselineResult"] = baseLineDict["baselineResult"]
+        let listPatient = await genPatientRespData([result.data])
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            patient: listPatient[0]
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientNotes(req, res, next) {
+    const t = await sequelizeDB.transaction()
+    try {
+        uuidDictNote = {
+            uuidType: UUID_CONST["note"],
+            tenantID: 0,
+        }
+
+        req.body["note_uuid"] = await getUUID(uuidDictNote, {
+            transaction: t,
+        })
+        
+        req.body.tenant_id = 'no need'
+        await db_create_notes(req.body)
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function createPatientNoteAttachment(req, res, next) {
+    try {
+        const data = req.files['file']
+        if (!data && !data[0]) {
+            return res.status(470).json({ message: 'You must select at least 1 file' })
+        }
+
+        let list = data
+        if (!data[0]) {
+            list = []
+            list.push(data)
+        }
+
+        list.forEach(obj => {
+            db_create_notes_attachment({
+                note_uuid:  'req.query.note_uuid',
+                name: 'obj.name', 
+                data: obj.data,
+                type: 'obj.type'
+            })
+        });
+        
+        req.apiRes = TRANSACTION_CODE["0"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TRANSACTION_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function getPatientNotes(req, res, next) {
+    try {
+        req.query.pid = req.params.pid
+        const result = await db_get_notes_list(req.query)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            notes: result.data,
+            count: result.data.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error.message
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+    res.response(req.apiRes)
+    return next()
+}
+
+
+async function downloadNoteAttachment(req, res, next) {
+    try {
+        if(!req.query.id){
+            return res.status(470).json({ message: 'Missing param id' })
+        }
+        const data = await db_download_attachment(req.query)
+
+        // const fileContents = Buffer.from(data.data.data, "base64");
+
+        // const readStream = new stream.PassThrough();
+        // readStream.end(fileContents);
+
+        // res.set('Content-disposition', 'attachment; filename=' + data.data.name);
+        // res.set('Content-Type', 'text/plain');
+
+        // return readStream.pipe(res);
+        return res.status(200).json({ data: data.data })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ error: error })
+    }
+}
+
+
 module.exports = {
     createPatientInBulk,
     // patientInventory,
@@ -3686,5 +3699,7 @@ module.exports = {
     getPatientInventory,
     patientActions,
     editPatient,
-    addNewPatient
+    addNewPatient,
+    createPatientNoteAttachment,
+    downloadNoteAttachment
 }

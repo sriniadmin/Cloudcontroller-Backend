@@ -5,26 +5,6 @@ var models = initModels(sequelizeDB)
 const logger = require("../config/logger")
 const Facilities = models.facility
 
-async function db_get_facility_list(tenant_id, username) {
-    // This async function gets the tenants matching the tenant_name
-    // It currently does not check if more than one tenant exist or not. TODO
-    // Returns a promise of the tenant_id number
-    let result
-    let whereStatement = { tenant_id: tenant_id }
-    try {
-        facility_data = await Facilities.findAll({
-            raw: true,
-            where: whereStatement,
-        })
-        logger.debug("facility list is" + facility_data)
-        result = facility_data
-    }
-    catch (err) {
-        logger.debug("Facility list fetch error " + tenant_id + "not found Err:" + err)
-        throw new Error("facility list fetch error -  tenant check")
-    }
-    return result
-}
 
 async function db_create_facility(tenant_id, facility_data, transaction) {
     //This email created new facility in the db
@@ -65,8 +45,44 @@ async function db_update_facility(tenant_id, facility_data, transaction) {
     return result
 }
 
+
+async function db_get_facility(params) {
+    try {
+        return await Facilities.findOne({
+            where: {
+                tenant_id: params.tenant_uuid,
+            }
+        })
+    } catch (err) {
+        throw err
+    }
+}
+
+
+async function db_get_facility_list(tenant_id, username) {
+    // This async function gets the tenants matching the tenant_name
+    // It currently does not check if more than one tenant exist or not. TODO
+    // Returns a promise of the tenant_id number
+    let result
+    let whereStatement = { tenant_id: tenant_id }
+    try {
+        facility_data = await Facilities.findAll({
+            raw: true,
+            where: whereStatement,
+        })
+        logger.debug("facility list is" + facility_data)
+        result = facility_data
+    }
+    catch (err) {
+        logger.debug("Facility list fetch error " + tenant_id + "not found Err:" + err)
+        throw new Error("facility list fetch error -  tenant check")
+    }
+    return result
+}
+
 module.exports = {
     db_get_facility_list,
     db_create_facility,
     db_update_facility,
+    db_get_facility
 }

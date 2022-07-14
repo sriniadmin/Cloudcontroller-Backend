@@ -45,7 +45,7 @@ module.exports = function (sequelize, DataTypes) {
             id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                defaultValue: 0,
+                autoIncrement: true,
                 primaryKey: true,
             },
             note_uuid: {

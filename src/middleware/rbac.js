@@ -1422,90 +1422,91 @@ ac.grant('Admin').extend(['Doctor', 'Nurse']);
 ac.grant('SuperAdmin').extend(['Admin', 'Doctor', 'Nurse'])
 
 var RBAC_Validate = async function (req, res, next) {
+    return next()
 
 
-    logger.debug("The role of the user is ", req.userRole, req.path, req.method)
-    let realResource = functionConvertor(req.path) //req.page
-    logger.debug("THE REQ PATH IS", realResource, req.path)
-    let resource = realResource // Identify the right resource
-    let role = req.userRole
-    logger.debug('the role is ', role)
-    let permission = ""
-    let tenant_id = req.userTenantId;
-    logger.debug('the tenant id in rbac is', tenant_id)
+    // logger.debug("The role of the user is ", req.userRole, req.path, req.method)
+    // let realResource = functionConvertor(req.path) //req.page
+    // logger.debug("THE REQ PATH IS", realResource, req.path)
+    // let resource = realResource // Identify the right resource
+    // let role = req.userRole
+    // logger.debug('the role is ', role)
+    // let permission = ""
+    // let tenant_id = req.userTenantId;
+    // logger.debug('the tenant id in rbac is', tenant_id)
 
-    let roleData = [];
-    try {
-        logger.debug('inside try rbac block')
-        roleData = await db_get_particular_role_list(tenant_id, role);
-        //logger.debug('the role data is',roleData)
-        //logger.debug('the stringify role data is',JSON.stringify(roleData))
-    } catch (err) {
-        logger.debug('role Data fetched in RBAC failed', err);
-    }
-    //logger.debug('role Data fetched in RBAC', roleData)
-    let reqRolePermissions = [];
-    //reqRolePermissions=roleData.role_permission
+    // let roleData = [];
+    // try {
+    //     logger.debug('inside try rbac block')
+    //     roleData = await db_get_particular_role_list(tenant_id, role);
+    //     //logger.debug('the role data is',roleData)
+    //     //logger.debug('the stringify role data is',JSON.stringify(roleData))
+    // } catch (err) {
+    //     logger.debug('role Data fetched in RBAC failed', err);
+    // }
+    // //logger.debug('role Data fetched in RBAC', roleData)
+    // let reqRolePermissions = [];
+    // //reqRolePermissions=roleData.role_permission
 
-    roleData.map((item) => {
-        if(item.role_name!=null&&role!=null){
-            if (item.role_name.toLowerCase() === role.toLowerCase()) {
-                reqRolePermissions = item.role_permission;
-            }
-        }
+    // roleData.map((item) => {
+    //     if(item.role_name!=null&&role!=null){
+    //         if (item.role_name.toLowerCase() === role.toLowerCase()) {
+    //             reqRolePermissions = item.role_permission;
+    //         }
+    //     }
         
-    })
-    //logger.debug('reqRolePermission array', role, reqRolePermissions);
-    reqRolePermissions.map((item) => {
-        item.role = role;
-    })
-    //logger.debug('reqRolePermission array after update', role, reqRolePermissions);
-    const ac = new AccessControl(reqRolePermissions)
+    // })
+    // //logger.debug('reqRolePermission array', role, reqRolePermissions);
+    // reqRolePermissions.map((item) => {
+    //     item.role = role;
+    // })
+    // //logger.debug('reqRolePermission array after update', role, reqRolePermissions);
+    // const ac = new AccessControl(reqRolePermissions)
 
-    try {
-        logger.debug('the user role is', role)
-        logger.debug("User role check", ac.hasRole(role))
-        if (!ac.hasRole(role)) {
-            logger.info("User does not have a role in the system.")
-            req.apiRes = SYSTEM_AAA_CODE["9"]
-            req.apiRes["error"] = {
-                errMessage: "User Role is undefined",
-            }
-            return next()
-        }
-        logger.debug("REQUEST METHOD", req.method, role, resource)
-        switch (req.method) {
-            case "GET":
-                permission = ac.can(role).readAny(resource)
-                logger.debug("PERMISSION METHOD", permission)
-                break
-            case "POST":
-                permission = ac.can(role).updateAny(resource)
-                break
-            case "DELETE":
-                permission = ac.can(role).deleteAny(resource)
-                break
-            case "PUT":
-                permission = ac.can(role).updateAny(resource)
-                break
-            default:
-        }
-    } catch {
-        logger.debug("Permission CATCH Continued ...")
-        return next()
-    }
+    // try {
+    //     logger.debug('the user role is', role)
+    //     logger.debug("User role check", ac.hasRole(role))
+    //     if (!ac.hasRole(role)) {
+    //         logger.info("User does not have a role in the system.")
+    //         req.apiRes = SYSTEM_AAA_CODE["9"]
+    //         req.apiRes["error"] = {
+    //             errMessage: "User Role is undefined",
+    //         }
+    //         return next()
+    //     }
+    //     logger.debug("REQUEST METHOD", req.method, role, resource)
+    //     switch (req.method) {
+    //         case "GET":
+    //             permission = ac.can(role).readAny(resource)
+    //             logger.debug("PERMISSION METHOD", permission)
+    //             break
+    //         case "POST":
+    //             permission = ac.can(role).updateAny(resource)
+    //             break
+    //         case "DELETE":
+    //             permission = ac.can(role).deleteAny(resource)
+    //             break
+    //         case "PUT":
+    //             permission = ac.can(role).updateAny(resource)
+    //             break
+    //         default:
+    //     }
+    // } catch {
+    //     logger.debug("Permission CATCH Continued ...")
+    //     return next()
+    // }
 
-    if (permission && permission.granted) {
-        logger.debug("Permission Granted Continued ...")
-        return next()
-    } else {
-        logger.debug("Permission NOT Granted Continued ...")
-        return next()
-        // return res.status(403).json({
-        //     Unauthorized: SYSTEM_AAA_CODE["13"]
-        // })
+    // if (permission && permission.granted) {
+    //     logger.debug("Permission Granted Continued ...")
+    //     return next()
+    // } else {
+    //     logger.debug("Permission NOT Granted Continued ...")
+    //     return next()
+    //     // return res.status(403).json({
+    //     //     Unauthorized: SYSTEM_AAA_CODE["13"]
+    //     // })
 
-    }
+    // }
 }
 
 module.exports = {

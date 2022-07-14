@@ -576,9 +576,10 @@ Patient_Data.hasMany(Vital_Threshold, {
     sourceKey: "pid"
 })
 
-async function db_threshold_by_patient(params) {
+async function db_threshold_by_patient(transaction) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patient_Data.findAll({
+        const data = await Patient_Data.findAll({
             include: [
                 {
                     model: Vital_Threshold,
@@ -586,8 +587,13 @@ async function db_threshold_by_patient(params) {
                 }
             ]
             // order: [['id', 'ASC']],
-        })
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
+        await t.rollback()
         throw new Error(error)
     }
 }
@@ -603,9 +609,10 @@ Patch_Patient_Map.hasMany(Patches, {
     sourceKey: "patch_uuid"
 })
 
-async function db_gateway_by_patient(params) {
+async function db_gateway_by_patient() {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patient_Data.findAll({
+        const data = await Patient_Data.findAll({
             attributes: ['pid', 'fname', 'lname'],
             include: [
                 {
@@ -624,8 +631,13 @@ async function db_gateway_by_patient(params) {
             ],
             raw: true,
             // order: [['id', 'ASC']],
-        })
+        },
+        { transaction: t})
+        const result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
+        await t.rollback()
         throw new Error(error)
     }
 }

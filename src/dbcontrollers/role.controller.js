@@ -354,6 +354,19 @@ async function db_get_role_list(params) {
 }
 
 
+async function db_get_role(params) {
+    try {
+        return await Role.findAll({
+            where: {
+                tenant_id: params.pid
+            }
+        })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+
 module.exports = {
     db_get_role_list,
     db_create_role,
@@ -362,4 +375,5 @@ module.exports = {
     db_bulk_create_role,
     db_update_role,
     db_role_exist,
+    db_get_role
 }

@@ -548,13 +548,6 @@ async function db_get_patient_inventory(params) {
     }
 }
 
-async function db_get_patient_details(params) {
-    const data = await Patients_Data.findOne({
-        where: { pid: params }
-    });
-    return data
-}
-
 //This db_get_patient_list_new needs to be removed - just verify once and remove the code
 
 async function db_get_patient_list_new(tenant_id, username) {
@@ -760,19 +753,6 @@ async function db_delete_patient(given_pid, transaction) {
         })
 }
 
-async function db_med_record_exist(params) {
-    try {
-        return await Patients_Data.count({
-            where: {
-                med_record: params,
-            },
-            raw: true,
-        })
-    } catch (err) {
-        throw new Error("Patient  " + params + "not found Err:" + err)
-    }
-}
-
 async function db_disable_patient(params) {
     let data
     let promises = []
@@ -845,25 +825,78 @@ async function db_edit_patient(params) {
     }
 }
 
-async function db_add_new_patient(params, transaction) {
+async function db_add_new_patient(params) {
+    const t = await sequelizeDB.transaction()
     try {
         if(!params.patient_type){
             params.patient_type = 'remote'
         }
-        let data = EDIT_PATIENT(params)
-        data.pid = params.pid
-        data.tenant_id = params.tenant_id
-        data.disabled = 1
-        data.status = "active"
-        return await Patients_Data.create(
-            data, 
-            {transaction: transaction}
+        let obj = EDIT_PATIENT(params)
+        obj.pid = params.pid
+        obj.tenant_id = params.tenant_id
+        obj.disabled = 1
+        obj.status = "active"
+        const data = await Patients_Data.create(
+            obj, 
+            {transaction: t}
         )
-    } catch (err) {
-        console.log(err)
-        throw new Error(err)
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        console.log(error)
+        await t.rollback()
+        throw error
     }
 }
+
+async function db_get_patient_details(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Patients_Data.findOne({
+            where: { pid: params.pid }
+        },
+        { transaction: t });
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
+async function db_med_record_exist(params) {
+    try {
+        return await Patients_Data.findOne({
+            where: {
+                med_record: params,
+            },
+            raw: true,
+        })
+    } catch (error) {
+        throw error
+    }
+}
+
+
+async function db_check_duplicate_patient(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Patients_Data.findOne({
+            where: params
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        error
+    }
+}
+
 
 module.exports = {
     db_get_patient_list,
@@ -882,5 +915,6 @@ module.exports = {
     db_check_patient_exist,
     db_update_patient_associated_list,
     db_edit_patient,
-    db_add_new_patient
+    db_add_new_patient,
+    db_check_duplicate_patient
 }
