@@ -3585,19 +3585,11 @@ async function createPatientNoteAttachment(req, res, next) {
             })
         });
         
-        req.apiRes = TRANSACTION_CODE["0"]
-        req.apiRes["response"] = {
-            data: req.body
-        }
+        return res.status(200).json({ message: 'Sucessful' })
     } catch (error) {
         console.log(error)
-        req.apiRes["error"] = {
-            error: error
-        }
-        req.apiRes = TRANSACTION_CODE["1"]
+        return res.status(500).json({ message: error })
     }
-    res.response(req.apiRes)
-    return next()
 }
 
 
