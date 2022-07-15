@@ -495,7 +495,7 @@ async function getBillingTotalSummaryByPractitioner(req, res, next) {
         const patchData = await db_get_patch_data({pid: req.query.pids});
         req.apiRes = BILLING_CODE["2"]
         req.apiRes["response"] = {
-        billingData: result,
+        billingData: result.data,
         patchData: patchData.data
         // count: billingCount
     }
