@@ -128,4 +128,24 @@ async function db_create_practictioner(
     return practictioner_list
 }
 
-module.exports = { db_get_practictioner_list, db_create_practictioner }
+async function db_add_practictioner(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Prac_Patient_Map.create(
+            params,
+            { transaction: t }
+        )
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw new Error(error)
+    }
+}
+
+module.exports = { 
+    db_get_practictioner_list, 
+    db_create_practictioner,
+    db_add_practictioner
+}

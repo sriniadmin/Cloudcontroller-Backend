@@ -145,6 +145,7 @@ const {
 const {
     db_get_practictioner_list,
     db_create_practictioner,
+    db_add_practictioner
 } = require("../../dbcontrollers/practictioner.controller")
 
 //Vital threshold
@@ -3099,29 +3100,59 @@ async function editPatient(req, res, next) {
 async function addNewPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
     try {
-        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
+	    const demographic_map = req.body.demographic_map
+        const medical_record = await db_med_record_exist(demographic_map.med_record)
         if (medical_record) {
             req.apiRes = PATIENT_CODE["6"]
             req.apiRes["error"] = {
                 isExist: true,
-                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + demographic_map.med_record,
             }
             return responseAPI(res, req.apiRes)
         }
 
-        tags = req.body.demographic_map.tags
+        tags = demographic_map.tags
         if(tags.length > 0){
-            recallFuntion(req.body.demographic_map.tags.length, 0, req, res, next, t)
+            recallFuntion(demographic_map.tags.length, 0, req, res, next, t)
         }
         else{
             let uuidDict = {
                 uuidType: UUID_CONST["patient"],
                 tenantID: req.body.tenantId,
             }
-            req.body.demographic_map.tenant_id = req.body.tenantId
-            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
-            req.body.demographic_map.associated_list = "[]"
-            await db_add_new_patient(req.body.demographic_map)
+            demographic_map.tenant_id = req.body.tenantId
+            demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            demographic_map.associated_list = "[]"
+            await db_add_new_patient(demographic_map)
+
+            if((demographic_map.primary_consultant.length > 0) || (demographic_map.secondary_consultant.length > 0)){
+                let list = []
+                if(demographic_map.primary_consultant.length > 0){
+                    demographic_map.primary_consultant.forEach(obj => {
+                        list.push({
+                            tenant_id: req.body.tenantId,
+                            practictioner_id: obj.uuid,
+                            pid: demographic_map.pid,
+                            practictioner_role: 'Primary'
+                        })
+                    });
+                }
+                if(demographic_map.secondary_consultant.length > 0){
+                    demographic_map.secondary_consultant.forEach(obj => {
+                        list.push({
+                            tenant_id: req.body.tenantId,
+                            practictioner_id: obj.uuid,
+                            pid: demographic_map.pid,
+                            practictioner_role: 'Secondary'
+                        })
+                    });
+                }
+
+                list.forEach(obj => {
+                    db_add_practictioner(obj)
+                });
+            }
+
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
             return responseAPI(res, req.apiRes)
@@ -3138,6 +3169,7 @@ async function addNewPatient(req, res, next) {
 async function recall(length, number, req, res, next, transaction) {
     const t = await sequelizeDB.transaction()
     try {
+	    const demographic_map = req.body.demographic_map
         condition = {
             tags: { [Op.like]: `%"${tags[number].label}"%` }
         }
@@ -3155,10 +3187,39 @@ async function recall(length, number, req, res, next, transaction) {
                 uuidType: UUID_CONST["patient"],
                 tenantID: req.body.tenantId,
             }
-            req.body.demographic_map.tenant_id = req.body.tenantId
-            req.body.demographic_map.pid = await getUUID(uuidDict, { transaction: t })
-            req.body.demographic_map.associated_list = "[]"
-            await db_add_new_patient(req.body.demographic_map)
+            demographic_map.tenant_id = req.body.tenantId
+            demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            demographic_map.associated_list = "[]"
+            await db_add_new_patient(demographic_map)
+
+            if((demographic_map.primary_consultant.length > 0) || (demographic_map.secondary_consultant.length > 0)){
+                let list = []
+                if(demographic_map.primary_consultant.length > 0){
+                    demographic_map.primary_consultant.forEach(obj => {
+                        list.push({
+                            tenant_id: req.body.tenantId,
+                            practictioner_id: obj.uuid,
+                            pid: demographic_map.pid,
+                            practictioner_role: 'Primary'
+                        })
+                    });
+                }
+                if(demographic_map.secondary_consultant.length > 0){
+                    demographic_map.secondary_consultant.forEach(obj => {
+                        list.push({
+                            tenant_id: req.body.tenantId,
+                            practictioner_id: obj.uuid,
+                            pid: demographic_map.pid,
+                            practictioner_role: 'Secondary'
+                        })
+                    });
+                }
+                
+                list.forEach(obj => {
+                    db_add_practictioner(obj)
+                });
+            }
+
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
             await transaction.commit();

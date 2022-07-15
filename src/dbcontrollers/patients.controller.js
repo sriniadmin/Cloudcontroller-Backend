@@ -868,14 +868,19 @@ async function db_get_patient_details(params) {
 
 
 async function db_med_record_exist(params) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patients_Data.findOne({
+        const data = Patients_Data.findOne({
             where: {
                 med_record: params,
-            },
-            raw: true,
-        })
+            }
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result.data
     } catch (error) {
+        await t.rollback()
         throw error
     }
 }
