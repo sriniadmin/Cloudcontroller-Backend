@@ -45,49 +45,28 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       primaryKey: true
     },
-    users_uuid: {
-      type: DataTypes.JSON,
-      allowNull: true
-
+    tenant_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    practictioner_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false
     },
     pid: {
       type: DataTypes.STRING(255),
-      allowNull: true
+      allowNull: false
 
     },
-    tenant_id: {
+    practictioner_role: {
       type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    archive: {
-      type: DataTypes.SMALLINT,
-      allowNull: true,
-      defaultValue: 1,
-      validate: {
-        isInt: true
-      }
-    },
-    primary: {
-      type: DataTypes.SMALLINT,
-      allowNull: true,
-      defaultValue: 0,
-      validate: {
-        isInt: true
-      }
+      allowNull: false
     },
     date: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
       defaultValue: Sequelize.fn("now"),
-    },
-    primary_consultant: {
-      type: DataTypes.JSON,
-      allowNull: true
-    },
-    secondary_consultant: {
-      type: DataTypes.JSON,
-      allowNull: true
-    },
+    }
 
   }, {
     sequelize,

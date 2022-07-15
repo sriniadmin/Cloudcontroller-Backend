@@ -35,8 +35,8 @@ async function db_create_user_tenant(tenant_id, user_tenant_data, transaction) {
 }
 
 user.hasOne(tenant, {
-    foreignKey: "tenant_uuid",
-    sourceKey: "tenant_id"
+    foreignKey: "pid",
+    targetKey: "pid",
 })
 
 async function db_get_user_tenant(params) {

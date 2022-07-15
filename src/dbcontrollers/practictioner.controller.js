@@ -14,10 +14,10 @@ var Prac = function (practictionerobj) {
         (this.archive = practictionerobj.archive)
 }
 
-models.practictioner_patient_map.hasMany(models.users, {
-    foreignKey: "user_uuid",
-    sourceKey: "users_uuid",
-})
+// models.practictioner_patient_map.hasMany(models.users, {
+//     foreignKey: "user_uuid",
+//     sourceKey: "users_uuid",
+// })
 
 // models.practictioner_patient_map.hasMany(models.users, {
 //     foreignKey: "user_uuid",

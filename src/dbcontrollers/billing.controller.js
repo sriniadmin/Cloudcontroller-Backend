@@ -10,6 +10,7 @@ const logger = require("../config/logger")
 const Billing = models.billing
 const BillingSummary = models.billing_summary
 const PatchPatientMap = models.patch_patient_map
+const Users = models.users
 
 models.billing.belongsTo(models.patch_patient_map, {
     foreignKey: "pid",
@@ -39,9 +40,24 @@ models.billing.belongsTo(models.tasks, {
     targetKey: "pid",
 })
 
+// models.practictioner_patient_map.hasOne(models.billing_summary, {
+//     foreignKey: "pid",
+//     targetKey: "pid",
+// })
+
+models.practictioner_patient_map.hasMany(models.billing_summary, {
+    foreignKey: "pid",
+    sourceKey: "pid",
+})
+
 models.patch_patient_map.hasMany(models.patch, {
     foreignKey: "patch_uuid",
     sourceKey: "patch_uuid",
+})
+
+models.users.hasMany(models.practictioner_patient_map, {
+    foreignKey: "practictioner_id",
+    sourceKey: "user_uuid",
 })
 
 async function db_get_patch_data(params){
@@ -579,6 +595,106 @@ async function db_update_billing_summary(pid, billDate, params){
     }
     return result;
 }
+
+
+async function db_get_billing_report_summary_by_practitioner(params) {
+    try{
+    let { limit, offset, filter = null, sort = null, sortdir = 'DESC' } = params
+    let arrSort = ['id', 'ASC'];
+    let billing;
+    if(sort){
+        arrSort = [sort, sortdir];
+    }
+    if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
+    // if(!filter){
+        return await Users.findAll({
+            attributes: ['id', 'fname', 'mname', 'lname', 'user_uuid', 'role'],
+            include: [
+                {
+                    model:models.practictioner_patient_map,
+                    attributes:['id', 'pid'],
+                    include: [
+                        {
+                            model:models.billing_summary,
+                            attributes:[ 'date', 'task_99453', 'task_99454', 'task_99457', 'task_99458', 'task_99091']
+                        }
+                    ]
+                }
+            ]
+        })
+    // billing = await BillingSummary.findAll({
+    //         limit: parseInt(limit),
+    //         offset: parseInt(offset),
+    //         include: [
+    //             {
+    //                 model:models.patient_data,
+    //                 attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled', 'primary_consultant', 'secondary_consultant'],
+    //                 where: {
+    //                     disabled: 1
+    //                 }
+    //             }
+               
+    //         ],
+    //         where: {
+    //             date: {
+    //                 [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
+    //             },
+    //             [Op.and]: [{
+    //                 date: {
+    //                     [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+    //                 }
+    //             }
+    //             ]
+    //         },
+    //         order: [
+    //            arrSort
+    //         ],
+    //         raw: false
+    //     })
+    //     return billing
+    // } else {
+    //     billing = await BillingSummary.findAll({
+    //         limit: parseInt(limit),
+    //         offset: parseInt(offset),
+    //         include: [
+    //             {
+    //                 model:models.patient_data,
+    //                 attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'primary_consultant', 'secondary_consultant']
+    //             }
+               
+    //         ],
+    //         where: {
+    //             date: {
+    //                 [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
+    //             },
+    //             [Op.and]: [{
+    //                 date: {
+    //                     [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
+    //                 }
+    //             }
+    //             ],
+    //             [Op.and]: [
+    //                 Sequelize.where(
+    //                     Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
+    //                     { [Op.like]: `%${filter}%` }
+    //                 )
+    //             ]
+    //         },
+    //         order: [
+    //             arrSort
+    //          ],
+    //         raw: false
+    //     })
+    //     return billing
+    // }
+    }catch(err){
+        console.log(err);
+        return false;
+    }
+    return billing
+}
+
+
 module.exports = {
     db_update_billing,
     db_get_billing_report,
@@ -590,5 +706,6 @@ module.exports = {
     db_get_billing_report_summary,
     db_get_billing_report_count,
     db_update_billing_summary,
-    db_get_patch_data
+    db_get_patch_data,
+    db_get_billing_report_summary_by_practitioner
 }

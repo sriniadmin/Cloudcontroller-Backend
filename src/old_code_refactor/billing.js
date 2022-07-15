@@ -15,6 +15,7 @@ const {
     db_search_billing_id,
     db_update_billing_summary,
     db_updated_task,
+    db_get_billing_report_summary_by_practitioner
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -474,6 +475,43 @@ async function updateBillingInformation(req, res, next) {
 }
 
 
+async function getBillingTotalSummaryByPractitioner(req, res, next) {
+    let billing;
+    let patchData = [];
+    try {
+        billing = await db_get_billing_report_summary_by_practitioner(req.query)
+        // let billingCount = await db_get_billing_report_count(req.query)
+        // let listPids = [];
+        // billing.map(item => {
+        //     if(!listPids.includes(item.pid)){
+        //         listPids.push(item.pid)
+        //     }
+        // })
+        // patchData = await db_get_patch_data({pid: listPids});
+    } catch (err) {
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    if(!billing){
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
+        return next()
+    }
+    req.apiRes = BILLING_CODE["2"]
+    req.apiRes["response"] = {
+        billingData: billing,
+        patchData: patchData,
+        // count: billingCount
+    }
+    return responseAPI(res, req.apiRes)
+}
+
+
 module.exports = {
     createBilling,
     updateBilling,
@@ -481,5 +519,6 @@ module.exports = {
     getBillingData,
     updateBillingInformation,
     getBillingTotalSummary,
-    updateBillingTask
+    updateBillingTask,
+    getBillingTotalSummaryByPractitioner
 }
