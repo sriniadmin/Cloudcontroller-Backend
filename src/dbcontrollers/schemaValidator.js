@@ -205,7 +205,7 @@ module.exports = {validate_schema}
 //             .then((result) => logger.debug(result))
 //             .catch((err) => logger.debug(err))
 //             res.cookie("tokenKey", accessToken)
-//         res.status(200).json({
+//         res.send(200, {{
 //             data: { lname: user.lname, role: user.role },
 
 //         })
@@ -216,7 +216,7 @@ module.exports = {validate_schema}
 
 // exports.getUsers = async (req, res, next) => {
 //     const users = await User.find({})
-//     res.status(200).json({
+//     res.send(200, {{
 //         data: users,
 //     })
 // }
@@ -226,7 +226,7 @@ module.exports = {validate_schema}
 //         const userId = req.params.userId
 //         const user = await User.findById(userId)
 //         if (!user) return next(new Error("User does not exist"))
-//         res.status(200).json({
+//         res.send(200, {{
 //             data: user,
 //         })
 //     } catch (error) {
@@ -240,7 +240,7 @@ module.exports = {validate_schema}
 //         const userId = req.params.userId
 //         await User.findByIdAndUpdate(userId, update)
 //         const user = await User.findById(userId)
-//         res.status(200).json({
+//         res.send(200, {{
 //             data: user,
 //             message: "User has been updated",
 //         })
@@ -253,7 +253,7 @@ module.exports = {validate_schema}
 //     try {
 //         const userId = req.params.userId
 //         await User.findByIdAndDelete(userId)
-//         res.status(200).json({
+//         res.send(200, {{
 //             data: null,
 //             message: "User has been deleted",
 //         })

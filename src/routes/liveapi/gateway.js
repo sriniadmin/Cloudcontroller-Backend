@@ -141,7 +141,7 @@ console.log('GATEWAY LIST: ', global_variable.gateway_list)
 //         await producer.disconnect()
 //     }
 //     logger.debug("Kakfa Sent Message")
-//     return res.status(200).json({ pushData: "Success" })
+//     return res.send(200, { pushData: "Success" })
 // })
 
 /**
@@ -165,7 +165,7 @@ console.log('GATEWAY LIST: ', global_variable.gateway_list)
 
 router.post("/discovered_devices", async function (req, res, next) {
     logger.debug("Gateway discovered_devices data is ", req.body)
-    return res.status(200).json({ discovered_devices: "Success" })
+    return res.send(200, { discovered_devices: "Success" })
 })
 
 function get_sensor_type(devices){
@@ -531,10 +531,10 @@ router.post("/gateway_keepalive", async function (req, res, next) {
             }
         }
 
-        return res.status(200).json(result)
+        return res.send(200, {result})
     } catch (error) {
         console.log(error)
-        return res.status(500).json('ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)
+        return res.status(500,'ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)
     }
 })
 
@@ -616,7 +616,7 @@ router.post("/gateway_register", async function (req, res, next) {
             temp_device["config"] = data[index].config
             device_list.push(temp_device)
         }
-        return res.status(200).json({
+        return res.send(200, {
             result: 'SUCCESSFUL',
             device_count: device_list.length,
             devices: device_list,
@@ -682,7 +682,7 @@ router.post("/gateway_register", async function (req, res, next) {
                         temp_device["config"] = patch_patient_list[index].config
                         device_list.push(temp_device)
                     }
-                    return res.status(200).json({
+                    return res.send(200, {
                         result: "success",
                         device_count: patch_patient_list[0].length,
                         devices: device_list,
@@ -702,7 +702,7 @@ router.post("/gateway_register", async function (req, res, next) {
             })
         })
     } catch (error) {
-        return res.status(500).json({
+        return res.status(500, {
             error: { errMessage: error },
         })
     }
@@ -830,13 +830,13 @@ router.post("/push_data", async function (req, res, next) {
 
             global_variable.io.emit(`SENSOR_DATA_${req.body.patientUUID}`, data)
         }
-        res.status(200).json({ pushData: "Success" })
-        // res.status(200).json({ pushData: await threshold_list })
+        res.send(200, { pushData: "Success" })
+        // res.send(200, {{ pushData: await threshold_list })
 
         //Get list to check threshold before other
         return CheckingThreshold(req.body)
     } catch (error) {
-        return res.status(500).json({ ERROR: error })
+        return res.status(500, { ERROR: error })
     }
 })
 

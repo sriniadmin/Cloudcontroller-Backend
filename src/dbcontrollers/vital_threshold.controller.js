@@ -106,12 +106,14 @@ async function db_get_vital_threshold_list(params) {
 
 
 async function db_create_vital_threshold(params, transaction) {
+    const t = await sequelizeDB.transaction()
     try {
         return await VitalThreshold.create(
             params,
             { transaction: transaction }
         )
     } catch (error) {
+        await t.rollback()
         throw new Error(error)
     }
 }

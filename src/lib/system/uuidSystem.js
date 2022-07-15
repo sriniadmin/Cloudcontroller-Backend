@@ -84,6 +84,7 @@ var getUUID = async function (uuidDict, transaction) {
     // Need to go and remove this UUID
 
   }
+  await transaction.transaction.commit()
   return uuidFull
 }
 

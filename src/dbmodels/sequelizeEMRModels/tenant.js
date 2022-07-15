@@ -45,11 +45,18 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(256),
       allowNull: false
     },
+    root_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false
+    },
+    level: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     date: {
       type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: Sequelize.fn('now')
-    }
+      allowNull: false,
+      defaultValue: Sequelize.fn('now')}
   }, {
     sequelize,
     tableName: 'tenant',
@@ -66,6 +73,7 @@ module.exports = function (sequelize, DataTypes) {
     ]
   });
 };
+
 
 
 // /**

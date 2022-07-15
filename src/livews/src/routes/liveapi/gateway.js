@@ -128,7 +128,7 @@ router.post("/push_dataee", async function (req, res, next) {
           await producer.disconnect()
       }
       logger.debug("Kakfa Sent Message")
-  return res.status(200).json({ "pushData": "Success" })
+  return res.send(200, { "pushData": "Success" })
 })
 
 
@@ -153,7 +153,7 @@ router.post("/push_dataee", async function (req, res, next) {
 
 router.post("/discovered_devices", async function (req, res, next) {
   logger.debug("Gateway discovered_devices data is ", req.body)
-  return res.status(200).json({ "discovered_devices": "Success" })
+  return res.send(200, { "discovered_devices": "Success" })
 })
 
 
@@ -178,7 +178,7 @@ router.post("/discovered_devices", async function (req, res, next) {
 
 router.post("/gateway_keepalive", async function (req, res, next) {
   logger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
-  return res.status(200).json({"Keepalive":"Success",
+  return res.send(200, {"Keepalive":"Success",
       "versionName": "999.0.0",
       "versionCode": "998",
       "apkUrl": "https://mbhospital.live247.ai/mobileApk/rn-update-apk-example-3.0.1.apk",
@@ -237,7 +237,7 @@ router.post("/gateway_registeree", function (req, res, next) {
                 logger.debug("The Device is", temp_device)
                 device_list.push(temp_device)
               }
-              return res.status(200).json(
+              return res.send(200, {
                 {
                   "result":"success",
                   "device_count" : patch_patient_list[0].length,

@@ -3038,8 +3038,7 @@ async function disablePatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["11"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -3065,8 +3064,7 @@ async function unassociatePatient(req, res, next) {
         console.log(error)
         req.apiRes = ASSOCIATE_CODE["0"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -3081,8 +3079,7 @@ async function editPatient(req, res, next) {
                 isExist: true,
                 error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
 
         await db_edit_patient(req.body.demographic_map)
@@ -3092,13 +3089,11 @@ async function editPatient(req, res, next) {
         console.log(error)
         req.apiRes = PATIENT_CODE["8"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
         await t.rollback();
-        return next()
+        return responseAPI(res, req.apiRes)
     }
-    res.response(req.apiRes)
     await t.commit()
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 async function addNewPatient(req, res, next) {
@@ -3111,8 +3106,7 @@ async function addNewPatient(req, res, next) {
                 isExist: true,
                 error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
             }
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
 
         tags = req.body.demographic_map.tags
@@ -3130,15 +3124,13 @@ async function addNewPatient(req, res, next) {
             await db_add_new_patient(req.body.demographic_map)
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
 }
 
@@ -3156,8 +3148,7 @@ async function recall(length, number, req, res, next, transaction) {
                 HttpStatus: "470",
                 Message: `Tag: "${tags[number].label}" is already exist`,
             }
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
         if (length === number+1) {
             let uuidDict = {
@@ -3170,17 +3161,15 @@ async function recall(length, number, req, res, next, transaction) {
             await db_add_new_patient(req.body.demographic_map)
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
-            res.response(req.apiRes)
             await transaction.commit();
-            return next()
+            return responseAPI(res, req.apiRes)
         }
         recallFuntion(length, number + 1, req, res, next, transaction)
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
 }
 
@@ -3402,7 +3391,6 @@ async function updatePatientProcedure(req, res, next) {
         }
         req.apiRes = PROCEDURE_CODE["6"]
     }
-
     return responseAPI(res, req.apiRes)
 }
 
@@ -3424,10 +3412,8 @@ async function createPatientPrescription(req, res, next) {
         }
         req.apiRes = PRESCRIPTION_CODE["4"]
     }
-
-    res.response(req.apiRes)
     await t.commit()
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3486,11 +3472,10 @@ async function createPatientVitalThreshold(req, res, next) {
         req.apiRes = TRANSACTION_CODE["1"]
         await t.rollback()
     }
-    res.response(req.apiRes)
     global_variable.threshold_list = db_threshold_by_patient()
     console.log(global_variable.threshold_list)
     await t.commit()
-    return next()
+    return responseAPI(res, req.apiRes)
 }
 
 
@@ -3511,7 +3496,6 @@ async function getPatientDetail(req, res, next) {
         }
         req.apiRes = PATIENT_CODE["1"]
     }
-
     return responseAPI(res, req.apiRes)
 }
 
@@ -3567,10 +3551,10 @@ async function createPatientNoteAttachment(req, res, next) {
             })
         });
         
-        return res.status(200).json({ message: 'Sucessful' })
+        return res.send(200, { message: 'Sucessful' })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ message: error })
+        return res.status(500, { message: error })
     }
 }
 
@@ -3611,10 +3595,10 @@ async function downloadNoteAttachment(req, res, next) {
         // res.set('Content-Type', 'text/plain');
 
         // return readStream.pipe(res);
-        return res.status(200).json({ data: data.data })
+        return res.send(200, { data: data.data })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ error: error })
+        return res.status(500, { error: error })
     }
 }
 

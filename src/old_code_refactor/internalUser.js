@@ -111,7 +111,8 @@ const {
     db_update_tenant,
     db_create_tenant,
     db_get_tenant_name,
-    db_check_tenant
+    db_check_tenant,
+    db_get_root_tenant
 } = require("../dbcontrollers/tenant.controller")
 
 const {
@@ -1250,7 +1251,7 @@ async function createConnector(req, res, next) {
 //         products: products,
 //         count: products.length,
 //     }
-//     res.response(req.apiRes)
+//     return responseAPI(res, req.apiRes)
 //     return next()
 // }
 
@@ -2202,8 +2203,7 @@ async function getProfiles(req, res, next) {
     let pidCount = await dbProfileExists(pid)
     if (pidCount === 0) {
         req.apiRes = PROFILE_CODE["5"]
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     try {
         profile = await dbGetProfileInfo(pid)
@@ -2213,8 +2213,7 @@ async function getProfiles(req, res, next) {
         logger.debug(`Profile fetch ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["1"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -2237,8 +2236,7 @@ async function postProfiles(req, res, next) {
 
     if (pidCount === 1) {
         req.apiRes = PROFILE_CODE["6"]
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
 
     let profile
@@ -2250,8 +2248,7 @@ async function postProfiles(req, res, next) {
         logger.debug(`Profile create ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["4"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -2263,8 +2260,7 @@ async function putProfiles(req, res, next) {
 
     if (pidCount === 0) {
         req.apiRes = PROFILE_CODE["5"]
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     profileData["profile_data"] = req.body[0]
     let profile
@@ -2276,8 +2272,7 @@ async function putProfiles(req, res, next) {
         logger.debug(`Profile update ERROR: ${err.message} `)
         req.apiRes = PROFILE_CODE["8"]
         req.apiRes["error"] = { error: err.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -2298,8 +2293,7 @@ async function deletePatch(req, res, next) {
         console.log(error)
         req.apiRes = DEVICE_CODE["4"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -2313,8 +2307,7 @@ async function getDeviceType(req, res, next) {
         console.log(error)
         req.apiRes = DEVICE_CODE["8"]
         req.apiRes["error"] = { error: error.message }
-        res.response(req.apiRes)
-        return next()
+        return responseAPI(res, req.apiRes)
     }
     return responseAPI(res, req.apiRes)
 }
@@ -2342,7 +2335,6 @@ async function getPathSaas(req, res, next) {
 }
 
 async function createDevice(req, res, next) {
-    const t = await sequelizeDB.transaction()
     try {
         const params = req.body.data[0]
 
@@ -2360,17 +2352,15 @@ async function createDevice(req, res, next) {
             }
         }
 
-        const check_number = await db_check_duplicate_device(condition, t)
+        const check_number = await db_check_duplicate_device(condition)
 
-        if(check_number && (params.patch_type === 'gateway')){
+        if(check_number.data && (params.patch_type === 'gateway')){
             req.apiRes = PATCH_CODE["14"]
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
-        else if(check_number){
+        else if(check_number.data){
             req.apiRes = PATCH_CODE["15"]
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
 
 
@@ -2379,10 +2369,10 @@ async function createDevice(req, res, next) {
                 condition = {
                     sim: params.sim
                 }
-                const check_sim = await db_check_duplicate_device(condition, t)
-                if(check_sim){
+                const check_sim = await db_check_duplicate_device(condition)
+                if(check_sim.data){
                     req.apiRes = PATCH_CODE["18"]
-                    res.response(req.apiRes)
+                    return responseAPI(res, req.apiRes)
                     return next()
                 }
             }
@@ -2392,10 +2382,10 @@ async function createDevice(req, res, next) {
                 condition = {
                     phone: params.phone
                 }
-                const check_phone = await db_check_duplicate_device(condition, t)
-                if(check_phone){
+                const check_phone = await db_check_duplicate_device(condition)
+                if(check_phone.data){
                     req.apiRes = PATCH_CODE["19"]
-                    res.response(req.apiRes)
+                    return responseAPI(res, req.apiRes)
                     return next()
                 }
             }
@@ -2404,62 +2394,55 @@ async function createDevice(req, res, next) {
 
         tags = params.tags
         if(tags.length>0){
-            recallFuntion(params.tags.length, 0, req, res, next, t)
+            recallFuntion(params.tags.length, 0, req, res, next)
         }else{
+            const t = await sequelizeDB.transaction()
             const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
             params["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
-            const data = await db_create_device(req, t)
+            const data = await db_create_device(req.body)
             req.apiRes = PATCH_CODE["3"]
-            req.apiRes["response"] = { data: data }
-            res.response(req.apiRes)
-            await t.commit()
-            return next()
+            req.apiRes["response"] = { data: data.data }
+            return responseAPI(res, req.apiRes)
         }
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
-        res.response(req.apiRes)
-        await t.rollback();
-        return next()
+        return responseAPI(res, req.apiRes)
     }
 }
 
-async function recall(length, number, req, res, next, transaction) {
+async function recall(length, number, req, res, next) {
     try {
         condition = {
             tags: { [Op.like]: `%"${tags[number]}"%` }
         }
-        const check_tags = await db_check_duplicate_device(condition, transaction)
-        if (check_tags) {
+        const check_tags = await db_check_duplicate_device(condition)
+        if (check_tags.data) {
             req.apiRes = {
                 Code: "TAGS_IS_ALREADY_EXIST",
                 HttpStatus: "470",
                 Message: `Tag: "${tags[number]}" is already exist`,
             }
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
         if (length === number+1) {
+            const t = await sequelizeDB.transaction()
             const uuidDict = { uuidType: UUID_CONST["patch"], tenantID: req.body.tenantId}
-            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: transaction })
+            req.body.data[0]["patch_uuid"] = await getUUID(uuidDict, { transaction: t })
             
-            const data = await db_create_device(req,  transaction)
+            const data = await db_create_device(req.body)
             req.apiRes = PATCH_CODE["3"]
-            req.apiRes["response"] = { data: data }
-            res.response(req.apiRes)
-            await transaction.commit();
-            return next()
+            req.apiRes["response"] = { data: data.data }
+            return responseAPI(res, req.apiRes)
         }
-        recallFuntion(length, number + 1, req, res, next, transaction)
+        recallFuntion(length, number + 1, req, res, next)
     } catch (error) {
         console.log(error)
         req.apiRes = PATCH_CODE["4"]
         req.apiRes["error"] = { error: error }
-        res.response(req.apiRes)
-        await transaction.rollback();
-        return next()
+        return responseAPI(res, req.apiRes)
     }
 }
 
@@ -2567,7 +2550,7 @@ async function updatePatch(req, res, next) {
 //         req.apiRes = TENANTS_CODE["1"]
 //     }
 
-//     res.response(req.apiRes)
+//     return responseAPI(res, req.apiRes)
 //     return next()
 // }
 
@@ -2597,13 +2580,11 @@ async function createUser(req, res, next) {
         const exist = await db_get_user(req.body)
         if(exist && exist.email === req.body.email){
             req.apiRes = USER_CODE["11"]
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
         else if(exist && exist.username === req.body.username){
             req.apiRes = USER_CODE["12"]
-            res.response(req.apiRes)
-            return next()
+            return responseAPI(res, req.apiRes)
         }
         const t = await sequelizeDB.transaction()
         const uuidDict = { uuidType: UUID_CONST["user"], tenantID: 0 }
@@ -2630,12 +2611,12 @@ async function updateUser(req, res, next) {
         // const exist = await db_get_user(req.body)
         // if(exist && exist.email === req.body.email){
         //     req.apiRes = USER_CODE["11"]
-        //     res.response(req.apiRes)
+        //     return responseAPI(res, req.apiRes)
         //     return next()
         // }
         // else if(exist && exist.username === req.body.username){
         //     req.apiRes = USER_CODE["12"]
-        //     res.response(req.apiRes)
+        //     return responseAPI(res, req.apiRes)
         //     return next()
         // }
         await db_update_user(req.body)
@@ -2820,13 +2801,11 @@ async function createLabReport(req, res, next) {
             }
             loopCreator(list[index], req, res, false)
         }
-
-
     } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
             return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
         }
-        return res.status(500).json({ error: error })
+        return res.status(500, { error: error })
     }
 }
 
@@ -2841,7 +2820,7 @@ async function loopCreator(obj, req, res, stop) {
         isShow: obj.isShow
     })
     if(stop){
-        return res.status(200).json({ message: 'Sucessful' })
+        return res.send(200, { message: 'Sucessful' })
     }
 }
 
@@ -2866,7 +2845,6 @@ async function getLabReportById(req, res, next) {
 
 async function download(req, res, next) {
     try {
-
         if(!req.query.id){
             return res.status(470).json({ message: 'Missing param id' })
         }
@@ -2883,7 +2861,7 @@ async function download(req, res, next) {
         return readStream.pipe(res);
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ error: error })
+        return res.status(500, { error: error })
     }
 }
 
@@ -2895,6 +2873,17 @@ async function createTenant(req, res, next) {
             req.apiRes = TENANTS_CODE["5"]
             return responseAPI(res, req.apiRes)
         }
+
+        const root = await db_get_root_tenant(req.body)
+        if(!root.data){
+            return res.send(500, { error: 'Root id is not exists' })
+        }
+        req.body.level = root.data.dataValues.level + 1
+        if(result.data){
+            req.apiRes = TENANTS_CODE["5"]
+            return responseAPI(res, req.apiRes)
+        }
+
         const t = await sequelizeDB.transaction()
         const uuidDict = { uuidType: UUID_CONST["tenant"], tenantID: 0 }
         req.body.tenant_uuid = await getUUID(uuidDict, { transaction: t })

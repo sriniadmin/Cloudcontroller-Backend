@@ -151,9 +151,9 @@ async function db_get_tenant_name(tenant_id) {
     try {
         tenant = await Tenants.findAll({
             where: {
-                tenant_uuid:tenant_id
+                tenant_uuid: tenant_id
 
-            } 
+            }
         })
     } catch (err) {
         throw new Error("Error in fetching the tenant" + err)
@@ -166,12 +166,13 @@ async function db_get_tenant_list(params) {
     const t = await sequelizeDB.transaction()
     try {
         const data = await Tenants.findAll({
+            attributes: ['tenant_name', 'tenant_uuid', 'date'],
             where: {
-                tenant_name: {[Op.not]: ''}
+                root_id: params.tenant_id
             },
             order: [["id", "DESC"]]
         },
-        { transaction: t })
+            { transaction: t })
         let result = { data: data }
         await t.commit()
         return result
@@ -190,7 +191,7 @@ async function db_check_tenant(params) {
                 tenant_name: params.tenant_name
             }
         },
-        { transaction: t })
+            { transaction: t })
         let result = { data: data }
         await t.commit()
         return result
@@ -204,17 +205,37 @@ async function db_check_tenant(params) {
 async function db_create_tenant(params) {
     const t = await sequelizeDB.transaction()
     try {
-      const data = await Tenants.create(
-      params,
-      { transaction: t })
-      const result = { data: data }
-      await t.commit()
-      return result
+        const data = await Tenants.create(
+            params,
+            { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
-      await t.rollback()
-      throw error
+        await t.rollback()
+        throw error
     }
-  }
+}
+
+
+async function db_get_root_tenant(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Tenants.findOne({
+            attributes: ['level'],
+            where: {
+                tenant_uuid: params.root_id
+            }
+        },
+        { transaction: t })
+        let result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
 
 
 module.exports = { 
@@ -225,5 +246,6 @@ module.exports = {
     db_update_tenant, 
     db_tenant_exist_trans,
     db_get_tenant_name,
-    db_check_tenant
+    db_check_tenant,
+    db_get_root_tenant
 }

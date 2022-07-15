@@ -735,40 +735,50 @@ async function db_get_device_id(params) {
     }
 }
 
-async function db_create_device(params, transaction) {
+async function db_create_device(params) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patches.create(
+        const data = await Patches.create(
             {
-                patch_type: params.body.data[0]["patch_type"],
+                patch_type: params.data[0]["patch_type"],
                 // patch_name: patch_data[i]["patch_name"],
-                patch_uuid: params.body.data[0]["patch_uuid"],
+                patch_uuid: params.data[0]["patch_uuid"],
                 patch_status: 'Inactive',
-                patch_group_id: params.body.data[0]["patch_uuid"],
+                patch_group_id: params.data[0]["patch_uuid"],
                 // specialty: patch_data[i]["specialty"],
-                patch_mac: params.body.data[0]["patch_mac"],
-                tags: JSON.stringify(params.body.data[0]["tags"]),
-                sim: params.body.data[0]["sim"],
-                device_serial: params.body.data[0]["device_serial"],
+                patch_mac: params.data[0]["patch_mac"],
+                tags: JSON.stringify(params.data[0]["tags"]),
+                sim: params.data[0]["sim"],
+                device_serial: params.data[0]["device_serial"],
                 group_type: 'Device',
                 in_use: 'false',
-                tenant_id: params.body.tenantId,
-                phone: params.body.data[0]["phone"],
+                tenant_id: params.tenantId,
+                phone: params.data[0]["phone"],
             },
-            { transaction: transaction }
+            { transaction: t }
         )
+        let result = { data: data }
+        await t.commit()
+        return result
     } catch (error) {
+        await t.rollback()
         throw new Error(error)
     }
 }
 
-async function db_check_duplicate_device(params, transaction) {
+async function db_check_duplicate_device(params) {
+    const t = await sequelizeDB.transaction()
     try {
-        return await Patches.findOne({
+        const data = await Patches.findOne({
             where: params
         },
         {transaction: transaction}
 	)
+    let result = { data: data }
+    await t.commit()
+    return result
     } catch (error) {
+        await t.rollback()
         throw new Error(error)
     }
 }

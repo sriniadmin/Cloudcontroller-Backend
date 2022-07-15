@@ -226,7 +226,7 @@ upgradeGateway = async function (req, res, next) {
 router.get("/gatewayeee", upgradeGateway, apiFinalProcess)
 
 router.get("/gateway", function (req, res, next) {
-    return res.status(200).json({
+    return res.send(200, {
         messages: 'u have connected to the Server',
         from: '/api/upgrade/gateway'
       })

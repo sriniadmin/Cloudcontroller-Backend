@@ -23,7 +23,7 @@ async function download(req, res, next) {
         return readStream.pipe(res);
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ error: error })
+        return res.status(500, { error: error })
     }
 }
 
@@ -70,12 +70,12 @@ async function upload(req, res, next) {
                 url: `${obj.name}`
             })
         });
-        return res.status(200).json({ message: 'Sucessful' })
+        return res.send(200, { message: 'Sucessful' })
     } catch (error) {
         if (error.code === "LIMIT_UNEXPECTED_FILE") {
             return res.status(470).json({ message: 'Exceeds the number of files allowed to upload.' })
         }
-        return res.status(500).json({ error: error })
+        return res.status(500, { error: error })
     }
 }
 
