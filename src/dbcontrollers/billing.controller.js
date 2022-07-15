@@ -60,40 +60,7 @@ models.users.hasMany(models.practictioner_patient_map, {
     sourceKey: "user_uuid",
 })
 
-async function db_get_patch_data(params){
-    let result = [];
-    let pids = null;
-    try{
-    if(typeof params.pid == 'string'){
-        pids = [params.pid];
-    } else {
-        pids = params.pid
-    }
 
-    if(params.pid){
-        result = await PatchPatientMap.findAll({
-            include: [
-                {
-                    model: models.patch,
-                },
-            ],
-            where: {
-                [Op.and]:[
-                    {
-                        pid: {
-                            [Op.in]: pids
-                        }
-                    },
-                ],
-            },
-            raw: true
-        })
-    }
-} catch(err){
-    console.log(err);
-}
-    return result;
-}
 async function db_get_billing_report(tenant_id, params) {
     let { limit, offset } = params
     let whereStatement = { tenant_id: tenant_id }
@@ -598,16 +565,9 @@ async function db_update_billing_summary(pid, billDate, params){
 
 
 async function db_get_billing_report_summary_by_practitioner(params) {
-    try{
-    let { limit, offset, filter = null, sort = null, sortdir = 'DESC' } = params
-    let arrSort = ['id', 'ASC'];
-    let billing;
-    if(sort){
-        arrSort = [sort, sortdir];
-    }
-    if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
-    // if(!filter){
-        return await Users.findAll({
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Users.findAll({
             attributes: ['id', 'fname', 'mname', 'lname', 'user_uuid', 'role'],
             include: [
                 {
@@ -620,78 +580,72 @@ async function db_get_billing_report_summary_by_practitioner(params) {
                         }
                     ]
                 }
-            ]
-        })
-    // billing = await BillingSummary.findAll({
-    //         limit: parseInt(limit),
-    //         offset: parseInt(offset),
-    //         include: [
-    //             {
-    //                 model:models.patient_data,
-    //                 attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled', 'primary_consultant', 'secondary_consultant'],
-    //                 where: {
-    //                     disabled: 1
-    //                 }
-    //             }
-               
-    //         ],
-    //         where: {
-    //             date: {
-    //                 [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
-    //             },
-    //             [Op.and]: [{
-    //                 date: {
-    //                     [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
-    //                 }
-    //             }
-    //             ]
-    //         },
-    //         order: [
-    //            arrSort
-    //         ],
-    //         raw: false
-    //     })
-    //     return billing
-    // } else {
-    //     billing = await BillingSummary.findAll({
-    //         limit: parseInt(limit),
-    //         offset: parseInt(offset),
-    //         include: [
-    //             {
-    //                 model:models.patient_data,
-    //                 attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'primary_consultant', 'secondary_consultant']
-    //             }
-               
-    //         ],
-    //         where: {
-    //             date: {
-    //                 [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
-    //             },
-    //             [Op.and]: [{
-    //                 date: {
-    //                     [Op.lte]: new Date(moment(params.bill_date).endOf('month').add(1, 'd').format('YYYY-MM-DD'))
-    //                 }
-    //             }
-    //             ],
-    //             [Op.and]: [
-    //                 Sequelize.where(
-    //                     Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
-    //                     { [Op.like]: `%${filter}%` }
-    //                 )
-    //             ]
-    //         },
-    //         order: [
-    //             arrSort
-    //          ],
-    //         raw: false
-    //     })
-    //     return billing
-    // }
-    }catch(err){
-        console.log(err);
-        return false;
+            ],
+            where: {user_uuid: {[Op.in]: params.list}}
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
     }
-    return billing
+}
+
+
+async function db_get_practitioner_list(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await models.practictioner_patient_map.findAll({
+            attributes: ['practictioner_id', 'pid'],
+            group: ['practictioner_id']
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
+async function db_get_patch_data(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        let data = [];
+        let pids = null;
+
+        if (typeof params.pid == 'string') {
+            pids = [params.pid];
+        }
+        else {
+            pids = params.pid
+        }
+
+        if (params.pid) {
+            data = await PatchPatientMap.findAll({
+                include: [
+                    {
+                        model: models.patch,
+                    }
+                ],
+                where: {
+                    [Op.and]: [{ pid: { [Op.in]: pids } }]
+                },
+                raw: true
+            },
+                { transaction: t })
+        }
+        const result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
 }
 
 
@@ -707,5 +661,6 @@ module.exports = {
     db_get_billing_report_count,
     db_update_billing_summary,
     db_get_patch_data,
-    db_get_billing_report_summary_by_practitioner
+    db_get_billing_report_summary_by_practitioner,
+    db_get_practitioner_list
 }

@@ -772,7 +772,7 @@ async function db_check_duplicate_device(params) {
         const data = await Patches.findOne({
             where: params
         },
-        {transaction: transaction}
+        {transaction: t}
 	)
     let result = { data: data }
     await t.commit()

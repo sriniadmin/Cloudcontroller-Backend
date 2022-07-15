@@ -15,7 +15,8 @@ const {
     db_search_billing_id,
     db_update_billing_summary,
     db_updated_task,
-    db_get_billing_report_summary_by_practitioner
+    db_get_billing_report_summary_by_practitioner,
+    db_get_practitioner_list
 } = require("../dbcontrollers/billing.controller")
 
 const {
@@ -47,7 +48,7 @@ async function getBilling(req, res, next) {
     req.apiRes = BILLING_CODE["2"]
     req.apiRes["response"] = {
         billingData: billing,
-        patchData: patch_data,
+        patchData: patch_data.data,
         count: billing.length,
     }
     return responseAPI(res, req.apiRes)
@@ -101,7 +102,7 @@ async function getBillingTotalSummary(req, res, next) {
     req.apiRes = BILLING_CODE["2"]
     req.apiRes["response"] = {
         billingData: billing,
-        patchData: patchData,
+        patchData: patchData.data,
         count: billingCount
     }
     return responseAPI(res, req.apiRes)
@@ -476,37 +477,31 @@ async function updateBillingInformation(req, res, next) {
 
 
 async function getBillingTotalSummaryByPractitioner(req, res, next) {
-    let billing;
-    let patchData = [];
     try {
-        billing = await db_get_billing_report_summary_by_practitioner(req.query)
-        // let billingCount = await db_get_billing_report_count(req.query)
-        // let listPids = [];
-        // billing.map(item => {
-        //     if(!listPids.includes(item.pid)){
-        //         listPids.push(item.pid)
-        //     }
-        // })
-        // patchData = await db_get_patch_data({pid: listPids});
-    } catch (err) {
-        req.apiRes = BILLING_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING BILLING INVENTORY",
-        }
-        return next()
-    }
-    if(!billing){
-        req.apiRes = BILLING_CODE["1"]
-        req.apiRes["error"] = {
-            error: "ERROR IN FETCHING BILLING INVENTORY",
-        }
-        return next()
-    }
-    req.apiRes = BILLING_CODE["2"]
-    req.apiRes["response"] = {
-        billingData: billing,
-        patchData: patchData,
+        req.query.list = []
+        req.query.pids = []
+        const list = await db_get_practitioner_list(req.query)
+        req.query.pids.push(list.data[0].pid)
+        list.data.forEach(obj => {
+            req.query.list.push(obj.practictioner_id)
+            if(!req.query.pids.includes(obj.pid)){
+                req.query.pids.push(obj.pid)
+            }
+        });
+        const result = await db_get_billing_report_summary_by_practitioner(req.query)
+        const patchData = await db_get_patch_data({pid: req.query.pids});
+        req.apiRes = BILLING_CODE["2"]
+        req.apiRes["response"] = {
+        billingData: result,
+        patchData: patchData.data
         // count: billingCount
+    }
+    } catch (error) {
+        console.log(error)
+        req.apiRes = BILLING_CODE["1"]
+        req.apiRes["error"] = {
+            error: "ERROR IN FETCHING BILLING INVENTORY",
+        }
     }
     return responseAPI(res, req.apiRes)
 }

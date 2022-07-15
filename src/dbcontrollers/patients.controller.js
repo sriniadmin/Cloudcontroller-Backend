@@ -893,7 +893,7 @@ async function db_check_duplicate_patient(params) {
         return result
     } catch (error) {
         await t.rollback()
-        error
+        throw error
     }
 }
 
