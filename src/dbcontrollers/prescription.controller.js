@@ -199,11 +199,12 @@ async function db_delete_prescription(given_pid, transaction) {
 }
 
 
-async function db_create_prescription(params, transaction) {
+async function db_create_prescription(params) {
+    const t = await sequelizeDB.transaction()
     try {
         let endDate = get_endDate(params.drug, params["date_added"])
 
-        return await Prescriptions.create(
+        const data = await Prescriptions.create(
             {
                 prescription_uuid: params["prescription_uuid"],
                 substitute: params["substitute"],
@@ -246,11 +247,14 @@ async function db_create_prescription(params, transaction) {
                 tenant_uuid: params["tenant_uuid"],
                 pid: params["pid"]
             },
-            { transaction: transaction }
+            { transaction: t }
         )
+        let result = { data: data }
+        await t.commit()
+        return result.data
     } catch (error) {
-        console.log(error)
-        throw new Error(error)
+        await t.rollback()
+        throw error
     }
 }
 

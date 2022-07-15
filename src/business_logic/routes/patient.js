@@ -3461,7 +3461,7 @@ async function createPatientPrescription(req, res, next) {
     try {
         const uuidDict = { uuidType: UUID_CONST["prescription"], tenantID: 0 }
         req.body.prescription_uuid = await getUUID(uuidDict, { transaction: t })
-        await db_create_prescription(req.body, t)
+        await db_create_prescription(req.body)
         req.apiRes = PRESCRIPTION_CODE["3"]
         req.apiRes["response"] = {
             data: req.body
@@ -3473,7 +3473,6 @@ async function createPatientPrescription(req, res, next) {
         }
         req.apiRes = PRESCRIPTION_CODE["4"]
     }
-    await t.commit()
     return responseAPI(res, req.apiRes)
 }
 
