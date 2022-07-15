@@ -481,9 +481,12 @@ async function getBillingTotalSummaryByPractitioner(req, res, next) {
         req.query.list = []
         req.query.pids = []
         const list = await db_get_practitioner_list(req.query)
+        req.query.list.push(list.data[0].practictioner_id)
         req.query.pids.push(list.data[0].pid)
         list.data.forEach(obj => {
-            req.query.list.push(obj.practictioner_id)
+            if(!req.query.list.includes(obj.practictioner_id)){
+                req.query.list.push(obj.practictioner_id)
+            }
             if(!req.query.pids.includes(obj.pid)){
                 req.query.pids.push(obj.pid)
             }

@@ -598,8 +598,7 @@ async function db_get_practitioner_list(params) {
     const t = await sequelizeDB.transaction()
     try {
         const data = await models.practictioner_patient_map.findAll({
-            attributes: ['practictioner_id', 'pid'],
-            group: ['practictioner_id']
+            attributes: ['practictioner_id', 'pid']
         },
         { transaction: t })
         const result = { data: data }
