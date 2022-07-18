@@ -951,12 +951,20 @@ async function db_update_patch_status(params) {
 
 async function db_update_patch_gateway(params) {
 
+    let data = {}
+    if(params.command === 'Reset'){
+        data.reset = 1
+    }
+    else if(params.command === 'Scan'){
+        data.scan = 1
+    }
+
     return await Patches.update(
-        { 
-            scan: params.scan,
-            reset: params.reset
-        },
-        { where: {patch_uuid: params.patch_uuid}}
+        data,
+        { where: {
+            patch_serial: params.patch_serial,
+            patch_type: 'gateway'
+        }}
     )
     .catch((error) => {
         throw new Error(error)
@@ -967,7 +975,7 @@ async function db_update_patch_gateway(params) {
 async function db_reset_device(params) {
     try {
         let data = {}
-        if(params.reset){
+        if(params.reset === 0){
             data.reset = params.reset
         }
         else{

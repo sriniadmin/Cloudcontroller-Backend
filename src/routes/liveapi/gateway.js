@@ -253,231 +253,6 @@ function parseDiscover(disData, devType) {
 
 router.post("/gateway_keepalive", async function (req, res, next) {
     try {
-        // // klogger.debug("Gateway Keepalive received data is ", req.body["patientUUID"])
-        // // klogger.debug("Gateway Keepalive received data is ", req.body)
-        // let resp = {
-        // }
-        // // let resp = { Keepalive: "Success" }
-        // let pid = req.body['patientUUID']
-        // let keepaliveHistory = {}
-        // let discoverHistory = {}
-        // let connectedGw = []
-        // if (!req.body['connectedDevices'] || !req.body['patientUUID']) {
-        //     return res.status(470).json({
-        //         status: '407',
-        //         messages: 'connectedDevices, patientUUID are required'
-        //     })
-        // }
-        // deviceListFromGateway = req.body['connectedDevices']
-        // let softkill = false
-        // // try{
-        // //     if (deviceListFromGateway) {
-        // //         deviceListFromGateway.forEach(patch => {
-        // //             if (patch['type'] == 'ds' && patch['connected'] == 'false') {
-        // //                 patch_serial = patch['serial_no']
-        // //                 // ble_scan_time = Date.parse(req.body['bleLastScanTime']) //Epoch time
-        // //                 // const dateToday = new Date()
-        // //                 // currEpoch = Date.parse(dateToday)
-        // //                 // if ( currEpoch-ble_scan_time > )
-        // //                 // 1643217183#SWAN__01:B6:EC:BB:0C:C9__RSSI:-62
-        // //                 ble_devices = req.body['discovered_ble']
-        // //                 if(ble_devices.includes(patch_serial)) {
-        // //                     if (new Date().getMinutes() % 5 == 0) {
-        // //                         softkill = True
-        // //                     }
-        // //                  } else {
-        // //                     if (new Date().getMinutes() % 4 == 0) {
-        // //                         softkill = True
-        // //                     }
-        // //                  }
-        // //         }
-        // //     })
-        // //  } }
-        // // catch (error){
-        // //     klogger.debug("DS - softkill failed -- workaround failed")
-        // // }
-
-        // let deviceDiscoveredListFromGateway = {}
-        // // try {
-        // if (req.body.hasOwnProperty("discovered")) {
-        //     alpha = parseDiscover(req.body['discovered'], "alpha")
-        //     deviceDiscoveredListFromGateway["ALPHA"] = alpha
-        // }
-        // if (req.body.hasOwnProperty("discovered_ble")) {
-        //     bleDisc = parseDiscover(req.body['discovered_ble'], "BLE")
-        //     deviceDiscoveredListFromGateway["BLE"] = bleDisc
-        // }
-        // if (req.body.hasOwnProperty("discovered_viva")) {
-        //     vivaDisc = parseDiscover(req.body['discovered_viva'], "VivaLnk")
-        //     deviceDiscoveredListFromGateway["VIVA"] = vivaDisc
-        // }
-
-
-        // connectedGw = parseConnected(deviceListFromGateway)
-        // klogger.debug("discovered device", deviceDiscoveredListFromGateway)
-        // // } catch ( error) {
-        // //     console.log(error)
-        // // klogger.debug("discovered device", req.body['discovered'], req.body['discovered_ble'], req.body['discovered_viva'], error )
-        // // }
-        // let promises = []
-        // let tenant_id
-
-        // //TODO discoveredDevices needs to be checked and the mysql DB for each of the patch should be 
-        // // updated with the battery details etc - Better to come up with the JSON model for this.
-
-        // const exist = await db_check_patient_exist(pid)
-        // if(!exist){
-        //     return res.status(470).json({
-        //         status: '407',
-        //         messages: 'patientUUID not exit'
-        //     })
-        // }
-        // tenant_id = exist['tenant_id']
-
-        // if ((typeof deviceListFromGateway !== 'string') && (deviceListFromGateway.length > 0)) {
-        //     for (let i = 0; i < deviceListFromGateway.length; i++) {
-        //         sn_no = deviceListFromGateway[i]['serial_no']
-        //         klogger.debug("SN of keepalive : ", sn_no)
-        //         promises.push(
-        //             db_get_patch_map_list(tenant_id, "", {
-        //                 sn: sn_no
-        //             })
-        //         )
-        //         // get the values of the keepalive and config change status and command from gateway device
-        //         // Update the threads, version etc  from the Keepalive message.
-        //     }
-        //     await Promise.all(promises).then(async (patch_patient_list) => {
-        //         klogger.debug(
-        //             "THE  PATCH PATIENT LIST IS",
-        //             patch_patient_list.length
-        //         )
-        //         let command, keepaliveTime
-        //         for (let i = 0; i < patch_patient_list.length; i++) {
-
-        //             if (patch_patient_list[i].length == 0) {
-        //                 klogger.debug(
-        //                     "THE  PATCH serial LIST IS Empty", i,
-        //                     patch_patient_list[i][0]
-        //                 )
-        //                 continue
-        //             }
-        //             keepaliveHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].keepaliveHistory
-        //             discoverHistory[patch_patient_list[i][0]['patches.patch_serial']] = patch_patient_list[i][0].discoverDevices
-        //             if (patch_patient_list[i][0].keepaliveTime !== undefined) {
-        //                 keepaliveTime = patch_patient_list[i][0].keepaliveTime
-        //                 resp['KeepaliveTime'] = keepaliveTime
-        //             }
-        //             if (patch_patient_list[i][0].command !== undefined) {
-        //                 command = patch_patient_list[i][0].command
-        //                 resp['Command'] = command
-        //             }
-        //             if (softkill !== undefined) {
-        //                 resp['Command'] = 'softkill'
-        //             }
-        //         }
-        //     })
-
-        //     klogger.debug("The response for keepalive is", resp, keepaliveHistory.length)
-        //     // clear the command from the patch_patient_map table for that specific gateway device
-        //     promises = []
-        //     for (let i = 0; i < deviceListFromGateway.length; i++) {
-        //         sn_no = deviceListFromGateway[i]['serial_no']
-        //         klogger.debug("Clearing the commands", sn_no)
-        //         promises.push(
-        //             clear_command(tenant_id, {
-        //                 pid: pid
-        //             })
-        //         )
-        //     }
-        //     await Promise.all(promises).then(async (clear_command_list) => {
-        //         klogger.debug("The commands are cleared : ", clear_command_list)
-
-        //     })
-
-        //     promises = []
-        //     // try {
-        //     for (let i = 0; i < deviceListFromGateway.length; i++) {
-        //         sn_no = deviceListFromGateway[i]['serial_no']
-        //         typeDevice = deviceListFromGateway[i]['type']
-        //         klogger.debug("Updaing keepalive data the commands", sn_no, typeDevice)
-        //         if (typeDevice == 'gateway') {
-        //             let dateNow = Date()
-
-        //             let keepaliveGw = []
-        //             let discoverGw = []
-
-        //             let discoverData = {}
-        //             klogger.debug("Gateway selected commands", sn_no, typeDevice, dateNow)
-        //             if (keepaliveHistory[sn_no]) {
-        //                 keepaliveGw = keepaliveHistory[sn_no]
-        //                 if (discoverHistory[sn_no]) {
-        //                     try {
-        //                         discoverGw = discoverHistory[sn_no]["devices"]["discover"]
-        //                     } catch (err) {
-        //                         klogger("Resetting the Discoveries to Empty", err)
-        //                         discoverGw = []
-        //                     }
-
-        //                 }
-
-        //             }
-        //             klogger.debug("keepalive Gw output", discoverGw)
-        //             // klogger.debug("keepalive Gw output",keepaliveGw)
-        //             // let keys = []
-        //             // for (var key in keepaliveGw) keys.push(Object.keys(keepaliveGw[key]))
-        //             // klogger.debug("keepalive data  time ", keys)
-
-        //             keepaliveGw.splice(0, 0, { [dateNow]: req.body });
-        //             keepaliveGw = keepaliveGw.slice(0, 40)
-        //             if (Object.getOwnPropertyNames(deviceDiscoveredListFromGateway).length > 0) {
-        //                 deviceDiscoveredListFromGateway["GATEWAY"] = sn_no
-
-        //                 if (discoverGw && discoverGw.length > 0) {
-        //                     discoverGw.splice(0, 0, { [dateNow]: deviceDiscoveredListFromGateway });
-        //                     discoverGw = discoverGw.slice(0, 3)
-        //                 } else {
-        //                     discoverGw = []
-        //                     discoverGw.push({ [dateNow]: deviceDiscoveredListFromGateway })
-        //                 }
-
-        //                 klogger.debug("Updating Gateway discovered devices", discoverGw)
-        //             }
-        //             discoverData["cloudstatus"] = dateNow
-
-        //             let devicesKeep = {
-        //                 "discover": discoverGw,
-        //                 "connected": connectedGw
-        //             }
-        //             discoverData["devices"] = devicesKeep
-        //             // discoverData["devices"].push(devicesKeep)
-
-        //             promises.push(
-        //                 update_keepalive(tenant_id, {
-        //                     pid: pid,
-        //                     sn: sn_no,
-        //                     keepaliveData: keepaliveGw,
-        //                     discoverData: discoverData
-        //                 })
-        //             )
-        //         }
-
-        //     }
-        //     await Promise.all(promises).then(async (keepalive_list) => {
-        //         klogger.debug("The keepalive data is updated : ", keepalive_list)
-
-        //     })
-        //     // } catch (error) {
-        //     //     console.log(error)
-        //     // }
-        // }
-        // else {
-        //     resp.response = 'Invalid data of connectedDevices'
-        // }
-        // // the response from the keepalive should be stored in keepalive_history - as last 50 entries only
-
-        // // klogger.debug("The keepalive response is", resp)
-        // // resp
-        // resp['Command'] = 'softkill'
         if(!req.body.keep_alive_time){
             return res.status(470).json({Message: 'keep_alive_time is missing'})
         }
@@ -512,26 +287,22 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         let list = await global_variable.gateway_list
         list = list.data
 
-        let result = {
-            Command: 'softkill'
-        }
+        let result = {}
         for (const obj of list) {
             if(obj.pid === req.body.patientUUID){
-                if(obj['patch_patient_maps.patches.scan'] !== undefined){
-                    if((((req.body['scan'] === true) || (req.body['scan'] === false)) && (req.body['scan'] !== obj['patch_patient_maps.patches.scan'])) 
-                    || (((req.body['reset'] === true) || (req.body['reset'] === false)) && (req.body['reset'] !== obj['patch_patient_maps.patches.reset']))){
-                        await db_update_patch_gateway({scan: Number(!Boolean(req.body['scan'])), reset: Number(!Boolean(req.body['reset'])), patch_uuid: obj['patch_patient_maps.patch_uuid']})
-                        obj['patch_patient_maps.patches.scan'] = Number(!Boolean(req.body['scan']))
-                        obj['patch_patient_maps.patches.reset'] = Number(!Boolean(req.body['reset']))
-                    }
-                    result.scan = !Boolean(Number(obj['patch_patient_maps.patches.scan']))
-                    result.reset = !Boolean(Number(obj['patch_patient_maps.patches.reset']))
-                    break;
+                if(obj['patch_patient_maps.patches.scan'] === 0){
+                    result.command = 'Scan'
+                }
+                else if(obj['patch_patient_maps.patches.reset'] === 0){
+                    result.command = 'Reset'
+                }
+                else {
+                    result.command = 'no action'
                 }
             }
         }
 
-        return res.send(200, {result})
+        return res.send(200, result)
     } catch (error) {
         console.log(error)
         return res.status(500,'ERROR FROM OLD SOURCE CODE, OLD LOGIC', error)
@@ -1153,5 +924,66 @@ async function CheckingThreshold(params) {
         }
     }
 }
+
+
+/**
+ * @openapi
+ *  /liveapi/gateway/active:
+ *   post:
+ *       tags:
+ *         - Gateway
+ *       summary: Receive data from gateway - like watch, mobile , band etc
+ *       requestBody:
+ *         description: Receive data from gateway - like watch, mobile , band etc
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/gateway_config'
+ *       responses:
+ *         '201':
+ *           description: User  Information is added.
+ */
+
+//TODO: Make it Http1.1
+router.post("/active", async function (req, res, next) {
+    try {
+        let data = req.body
+        if (!data.command || ((data.command !== 'Scan') && (data.command !== 'Reset')) || !data.gateway_id || !data.patient_id) {
+            return res.status(470).json(
+                {
+                    status: 'fail',
+                message: 'Invalid request format'
+                }
+            )
+        }
+
+        let list = await global_variable.gateway_list
+        list = list.data
+
+        for (const obj of list) {
+            if (obj.pid === data.patient_id) {
+                if (data.command === 'Scan') {
+                    await db_update_patch_gateway({ command: 'Scan', patch_serial: data.gateway_id })
+                }
+                else
+                    if (data.command === 'Reset') {
+                        await db_update_patch_gateway({ command: 'Reset', patch_serial: data.gateway_id })
+                    }
+                break
+            }
+        }
+        global_variable.gateway_list = db_gateway_by_patient()
+        console.log(global_variable.gateway_list)
+        return res.status(200).json(
+            {
+                status: 'success',
+                message: 'success'
+            }
+        )
+    } catch (error) {
+        return res.status(500).json({ Message: error.message })
+    }
+})
 
 module.exports = router
