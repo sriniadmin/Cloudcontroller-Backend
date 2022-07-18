@@ -1450,64 +1450,6 @@ async function getRemoteLocation(req, res, next) {
     return responseAPI(res, req.apiRes)
 }
 
-// Validated
-async function createFacility(req, res, next) {
-    logger.debug("Facility  header output is ", req.headers)
-    logger.debug("Facility  Session output is ", req.session)
-    const t = await sequelizeDB.transaction()
-    let email = req.userEmail
-    let username = req.userName
-    let tenant_name = req.userTenant
-    let tenant_id = req.userTenantId
-
-    logger.debug("THE MAIN TENANT ID IS", tenant_id)
-    tenant_id = req.body["tenant_id"] // This will take the tenant ID passed during the Tenant creation
-    let facility_data = req.body
-    let facilities
-    //JSON SCHEMA Validation
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["facilitySchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed ",
-        }
-        return next()
-    }
-    uuidDict = {
-        uuidType: UUID_CONST["facility"], // tenant_id should be the same as login tenant
-        tenantID: tenant_id,
-    }
-    try {
-        facilities = await sequelizeDB.transaction(async function (t) {
-            let uuid_result = await getUUID(uuidDict, { transaction: t })
-            logger.debug("The uuid result is", uuid_result)
-            facility_data["facility_uuid"] = uuid_result
-            facility_data["tenant_id"] = tenant_id
-            logger.debug("TENANT ID IS", facility_data["tenant_id"])
-            return db_create_facility(tenant_id, facility_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("Facility create error " + err)
-        req.apiRes = FACILITY_CODE["4"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING FACILITY",
-        }
-        return next()
-    }
-    logger.debug("Facility list is " + facilities)
-    req.apiRes = FACILITY_CODE["3"]
-    req.apiRes["response"] = {
-        facilities_data: facilities,
-        count: facilities.length,
-    }
-    return next()
-}
-
 async function updateFacility(req, res, next) {
     email = req.userEmail
     username = email.split("@")[0]
@@ -2898,6 +2840,24 @@ async function createTenant(req, res, next) {
             error: error
         }
         req.apiRes = TENANTS_CODE["4"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
+
+async function createFacility(req, res, next) {
+    try {
+        await db_create_facility(req.body)
+        req.apiRes = FACILITY_CODE["3"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = FACILITY_CODE["4"]
     }
     return responseAPI(res, req.apiRes)
 }

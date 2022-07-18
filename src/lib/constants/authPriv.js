@@ -13,6 +13,7 @@ let IGNORE_AUTH_PATH = [
   "/liveapi/gateway/gateway_keepalive",
   "/liveapi/gateway/push_data",
   "/liveapi/gateway/discovered_devices",
+  "/liveapi/gateway/active",
 
   "/video/guide/helpvideo",
   "/video/guide/",

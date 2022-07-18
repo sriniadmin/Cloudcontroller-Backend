@@ -6,22 +6,6 @@ const logger = require("../config/logger")
 const Facilities = models.facility
 
 
-async function db_create_facility(tenant_id, facility_data, transaction) {
-    //This email created new facility in the db
-    let result
-    try {
-        result = await Facilities.create(
-            facility_data,
-            { transaction: transaction["transaction"] })
-        logger.debug("facility insert output is" + result)
-    }
-    catch (err) {
-        logger.debug("facility insert  error " + tenant_id + " not found Err:" + err)
-        throw new Error("facility insert  error -  tenant check")
-    }
-    return result
-}
-
 async function db_update_facility(tenant_id, facility_data, transaction) {
     let result
     try {
@@ -79,6 +63,25 @@ async function db_get_facility_list(tenant_id, username) {
     }
     return result
 }
+
+
+
+async function db_create_facility(params) {
+    params.id = undefined
+    const t = await sequelizeDB.transaction()
+    try {
+      const data = await Facilities.create(
+      params,
+      { transaction: t })
+      const result = { data: data }
+      await t.commit()
+      return result.data
+    } catch (error) {
+      await t.rollback()
+      throw error
+    }
+  }
+
 
 module.exports = {
     db_get_facility_list,

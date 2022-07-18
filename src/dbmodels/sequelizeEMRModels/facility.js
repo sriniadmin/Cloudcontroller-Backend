@@ -319,10 +319,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: false
     },
-    facility_uuid: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
     facility_map: {
       type: DataTypes.JSON,
       allowNull: true

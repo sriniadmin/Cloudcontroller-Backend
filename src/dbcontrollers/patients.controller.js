@@ -529,20 +529,16 @@ async function db_get_patient_inventory(params) {
         const data = await Patients_Data.findAll({
             where: condition,
             order: [
-                ['date', 'DESC']
+                ['id', 'DESC']
             ],
             limit: limit,
             offset: offset,
             raw: false,
         });
-        const count = await Patients_Data.findAll({
-            where: condition,
-            order: [
-                ['date', 'DESC']
-            ],
-            raw: false,
+        const count = await Patients_Data.count({
+            where: condition
         });
-        return { data: data, count: count.length }
+        return { data: data, count: count }
     } catch (error) {
         throw new Error(error)
     }
