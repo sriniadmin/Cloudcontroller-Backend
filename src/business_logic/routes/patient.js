@@ -3073,17 +3073,48 @@ async function unassociatePatient(req, res, next) {
 async function editPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
     try {
-        const medical_record = await db_med_record_exist(req.body.demographic_map.med_record)
-        if (medical_record && medical_record.pid !== req.body.demographic_map.pid) {
+	let demographic_map = req.body.demographic_map
+        const medical_record = await db_med_record_exist(demographic_map.med_record)
+        if (medical_record && medical_record.pid !== demographic_map.pid) {
             req.apiRes = PATIENT_CODE["8"]
             req.apiRes["error"] = {
                 isExist: true,
-                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + req.body.demographic_map.med_record,
+                error: "MEDICAL RECORD NUMBER ALREADY EXISTS:" + demographic_map.med_record,
             }
             return responseAPI(res, req.apiRes)
         }
 
-        await db_edit_patient(req.body.demographic_map)
+        await db_edit_patient(demographic_map)
+
+        let list = []
+        if((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)){
+            demographic_map.primary_consultant.forEach(obj => {
+                list.push({
+                    tenant_id: req.body.tenantId,
+                    practictioner_id: obj.uuid,
+                    pid: demographic_map.pid,
+                    practictioner_role: 'Primary'
+                })
+            });
+        }
+
+        if((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0)){
+            demographic_map.secondary_consultant.forEach(obj => {
+                list.push({
+                    tenant_id: req.body.tenantId,
+                    practictioner_id: obj.uuid,
+                    pid: demographic_map.pid,
+                    practictioner_role: 'Secondary'
+                })
+            });
+        }
+
+        if(list.length > 0){
+            list.forEach(obj => {
+                db_add_practictioner(obj)
+            });
+        }
+
         req.apiRes = PATIENT_CODE["7"]
         req.apiRes["response"] = req.body
     } catch (error) {
@@ -3100,7 +3131,7 @@ async function editPatient(req, res, next) {
 async function addNewPatient(req, res, next) {
     const t = await sequelizeDB.transaction()
     try {
-	    const demographic_map = req.body.demographic_map
+        const demographic_map = req.body.demographic_map
         const medical_record = await db_med_record_exist(demographic_map.med_record)
         if (medical_record) {
             req.apiRes = PATIENT_CODE["6"]
@@ -3112,10 +3143,10 @@ async function addNewPatient(req, res, next) {
         }
 
         tags = demographic_map.tags
-        if(tags.length > 0){
+        if (tags.length > 0) {
             recallFuntion(demographic_map.tags.length, 0, req, res, next, t)
         }
-        else{
+        else {
             let uuidDict = {
                 uuidType: UUID_CONST["patient"],
                 tenantID: req.body.tenantId,
@@ -3125,29 +3156,30 @@ async function addNewPatient(req, res, next) {
             demographic_map.associated_list = "[]"
             await db_add_new_patient(demographic_map)
 
-            if(((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)) || ((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0))){
-                let list = []
-                if(demographic_map.primary_consultant.length > 0){
-                    demographic_map.primary_consultant.forEach(obj => {
-                        list.push({
-                            tenant_id: req.body.tenantId,
-                            practictioner_id: obj.uuid,
-                            pid: demographic_map.pid,
-                            practictioner_role: 'Primary'
-                        })
-                    });
-                }
-                if(demographic_map.secondary_consultant.length > 0){
-                    demographic_map.secondary_consultant.forEach(obj => {
-                        list.push({
-                            tenant_id: req.body.tenantId,
-                            practictioner_id: obj.uuid,
-                            pid: demographic_map.pid,
-                            practictioner_role: 'Secondary'
-                        })
-                    });
-                }
+            let list = []
+            if ((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)) {
+                demographic_map.primary_consultant.forEach(obj => {
+                    list.push({
+                        tenant_id: req.body.tenantId,
+                        practictioner_id: obj.uuid,
+                        pid: demographic_map.pid,
+                        practictioner_role: 'Primary'
+                    })
+                });
+            }
 
+            if ((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0)) {
+                demographic_map.secondary_consultant.forEach(obj => {
+                    list.push({
+                        tenant_id: req.body.tenantId,
+                        practictioner_id: obj.uuid,
+                        pid: demographic_map.pid,
+                        practictioner_role: 'Secondary'
+                    })
+                });
+            }
+
+            if (list.length > 0) {
                 list.forEach(obj => {
                     db_add_practictioner(obj)
                 });

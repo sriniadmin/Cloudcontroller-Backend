@@ -568,7 +568,7 @@ async function db_get_billing_report_summary_by_practitioner(params) {
     const t = await sequelizeDB.transaction()
     try {
         const data = await Users.findAll({
-            attributes: ['id', 'fname', 'mname', 'lname', 'user_uuid', 'role'],
+            attributes: ['id', 'fname', 'mname', 'lname', 'user_uuid', 'role', 'phone'],
             include: [
                 {
                     model:models.practictioner_patient_map,
