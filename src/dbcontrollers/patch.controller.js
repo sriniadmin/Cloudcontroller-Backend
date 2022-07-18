@@ -34,7 +34,7 @@ async function db_get_patch_select_boxes(params) {
     let data
     try {
         data = await Patches.findAll({
-            attributes: ['id', 'patch_type', 'device_serial', 'patch_uuid', 'tags', 'sim', 'phone'],
+            attributes: ['id', 'patch_type', 'device_serial', 'patch_mac', 'patch_uuid', 'tags', 'sim', 'phone'],
             where: {
                 patch_type: params.devicetype,
                 patch_status: 'inactive',
