@@ -168,7 +168,7 @@ async function db_get_tenant_list(params) {
         const data = await Tenants.findAll({
             attributes: ['tenant_name', 'tenant_uuid', 'date'],
             where: {
-                root_id: params.tenant_id
+                root_id: params.root_id
             },
             order: [["id", "DESC"]]
         },

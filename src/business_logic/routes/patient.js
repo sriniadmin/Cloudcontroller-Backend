@@ -3125,7 +3125,7 @@ async function addNewPatient(req, res, next) {
             demographic_map.associated_list = "[]"
             await db_add_new_patient(demographic_map)
 
-            if((demographic_map.primary_consultant.length > 0) || (demographic_map.secondary_consultant.length > 0)){
+            if(((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)) || ((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0))){
                 let list = []
                 if(demographic_map.primary_consultant.length > 0){
                     demographic_map.primary_consultant.forEach(obj => {
