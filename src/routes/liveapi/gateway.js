@@ -291,13 +291,13 @@ router.post("/gateway_keepalive", async function (req, res, next) {
         for (const obj of list) {
             if(obj.pid === req.body.patientUUID){
                 if(obj['patch_patient_maps.patches.scan'] === 0){
-                    result.command = 'Scan'
+                    result.Command = 'Scan'
                 }
                 else if(obj['patch_patient_maps.patches.reset'] === 0){
-                    result.command = 'Reset'
+                    result.Command = 'Reset'
                 }
                 else {
-                    result.command = 'no action'
+                    result.Command = 'no action'
                 }
             }
         }
@@ -963,11 +963,11 @@ router.post("/active", async function (req, res, next) {
 
         for (const obj of list) {
             if (obj.pid === data.patient_id) {
-                if (data.command === 'Scan') {
+                if (data.command === 'Scan' || data.Command === 'Scan') {
                     await db_update_patch_gateway({ command: 'Scan', patch_serial: data.gateway_id })
                 }
                 else
-                    if (data.command === 'Reset') {
+                    if ((data.command === 'Reset') || (data.Command === 'Reset')) {
                         await db_update_patch_gateway({ command: 'Reset', patch_serial: data.gateway_id })
                     }
                 break
