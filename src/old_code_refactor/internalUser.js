@@ -112,7 +112,8 @@ const {
     db_create_tenant,
     db_get_tenant_name,
     db_check_tenant,
-    db_get_root_tenant
+    db_get_root_tenant,
+    db_disable_tenant
 } = require("../dbcontrollers/tenant.controller")
 
 const {
@@ -1036,51 +1037,6 @@ async function getTenant(req, res, next) {
     return responseAPI(res, req.apiRes)
 }
 
-async function updateTenant(req, res, next) {
-    username = req.userName
-    tenant_id = req.userTenantId
-    let given_tenant_uuid = req.params.tenant_uuid
-    const t = await sequelizeDB.transaction()
-    //JSON SChema logic
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["tenantsSchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed " + error,
-        }
-        return next()
-    }
-
-    let tenant_data = req.body
-    let tenants
-    try {
-        tenants = await sequelizeDB.transaction(async function (t) {
-            return db_update_tenant(tenant_id, tenant_data, given_tenant_uuid, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("tenant Create error " + err)
-        req.apiRes = TENANTS_CODE["4"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING THE NEW TENANT",
-        }
-        return next()
-    }
-
-    logger.debug("tenant  is" + tenants)
-    tenants = dbOutput_JSON(tenants)
-    tenants = req.body
-    req.apiRes = TENANTS_CODE["3"]
-    req.apiRes["response"] = {
-        tenants: [tenants],
-        count: tenants.length,
-    }
-    return next()
-}
 
 //BED ROUTES
 // Validated
@@ -1450,54 +1406,6 @@ async function getRemoteLocation(req, res, next) {
     return responseAPI(res, req.apiRes)
 }
 
-async function updateFacility(req, res, next) {
-    email = req.userEmail
-    username = email.split("@")[0]
-    tenant_name = req.userTenant
-    let facility_data = req.body
-    let tenant_id = req.query.tenant_id
-    let facilities
-    //JSON SCHEMA Validation
-    let schema_status = schemaValidator.validate_schema(
-        req,
-        SCHEMA_CODE["facilitySchema"]
-    )
-    if (!schema_status["status"]) {
-        req.apiRes = JSON_SCHEMA_CODE["1"]
-        req.apiRes["error"] = {
-            error: "Schema Validation Failed " + error,
-        }
-        return next()
-    }
-    uuidDict = {
-        uuidType: UUID_CONST["facility"],
-        tenantID: tenant_id,
-    }
-    try {
-        facilities = await sequelizeDB.transaction(function (t) {
-            facility_data['tenant_id'] = tenant_id
-            return db_update_facility(tenant_id, facility_data, {
-                transaction: t,
-            })
-        })
-    } catch (err) {
-        logger.debug("Facility update error " + err)
-        req.apiRes = FACILITY_CODE["6"]
-        req.apiRes["error"] = {
-            error: "ERROR IN CREATING FACILITY",
-        }
-        return next()
-    }
-    logger.debug("Facility list is " + facilities)
-    respResult = dbOutput_JSON(facilities)
-    respResult = req.body
-    req.apiRes = FACILITY_CODE["5"]
-    req.apiRes["response"] = {
-        facilities: respResult,
-        count: respResult.length,
-    }
-    return next()
-}
 
 async function createRole(req, res, next) {
     const t = await sequelizeDB.transaction()
@@ -2863,6 +2771,42 @@ async function createFacility(req, res, next) {
 }
 
 
+async function updateTenant(req, res, next) {
+    try {
+        req.body.tenant_uuid = req.params.tenant_uuid
+        await db_update_tenant(req.body)
+        req.body.name = req.body.tenant_name
+        await db_update_facility(req.body)
+        req.apiRes = TENANTS_CODE["6"]
+        req.apiRes["response"] = {
+            data: req.body
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TENANTS_CODE["7"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
+
+async function disableTenant(req, res, next) {
+    try {
+        await db_disable_tenant(req.params)
+        req.apiRes = TENANTS_CODE["8"]
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error
+        }
+        req.apiRes = TENANTS_CODE["9"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
+
 module.exports = {
     getUserInventory,
     getUserProfile,
@@ -2891,7 +2835,6 @@ module.exports = {
     getImages,
     createLocation,
     getLocation,
-    updateFacility,
     updateTenant,
     createRole,
     getRoleList,
@@ -2926,5 +2869,6 @@ module.exports = {
     resetDevice,
     getRole,
     getLabReportById,
-    download
+    download,
+    disableTenant
 }

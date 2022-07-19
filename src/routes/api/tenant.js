@@ -5,6 +5,7 @@ var {
     getTenant,
     createTenant,
     updateTenant,
+    disableTenant
 } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
@@ -72,5 +73,26 @@ router.post("/", createTenant, apiFinalProcess)
  */
 
 router.put("/:tenant_uuid", updateTenant, apiFinalProcess)
+
+/**
+ * @openapi
+ * /api/tenant/:
+ *   delete:
+ *       tags:
+ *         - Tenants
+ *       summary: Create new tenant
+ *       requestBody:
+ *         description: New Tenant is created with all the necessary information
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Tenant_create'
+ *       responses:
+ *         '201':
+ *           description: Tenants Information is added.
+ */
+
+ router.delete("/:tenant_uuid", disableTenant, apiFinalProcess)
 
 module.exports = router

@@ -53,6 +53,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    disable: {
+      type: DataTypes.STRING(5),
+      allowNull: false
+    },
     date: {
       type: DataTypes.DATE,
       allowNull: false,

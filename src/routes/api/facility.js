@@ -1,7 +1,7 @@
 //This handles facility inventory
 var express = require("express")
 var router = express.Router()
-var { getFacility, createFacility, updateFacility } = require("../../old_code_refactor/internalUser")
+var { getFacility, createFacility } = require("../../old_code_refactor/internalUser")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
 
 /**
@@ -68,7 +68,7 @@ router.post("/", createFacility, apiFinalProcess)
  *               type: uuid
  *            description: The facility_uuid of specific  facility
  */
-router.put("/:facility_uuid", updateFacility, apiFinalProcess)
+// router.put("/:facility_uuid", updateFacility, apiFinalProcess)
 
 
 module.exports = router

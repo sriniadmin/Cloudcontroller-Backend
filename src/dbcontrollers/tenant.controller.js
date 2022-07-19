@@ -14,47 +14,6 @@ var Tenant = function (tenantobj) {
 }
 
 
-async function db_update_tenant(tenant_id, tenant_data, given_tenant_uuid, transaction) {
-    tenant_list = ""
-    let pdata = new Tenant(tenant_data)
-    logger.debug("tenant data is " + tenant_data)
-    let { tenant_uuid } = given_tenant_uuid
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is not undefined")
-        trans = transaction["transaction"]
-    }
-    await Tenants.update({
-
-        tenant_name: tenant_data['tenant_name'],
-
-    },
-        {
-            where: {
-                tenant_uuid: given_tenant_uuid
-            }
-        },
-        { transaction: trans })
-        .then((tenant_data) => {
-            logger.debug("tenant update output is" + tenant_data)
-            tenant_list = tenant_data
-        })
-        .catch((err) => {
-            logger.debug(
-                "tenant insert  error " +
-                tenant_id +
-                " not found Err:" +
-                err
-            )
-            throw new Error("tenant insert  error -  tenant check")
-        })
-
-    return tenant_list
-}
-
-
-
-
 async function db_get_tenant_id(tenant_name) {
     tenant_id = ""
     redisResponse = await redisClient.checkRedisCache('tenants', tenant_name);
@@ -168,7 +127,8 @@ async function db_get_tenant_list(params) {
         const data = await Tenants.findAll({
             attributes: ['tenant_name', 'tenant_uuid', 'date'],
             where: {
-                root_id: params.root_id
+                root_id: params.root_id,
+                disable: 'false'
             },
             order: [["id", "DESC"]]
         },
@@ -238,6 +198,50 @@ async function db_get_root_tenant(params) {
 }
 
 
+async function db_update_tenant(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = Tenants.update(
+            { tenant_name: params.tenant_name },
+            {
+                where: {
+                    tenant_uuid: params.tenant_uuid
+                }
+            },
+            { transaction: t }
+        )
+        let result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
+async function db_disable_tenant(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = Tenants.update(
+            { disable: 'true' },
+            {
+                where: {
+                    tenant_uuid: params.tenant_uuid
+                }
+            },
+            { transaction: t }
+        )
+        let result = { data: data }
+        await t.commit()
+        return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
 module.exports = { 
     db_get_tenant_id, 
     db_get_tenant_list, 
@@ -247,5 +251,6 @@ module.exports = {
     db_tenant_exist_trans,
     db_get_tenant_name,
     db_check_tenant,
-    db_get_root_tenant
+    db_get_root_tenant,
+    db_disable_tenant
 }

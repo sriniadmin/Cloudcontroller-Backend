@@ -6,30 +6,6 @@ const logger = require("../config/logger")
 const Facilities = models.facility
 
 
-async function db_update_facility(tenant_id, facility_data, transaction) {
-    let result
-    try {
-        result = await Facilities.update(
-            facility_data,
-            {
-                where: {
-                    tenant_id: tenant_id,
-                },
-            },
-            { transaction: transaction["transaction"] }
-        )
-        logger.debug("Facility insert output is" + result)
-    }
-    catch (err) {
-        logger.debug(
-            "Facility insert  error " + tenant_id + " not found Err:" + err
-        )
-        throw new Error("facility insert  error -  tenant check")
-    }
-    return result
-}
-
-
 async function db_get_facility(params) {
     try {
         return await Facilities.findOne({
@@ -70,17 +46,40 @@ async function db_create_facility(params) {
     params.id = undefined
     const t = await sequelizeDB.transaction()
     try {
-      const data = await Facilities.create(
-      params,
-      { transaction: t })
-      const result = { data: data }
-      await t.commit()
-      return result.data
+        const data = await Facilities.create(
+            params,
+            { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result.data
     } catch (error) {
-      await t.rollback()
-      throw error
+        await t.rollback()
+        throw error
     }
-  }
+}
+
+
+async function db_update_facility(params) {
+    params.id = undefined
+    params.tenant_id = undefined
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Facilities.update(
+            params,
+            {
+                where: {
+                    tenant_id: params.tenant_uuid
+                }
+            },
+            { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result.data
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
 
 
 module.exports = {

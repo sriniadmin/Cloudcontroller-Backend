@@ -774,6 +774,30 @@ let TENANTS_CODE = {
         Message: "Tenant is already exists",
         Details: {},
     },
+    6: {
+        Code: "UPDATE_TENANTS_SUCCESS",
+        HttpStatus: "200",
+        Message: "Failure in updating the new tenants information",
+        Details: {},
+    },
+    7: {
+        Code: "UPDATE_TENANTS_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in updating the new tenants information",
+        Details: {},
+    },
+    8: {
+        Code: "INACTIVE_TENANTS_SUCCESS",
+        HttpStatus: "200",
+        Message: "Failure in inacting the new tenants information",
+        Details: {},
+    },
+    9: {
+        Code: "INACTIVE_TENANTS_FAILURE",
+        HttpStatus: "470",
+        Message: "Failure in inacting the new tenants information",
+        Details: {},
+    },
 }
 let NOTES_CODE = {
     1: {
