@@ -2773,6 +2773,12 @@ async function createFacility(req, res, next) {
 
 async function updateTenant(req, res, next) {
     try {
+        const result = await db_check_tenant(req.body)
+        if(result.data && (result.data.tenant_uuid !== req.params.tenant_uuid)){
+            req.apiRes = TENANTS_CODE["5"]
+            return responseAPI(res, req.apiRes)
+        }
+
         req.body.tenant_uuid = req.params.tenant_uuid
         await db_update_tenant(req.body)
         req.body.name = req.body.tenant_name

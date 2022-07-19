@@ -73,6 +73,7 @@ const db_check_duplicate_patient = patient_controller.db_check_duplicate_patient
 const db_bulk_create_patient = patient_controller.db_bulk_create_patient
 const db_patient_info = patient_controller.db_patient_info
 const db_disable_patient = patient_controller.db_disable_patient
+const db_check_patient_exist = patient_controller.db_check_patient_exist
 const db_edit_patient = patient_controller.db_edit_patient
 const db_add_new_patient = patient_controller.db_add_new_patient
 
@@ -3006,6 +3007,7 @@ async function getPatientInventory(req, res, next) {
     return next()
 }
 
+
 async function patientActions(req, res, next) {
     if(req.body.action === 'unassociate'){
         return unassociatePatient(req, res, next)
@@ -3016,6 +3018,13 @@ async function patientActions(req, res, next) {
 
 async function disablePatient(req, res, next) {
     try {
+        const patient = await db_check_patient_exist(req.body.list[0].pid)
+
+        req.body.associated_list = '["gateway","ecg","spo2","temperature","digital","ihealth"]'
+        if((patient.associated_list).includes('alphamed')){
+            req.body.associated_list = '["gateway","ecg","spo2","temperature","digital","alphamed"]'
+        }
+
         const data = await db_disable_patient(req.body)
         if(data[0][0] === 1){
             //chnage process later

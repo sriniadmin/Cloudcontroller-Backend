@@ -522,9 +522,14 @@ async function db_get_patient_inventory(params) {
             }
         }
         
-        condition.tenant_id = params.tenantId,
-        condition.patient_type = params.patientType,
-        condition.disabled = 1
+        condition.tenant_id = params.tenantId
+        if(params.patientType === 'deboarded'){
+            condition.disabled = 0
+        }
+        else{
+            condition.patient_type = params.patientType
+            condition.disabled = 1
+        }
 
         const data = await Patients_Data.findAll({
             where: condition,
@@ -755,7 +760,11 @@ async function db_disable_patient(params) {
     params.list.forEach(obj => {
         promises.push(
             Patients_Data.update(
-                { disabled: 0, med_record: 'DISABLED' },
+                {  
+                    disabled: 0, 
+                    med_record: 'DISABLED', 
+                    associated_list: params.associated_list
+                },
                 {
                     where:{ 
                         tenant_id: params.tenantId,
@@ -774,19 +783,6 @@ async function db_disable_patient(params) {
         console.log(error)
     })
     return data
-}
-
-async function db_check_patient_exist(params) {
-    try {
-        return await Patients_Data.findOne({
-            where: {
-                pid: params,
-            },
-        })
-    } catch (err) {
-        console.log(err)
-        throw new Error(err)
-    }
 }
 
 async function db_update_patient_associated_list(params) {
@@ -892,6 +888,25 @@ async function db_check_duplicate_patient(params) {
         const result = { data: data }
         await t.commit()
         return result
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
+async function db_check_patient_exist(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await Patients_Data.findOne({
+            where: {
+                pid: params,
+            },
+        },
+        { transaction: t })
+        const result = { data: data }
+        await t.commit()
+        return result.data
     } catch (error) {
         await t.rollback()
         throw error
