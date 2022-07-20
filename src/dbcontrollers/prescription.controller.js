@@ -272,9 +272,27 @@ async function db_get_prescription_list(params) {
 }
 
 
+async function db_create_medication(params) {
+    const t = await sequelizeDB.transaction()
+    try {
+        const data = await models.medication.create(
+            params,
+            { transaction: t }
+        )
+        let result = { data: data }
+        await t.commit()
+        return result.data
+    } catch (error) {
+        await t.rollback()
+        throw error
+    }
+}
+
+
 module.exports = {
     db_get_prescription_list,
     db_create_prescription,
     db_update_prescription,
     db_delete_prescription,
+    db_create_medication
 }

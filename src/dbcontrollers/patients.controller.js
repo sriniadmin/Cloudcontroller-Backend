@@ -761,8 +761,7 @@ async function db_disable_patient(params) {
         promises.push(
             Patients_Data.update(
                 {  
-                    disabled: 0, 
-                    med_record: 'DISABLED', 
+                    disabled: 0,
                     associated_list: params.associated_list
                 },
                 {

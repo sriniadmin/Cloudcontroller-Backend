@@ -158,6 +158,7 @@ const {
 const {
     db_get_prescription_list,
     db_create_prescription,
+    db_create_medication,
     db_update_prescription,
 } = require("../../dbcontrollers/prescription.controller")
 
@@ -3138,7 +3139,6 @@ async function editPatient(req, res, next) {
 }
 
 async function addNewPatient(req, res, next) {
-    const t = await sequelizeDB.transaction()
     try {
         const demographic_map = req.body.demographic_map
         const medical_record = await db_med_record_exist(demographic_map.med_record)
@@ -3153,7 +3153,7 @@ async function addNewPatient(req, res, next) {
 
         tags = demographic_map.tags
         if (tags.length > 0) {
-            recallFuntion(demographic_map.tags.length, 0, req, res, next, t)
+            recallFuntion(demographic_map.tags.length, 0, req, res, next)
         }
         else {
             let uuidDict = {
@@ -3161,12 +3161,13 @@ async function addNewPatient(req, res, next) {
                 tenantID: req.body.tenantId,
             }
             demographic_map.tenant_id = req.body.tenantId
+            const t = await sequelizeDB.transaction()
             demographic_map.pid = await getUUID(uuidDict, { transaction: t })
             demographic_map.associated_list = "[]"
             await db_add_new_patient(demographic_map)
 
             let list = []
-            if ((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)) {
+            if((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)){
                 demographic_map.primary_consultant.forEach(obj => {
                     list.push({
                         tenant_id: req.body.tenantId,
@@ -3177,7 +3178,7 @@ async function addNewPatient(req, res, next) {
                 });
             }
 
-            if ((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0)) {
+            if((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0)){
                 demographic_map.secondary_consultant.forEach(obj => {
                     list.push({
                         tenant_id: req.body.tenantId,
@@ -3188,7 +3189,7 @@ async function addNewPatient(req, res, next) {
                 });
             }
 
-            if (list.length > 0) {
+            if(list.length > 0){
                 list.forEach(obj => {
                     db_add_practictioner(obj)
                 });
@@ -3207,8 +3208,7 @@ async function addNewPatient(req, res, next) {
 }
 
 
-async function recall(length, number, req, res, next, transaction) {
-    const t = await sequelizeDB.transaction()
+async function recall(length, number, req, res, next) {
     try {
 	    const demographic_map = req.body.demographic_map
         condition = {
@@ -3229,33 +3229,35 @@ async function recall(length, number, req, res, next, transaction) {
                 tenantID: req.body.tenantId,
             }
             demographic_map.tenant_id = req.body.tenantId
+            const t = await sequelizeDB.transaction()
             demographic_map.pid = await getUUID(uuidDict, { transaction: t })
             demographic_map.associated_list = "[]"
             await db_add_new_patient(demographic_map)
 
-            if((demographic_map.primary_consultant.length > 0) || (demographic_map.secondary_consultant.length > 0)){
-                let list = []
-                if(demographic_map.primary_consultant.length > 0){
-                    demographic_map.primary_consultant.forEach(obj => {
-                        list.push({
-                            tenant_id: req.body.tenantId,
-                            practictioner_id: obj.uuid,
-                            pid: demographic_map.pid,
-                            practictioner_role: 'Primary'
-                        })
-                    });
-                }
-                if(demographic_map.secondary_consultant.length > 0){
-                    demographic_map.secondary_consultant.forEach(obj => {
-                        list.push({
-                            tenant_id: req.body.tenantId,
-                            practictioner_id: obj.uuid,
-                            pid: demographic_map.pid,
-                            practictioner_role: 'Secondary'
-                        })
-                    });
-                }
-                
+            let list = []
+            if((demographic_map.primary_consultant) && (demographic_map.primary_consultant.length > 0)){
+                demographic_map.primary_consultant.forEach(obj => {
+                    list.push({
+                        tenant_id: req.body.tenantId,
+                        practictioner_id: obj.uuid,
+                        pid: demographic_map.pid,
+                        practictioner_role: 'Primary'
+                    })
+                });
+            }
+
+            if((demographic_map.secondary_consultant) && (demographic_map.secondary_consultant.length > 0)){
+                demographic_map.secondary_consultant.forEach(obj => {
+                    list.push({
+                        tenant_id: req.body.tenantId,
+                        practictioner_id: obj.uuid,
+                        pid: demographic_map.pid,
+                        practictioner_role: 'Secondary'
+                    })
+                });
+            }
+
+            if(list.length > 0){
                 list.forEach(obj => {
                     db_add_practictioner(obj)
                 });
@@ -3263,10 +3265,9 @@ async function recall(length, number, req, res, next, transaction) {
 
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
-            await transaction.commit();
             return responseAPI(res, req.apiRes)
         }
-        recallFuntion(length, number + 1, req, res, next, transaction)
+        recallFuntion(length, number + 1, req, res, next)
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]
@@ -3507,14 +3508,49 @@ async function createPatientPrescription(req, res, next) {
         req.apiRes["response"] = {
             data: req.body
         }
+
+        let list = req.body.drug
+        for (let index = 0; index < list.length; index++) {
+            if (index + 1 === list.length) {
+                return loopCreator(list[index], req, res, true)
+            }
+            loopCreator(list[index], req, res, false)
+        }
     } catch (error) {
         console.log(error)
         req.apiRes["error"] = {
             error: error
         }
         req.apiRes = PRESCRIPTION_CODE["4"]
+        return responseAPI(res, req.apiRes)
     }
-    return responseAPI(res, req.apiRes)
+}
+
+
+async function loopCreator(obj, req, res, stop) {
+    try {
+        await db_create_medication({
+            tenant_id: req.body.tenant_uuid,
+            pid: req.body.pid,
+            occurrence: obj.occurrence,
+            type: obj.type,
+            drug_name: obj.drugName,
+            trade_name: obj.tradeName,
+            dosage_morning: obj.dosage_morning,
+            dosage_afternoon: obj.dosage_afternoon,
+            dosage_evening: obj.dosage_evening
+        })
+        if(stop){
+            return responseAPI(res, req.apiRes)
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error.message
+        }
+        req.apiRes = PRESCRIPTION_CODE["4"]
+        return responseAPI(res, req.apiRes)
+    }
 }
 
 

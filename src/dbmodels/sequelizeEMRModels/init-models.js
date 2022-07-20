@@ -198,6 +198,7 @@ var _phone_numbers = require("./phone_numbers")
 var _pnotes = require("./pnotes")
 var _practictioner_patient_map = require("./practictioner_patient_map")
 var _prescriptions = require("./prescriptions")
+var _medication = require("./medication")
 var _prices = require("./prices")
 var _procedure_answers = require("./procedure_answers")
 var _procedure_order = require("./procedure_order")
@@ -507,6 +508,7 @@ function initModels(sequelize) {
         sequelize,
         DataTypes
     )
+    var medication = _medication(sequelize, DataTypes)
     var prescriptions = _prescriptions(sequelize, DataTypes)
     var prices = _prices(sequelize, DataTypes)
     var procedure_answers = _procedure_answers(sequelize, DataTypes)
@@ -797,6 +799,7 @@ function initModels(sequelize) {
         pnotes,
         practictioner_patient_map,
         prescriptions,
+        medication,
         prices,
         procedure_answers,
         procedure_order,
