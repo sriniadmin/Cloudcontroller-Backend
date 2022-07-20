@@ -55,7 +55,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     disable: {
       type: DataTypes.STRING(5),
-      allowNull: false
+      allowNull: true
     },
     date: {
       type: DataTypes.DATE,
