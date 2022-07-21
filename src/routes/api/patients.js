@@ -53,7 +53,9 @@ const {
     editPatient,
     addNewPatient,
     createPatientNoteAttachment,
-    downloadNoteAttachment
+    downloadNoteAttachment,
+    getPatientMedication,
+    editPatientMedication
 } = require("../../business_logic/routes/patient")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse");
 
@@ -1627,6 +1629,84 @@ router.put("/:pid/procedure", updatePatientProcedure, apiFinalProcess)
  */
 
 router.get("/:pid/procedure", getPatientProcedure, apiFinalProcess)
+
+
+/**
+ * @openapi
+ * /api/patients/{pid}/medication:
+ *   get:
+ *       tags:
+ *         - Patient
+ *       summary: Information of the prescription
+ *       responses:
+ *         '201':
+ *           description: Prescription Information is provided.
+ *       parameters:
+ *          - in: path
+ *            name: pid
+ *            default: 0
+ *            schema:
+ *               type: uuid
+ *            description: The uuid of specific Prescription
+ *          - in: query
+ *            name: limit
+ *            default: 20
+ *            schema:
+ *               type: integer
+ *            description: The number of items to return
+ *          - in: query
+ *            name: offset
+ *            default: 0
+ *            schema:
+ *               type: integer
+ *            description: The number of items to skip before starting to collect the result set
+ *          - in: query
+ *            name: filter
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: The number of items to skip before starting to collect the result set
+ */
+ router.get("/:pid/medication", getPatientMedication, apiFinalProcess);
+
+
+ /**
+ * @openapi
+ * /api/patients/{pid}/medication:
+ *   put:
+ *       tags:
+ *         - Patient
+ *       summary: Information of the prescription
+ *       responses:
+ *         '201':
+ *           description: Prescription Information is provided.
+ *       parameters:
+ *          - in: path
+ *            name: pid
+ *            default: 0
+ *            schema:
+ *               type: uuid
+ *            description: The uuid of specific Prescription
+ *          - in: query
+ *            name: limit
+ *            default: 20
+ *            schema:
+ *               type: integer
+ *            description: The number of items to return
+ *          - in: query
+ *            name: offset
+ *            default: 0
+ *            schema:
+ *               type: integer
+ *            description: The number of items to skip before starting to collect the result set
+ *          - in: query
+ *            name: filter
+ *            default: 0
+ *            schema:
+ *               type: string
+ *            description: The number of items to skip before starting to collect the result set
+ */
+  router.put("/:pid/medication", editPatientMedication, apiFinalProcess);
 
 
 module.exports = router;

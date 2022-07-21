@@ -198,6 +198,11 @@ const {
     db_get_procedure_list,
     db_update_procedure,
 } = require("../../dbcontrollers/procedure.controller")
+
+const {
+    db_get_medication_list,
+    db_edit_medication
+} = require("../../dbcontrollers/medication")
 const report = require("../../dbmodels/sequelizeEMRModels/report")
 const { db_create_user, db_update_patient_user } = require("../../dbcontrollers/user.controller")
 const { createPatch } = require("../../middleware/rbac")
@@ -3740,6 +3745,46 @@ async function downloadNoteAttachment(req, res, next) {
 }
 
 
+async function getPatientMedication(req, res, next) {
+    try {
+        req.query.pid = req.params.pid
+        const result = await db_get_medication_list(req.query)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            data: result,
+            count: result.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error.message
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
+
+async function editPatientMedication(req, res, next) {
+    try {
+        req.body.updateId = req.body.id
+        req.body.id = undefined
+        const result = await db_edit_medication(req.body)
+        req.apiRes = PATIENT_CODE["2"]
+        req.apiRes["response"] = {
+            data: result,
+            count: result.length
+        }
+    } catch (error) {
+        console.log(error)
+        req.apiRes["error"] = {
+            error: error.message
+        }
+        req.apiRes = PATIENT_CODE["1"]
+    }
+    return responseAPI(res, req.apiRes)
+}
+
 module.exports = {
     createPatientInBulk,
     // patientInventory,
@@ -3795,5 +3840,7 @@ module.exports = {
     editPatient,
     addNewPatient,
     createPatientNoteAttachment,
-    downloadNoteAttachment
+    downloadNoteAttachment,
+    getPatientMedication,
+    editPatientMedication
 }

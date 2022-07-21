@@ -2223,7 +2223,6 @@ async function createDevice(req, res, next) {
                 if(check_sim.data){
                     req.apiRes = PATCH_CODE["18"]
                     return responseAPI(res, req.apiRes)
-                    return next()
                 }
             }
 
@@ -2236,7 +2235,6 @@ async function createDevice(req, res, next) {
                 if(check_phone.data){
                     req.apiRes = PATCH_CODE["19"]
                     return responseAPI(res, req.apiRes)
-                    return next()
                 }
             }
         }

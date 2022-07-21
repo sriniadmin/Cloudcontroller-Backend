@@ -51,20 +51,25 @@ module.exports = function (sequelize, DataTypes) {
     },
     dosage_morning: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        isDate: true
-      }
+      allowNull: false
     },
     dosage_afternoon: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            isDate: true
-        }
+        allowNull: false
     },
     dosage_evening: {
         type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+          isDate: true
+      }
+    },
+    end_date: {
+        type: DataTypes.DATE,
         allowNull: false,
         validate: {
             isDate: true
