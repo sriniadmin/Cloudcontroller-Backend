@@ -46,6 +46,14 @@ module.exports = function (sequelize, DataTypes) {
             status: {
                 type: DataTypes.STRING(45),
                 allowNull: false,
+            },
+            alert_uuid: {
+                type: DataTypes.STRING(255),
+                allowNull: false,
+            },
+            isAttended: {
+                type: DataTypes.STRING(15),
+                allowNull: true,
             }
         },
         {

@@ -137,15 +137,15 @@ let ASSOCIATE_CODE = {
 
 let ALERT_CODE = {
     1: {
-        Code: "FETCH_ALERT_DATA_FAILURE",
+        Code: "FAILED",
         HttpStatus: "470",
-        Message: "Failure in fetching the alert data information",
+        Message: "Failed",
         Details: {},
     },
     0: {
-        Code: "FETCH_ALERT_DATA_SUCCESS",
+        Code: "SUCCESSFUL",
         HttpStatus: "200",
-        Message: "Success in fetching the alert data information",
+        Message: "Successfull",
         Details: {},
     }
 }

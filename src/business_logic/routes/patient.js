@@ -3156,11 +3156,11 @@ async function addNewPatient(req, res, next) {
             return responseAPI(res, req.apiRes)
         }
 
-        tags = demographic_map.tags
-        if (tags.length > 0) {
-            recallFuntion(demographic_map.tags.length, 0, req, res, next)
-        }
-        else {
+        // tags = demographic_map.tags
+        // if (tags.length > 0) {
+        //     recallFuntion(demographic_map.tags.length, 0, req, res, next)
+        // }
+        // else {
             let uuidDict = {
                 uuidType: UUID_CONST["patient"],
                 tenantID: req.body.tenantId,
@@ -3204,7 +3204,7 @@ async function addNewPatient(req, res, next) {
             req.apiRes = PATIENT_CODE["3"]
             req.apiRes["response"] = { patient_data: req.body }
             return responseAPI(res, req.apiRes)
-        }
+        // }
     } catch (error) {
         console.log(error)
         req.apiRes = PATIENT_CODE["4"]

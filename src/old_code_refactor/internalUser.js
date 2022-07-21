@@ -2187,32 +2187,29 @@ async function getPathSaas(req, res, next) {
 async function createDevice(req, res, next) {
     try {
         const params = req.body.data[0]
-
         let condition = {}
-        if(params.patch_type === 'gateway'){
+
+        if(params.device_serial){
             condition = {
-                patch_type: params.patch_type,
                 device_serial: params.device_serial
             }
-        }
-        else {
-            condition = {
-                patch_type: params.patch_type,
-                patch_mac: params.patch_mac
+            const check_number = await db_check_duplicate_device(condition)
+            if(check_number.data){
+                req.apiRes = PATCH_CODE["14"]
+                return responseAPI(res, req.apiRes)
             }
         }
-
-        const check_number = await db_check_duplicate_device(condition)
-
-        if(check_number.data && (params.patch_type === 'gateway')){
-            req.apiRes = PATCH_CODE["14"]
-            return responseAPI(res, req.apiRes)
+        if(params.patch_mac){
+            condition = {
+                patch_mac: params.patch_mac
+            }
+            const check_number = await db_check_duplicate_device(condition)
+            if(check_number.data){
+                req.apiRes = PATCH_CODE["15"]
+                return responseAPI(res, req.apiRes)
+            }
         }
-        else if(check_number.data){
-            req.apiRes = PATCH_CODE["15"]
-            return responseAPI(res, req.apiRes)
-        }
-
+        
 
         if(params.patch_type === 'gateway'){
             if(params.sim){
@@ -2225,8 +2222,6 @@ async function createDevice(req, res, next) {
                     return responseAPI(res, req.apiRes)
                 }
             }
-
-
             if(params.phone){
                 condition = {
                     phone: params.phone

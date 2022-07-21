@@ -9,6 +9,7 @@ log4js.configure('./src/config/log4js-config.json');
 const logger = log4js.getLogger('liveapidata');
 const klogger = log4js.getLogger('liveapi');
 const rlogger = log4js.getLogger('liveapiReg');
+const getUUID = require("../../lib/system/uuidSystem").getUUID
 
 const patient_controller = require("../../dbcontrollers/patients.controller")
 const {
@@ -873,7 +874,9 @@ async function CheckingThreshold(params) {
                     if(json_rk[sensor.value] < Threshold[sensor.min]){
                         status = 'low'
                     }
+                    const alert_uuid = await getUUID({uuidType: 'alert'})
                     await db_add_alert_data({
+                        alert_uuid: alert_uuid,
                         pid: obj.pid,
                         device_type: sensor.key,
                         value: json_rk[sensor.value],
@@ -889,7 +892,9 @@ async function CheckingThreshold(params) {
                     if(json_rk[sensor.value_plus] < Threshold[sensor.min_plus]){
                         status = 'low'
                     }
+                    const alert_uuid = await getUUID({uuidType: 'alert'})
                     await db_add_alert_data({
+                        alert_uuid: alert_uuid,
                         pid: obj.pid,
                         device_type: sensor.key,
                         value: json_rk[sensor.value_plus],
@@ -908,7 +913,9 @@ async function CheckingThreshold(params) {
                     if(params[sensor.value] < Threshold[sensor.min]){
                         status = 'low'
                     }
+                    const alert_uuid = await getUUID({uuidType: 'alert'})
                     await db_add_alert_data({
+                        alert_uuid: alert_uuid,
                         pid: obj.pid,
                         device_type: sensor.key,
                         value: params[sensor.value],

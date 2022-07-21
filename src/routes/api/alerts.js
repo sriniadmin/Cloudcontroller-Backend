@@ -5,7 +5,11 @@ const router = express.Router();
 const { systemAlertHandler } = require("../../dbcontrollers/systemAlert.controller")
 const { systemStatusHandler } = require("../../dbcontrollers/systemAlertStatus.controller")
 const { apiFinalProcess } = require("../../middleware/apiFinalResponse")
-const { getAlertData } = require("../../old_code_refactor/alert")
+const { 
+	getAlertData,
+	editAlertData,
+	addAlertNote
+ } = require("../../old_code_refactor/alert")
 
 
 //a-z custom modules
@@ -110,153 +114,13 @@ async function getPatientInfo(req, res, pid, al) {
  * 
  */
 router.get("/", getAlertData, apiFinalProcess)
-// router.get("/", function (req, res, next) {
-// 	logger.debug("Alerts Params", req.params);
-// 	logger.debug("Alerts Query", req.query);
-
-// 	(async () => {
-// 		try {
-// 			let query = ALERTA + 'alerts';
-// 			let and = false
-// 			let drFilter = undefined;
-// 			let state = undefined;
-// 			let pInfo = undefined
-
-// 			if (req.query.hasOwnProperty('pid')) {
-// 				query = query + '?resource=' + req.query.pid;
-// 				and = true
-// 				pInfo = await getPatientInfo(req, res, req.query.pid, null)
-// 			}
-
-// 			if (req.query.hasOwnProperty('limit')) {
-// 				if (and) {
-// 					query = query + '&'
-// 				} else {
-// 					query = query + '?'
-// 				}
-// 				query = query + 'page-size=' + req.query.limit;
-// 				and = true
-// 			}
-
-// 			if (req.query.hasOwnProperty('offset')) {
-// 				if (and) {
-// 					query = query + '&'
-// 				} else {
-// 					query = query + '?'
-// 				}
-// 				let pageNum = parseInt(req.query.offset) + 1
-// 				query = query + 'page=' + pageNum;
-// 				and = true
-// 			}
-
-// 			if (req.query.hasOwnProperty('from')) {
-// 				if (and) {
-// 					query = query + '&'
-// 				} else {
-// 					query = query + '?'
-// 				}
-// 				query = query + 'from-date=' + req.query.from;
-// 				and = true
-// 			}
-
-// 			if (req.query.hasOwnProperty('to')) {
-// 				if (and) {
-// 					query = query + '&'
-// 				} else {
-// 					query = query + '?'
-// 				}
-// 				query = query + 'to-date=' + req.query.to;
-// 				and = true
-// 			}
-
-// 			if (req.query.hasOwnProperty('status')) {
-// 				state = req.query.status
-// 			}
 
 
-// 			if (req.query.hasOwnProperty('filter')) {
-// 				drFilter = req.query.filter
-// 			}
+router.put("/", editAlertData, apiFinalProcess)
 
-// 			logger.debug("The alert query is", query);
-// 			const response = await got(query);
-// 			let resp = JSON.parse(response.body);
-// 			let alertResp = {
-// 				num: 0,
-// 				status: "error",
-// 				alerts: []
-// 			};
-// 			logger.debug("Alerts %d", resp.alerts.length);
-// 			if (resp.alerts.length) {
-// 				alertResp.num = resp.alerts.length;
 
-// 				let promisesArray = [];
-// 				for (let i = 0; i < resp.alerts.length; i++) {
-// 					let v = resp.alerts[i]
+router.post("/add-note", addAlertNote, apiFinalProcess)
 
-// 					if (drFilter && !v.tags.includes(drFilter)) {
-// 						alertResp.num = alertResp.num - 1
-// 						continue
-// 					}
-
-// 					if (state && (state != v.status)) {
-// 						alertResp.num = alertResp.num - 1
-// 						continue
-// 					}
-// 					let al = {
-// 						id: v.id,
-// 						type: v.event,
-// 						value: v.value,
-// 						status: v.status,
-// 						tags: v.tags,
-// 						text: v.text,
-// 						count: v.duplicateCount,
-// 						firstRcvTm: v.createTime,
-// 						lastRcvTm: v.lastReceiveTime
-// 					};
-// 					if (!req.query.hasOwnProperty('pid')) {
-// 						al['pid'] = v.resource
-// 						let patientInfo = getPatientInfo(req, res, v.resource, al)
-// 						promisesArray.push(patientInfo)
-// 					} else if (pInfo != undefined) {
-// 						al['pName'] = pInfo.title + ' ' + pInfo.fname + ' ' + pInfo.lname
-// 						al['mr'] = pInfo.med_record
-// 					}
-// 					alertResp.alerts.push(al);
-// 				};
-// 				try {
-// 					let values = await Promise.all(promisesArray)
-// 				} catch (err) {
-// 					logger.error("Alert Status Promise All: ", err)
-// 				}
-
-// 				alertResp.status = "ok";
-// 				return res.status(ALERTS_CODE["2"].HttpStatus).json({
-// 					result: ALERTS_CODE["2"].Code,
-// 					response: { "alerts": [alertResp] },
-// 					error: {},
-// 					privilege: {}
-// 				})
-// 			} else {
-// 				logger.error("invalid request");
-// 				return res.status(ALERTS_CODE["2"].HttpStatus).json({
-// 					result: ALERTS_CODE["2"].Code,
-// 					response: { "alerts": [alertResp] },
-// 					error: {},
-// 					privilege: {}
-// 				})
-// 			}
-// 		} catch (err) {
-// 			logger.debug(err);
-// 			return res.status(ALERTS_CODE["1"].HttpStatus).json({
-// 				result: ALERTS_CODE["1"].Code,
-// 				response: {},
-// 				error: { errMessage: ALERTS_CODE["1"].Message + err },
-// 				privilege: {}
-// 			})
-// 		}
-// 	})();
-// });
 
 router.get("/:alert/status", function (req, res, next) {
 	logger.debug("Alerts Params", req.params);

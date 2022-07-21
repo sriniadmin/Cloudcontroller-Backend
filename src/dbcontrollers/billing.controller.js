@@ -431,7 +431,7 @@ async function db_get_billing_report_count(params) {
 }
 async function db_get_billing_report_summary(params) {
     try{
-    let { limit, offset, filter = null, sort = null, sortdir = 'DESC' } = params
+    let { limit, offset, filter = null, sort = null, sortdir = 'DESC', type } = params
     let arrSort = ['id', 'ASC'];
     let billing;
     if(sort){
@@ -447,7 +447,8 @@ async function db_get_billing_report_summary(params) {
                     model:models.patient_data,
                     attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled', 'primary_consultant', 'secondary_consultant', 'tags'],
                     where: {
-                        disabled: 1
+                        disabled: 1,
+                        patient_type: type
                     }
                 }
                
@@ -495,7 +496,9 @@ async function db_get_billing_report_summary(params) {
                         Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
                         { [Op.like]: `%${filter}%` }
                     )
-                ]
+                ],
+                disabled: 1,
+                patient_type: type
             },
             order: [
                 arrSort

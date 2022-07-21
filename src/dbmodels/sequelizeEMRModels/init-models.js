@@ -257,6 +257,7 @@ var _patient_location_table = require("./patient_location_table")
 var _patient_medication_table = require("./patient_medication_table")
 var _device_type = require("./device_type")
 var _alert_data = require("./alert_data")
+var _alert_note = require("./alert_note")
 var _logger_data = require("./logger_data")
 var _upgradeMobile = require("./upgradeMobile");
 
@@ -597,6 +598,7 @@ function initModels(sequelize) {
     var medical_illness_map=_medical_illness_map(sequelize,DataTypes)
     var device_type = _device_type(sequelize, DataTypes)
     var alert_data = _alert_data(sequelize, DataTypes)
+    var alert_note = _alert_note(sequelize, DataTypes)
     var logger_data = _logger_data(sequelize, DataTypes)
 
 
@@ -875,7 +877,8 @@ function initModels(sequelize) {
         device_type,
         alert_data,
         logger_data,
-        note_attachment
+        note_attachment,
+        alert_note
     }
 }
 //Relations
