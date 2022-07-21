@@ -29,7 +29,7 @@ async function db_get_alert_data(params) {
 
             condition.device_type = { [Op.like]: `%${params.search}%` }
         }
-        if(params.isAttended){
+        if(params.isAttended && params.isAttended !== 'all'){
             condition.isAttended = params.isAttended
         }
         if(params.date){
