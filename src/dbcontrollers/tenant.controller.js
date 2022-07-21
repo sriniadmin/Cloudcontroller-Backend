@@ -78,6 +78,7 @@ async function db_tenant_exist(tenant_uuid, uuid_type) {
 async function db_tenant_exist_trans(tenant_uuid, uuid_type, transaction) {
     // This async function gets the tenants matching the tenant_name
     // It currently does not check if more than one tenant exist or not. TODO
+    const t = await sequelizeDB.transaction()
     // Returns a promise of the tenant_id number
     let tenant_id = ""
     await Tenants.findAll({
@@ -85,8 +86,7 @@ async function db_tenant_exist_trans(tenant_uuid, uuid_type, transaction) {
             tenant_uuid: tenant_uuid,
         },
         raw: true,
-    },
-        { transaction: transaction["transaction"] })
+    })
         .then((tenant_data) => {
             logger.debug("Tenant list is" + tenant_data, typeof tenant_data, tenant_data.length)
             if (tenant_data.length == 0)
@@ -201,7 +201,7 @@ async function db_get_root_tenant(params) {
 async function db_update_tenant(params) {
     const t = await sequelizeDB.transaction()
     try {
-        const data = Tenants.update(
+        const data = await Tenants.update(
             { tenant_name: params.tenant_name },
             {
                 where: {

@@ -7,14 +7,7 @@ var models = initModels(sequelizeDB)
 
 const UUID = models.uuid
 
-async function db_create_uuid(tenant_uuid, uuid_with_uuidtype, transaction) {
-    logger.debug("UUID data to insert is " + uuid_with_uuidtype, tenant_uuid, transaction)
-    let trans = null
-    if (typeof transaction !== "undefined") {
-        logger.debug("Transacation is ", transaction)
-        trans = transaction["transaction"]
-    }
-
+async function db_create_uuid(tenant_uuid, uuid_with_uuidtype) {
     let uuid_list = null
     let error = null
 
@@ -24,8 +17,7 @@ async function db_create_uuid(tenant_uuid, uuid_with_uuidtype, transaction) {
             {
                 tenant_uuid: tenant_uuid,
                 uuid: uuid_with_uuidtype,
-            },
-            { transaction: trans }
+            }
         )
             .then((uuid_data) => {
                 logger.debug("UUID Insert output is" + JSON.stringify(uuid_data))

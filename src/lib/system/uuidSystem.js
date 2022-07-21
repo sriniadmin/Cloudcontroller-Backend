@@ -58,13 +58,15 @@ var getUUID = async function (uuidDict, transaction) {
     logger.debug("The UUID generated is ", uuidFull, uuidGen)
     index += 1
 
-    await db_tenant_exist_trans(tenantID, UUID_CONST[uuidType], transaction)
+    // await db_tenant_exist_trans(tenantID, UUID_CONST[uuidType], transaction)
+    await db_tenant_exist_trans(tenantID, UUID_CONST[uuidType])
       .then((tenantUUID) => {
         if (UUID_CONST[uuidType] == 'tenant') {
           tenantUUID = uuidFull
         }
         logger.debug('the tenant uuid is', tenantUUID)
-        db_create_uuid(tenantUUID, uuidFull, transaction)
+        // db_create_uuid(tenantUUID, uuidFull, transaction)
+        db_create_uuid(tenantUUID, uuidFull)
           .then((uuid_data) => {
 
             uuidGen = true
@@ -84,7 +86,7 @@ var getUUID = async function (uuidDict, transaction) {
     // Need to go and remove this UUID
 
   }
-  await transaction.transaction.commit()
+  // await transaction.transaction.commit()
   return uuidFull
 }
 

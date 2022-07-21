@@ -591,7 +591,7 @@ async function grpcCall(given_pid, duration, tenant_id) {
             duration: duration,
             tenantUUID: tenant_id,
         }
-        logger.debug("Patient GRPC calling.. ", tenant_id)
+        // logger.debug("Patient GRPC calling.. ", tenant_id)
         // baselineResult = await patientDetailsGRPC(patientInventoryJSON)
 
         baselineResult = {"status":1,"result":{"code":14,"details":"Name resolution failed for target dns:sensor_consumer:9010","metadata":{}}}
@@ -3167,7 +3167,8 @@ async function addNewPatient(req, res, next) {
             }
             demographic_map.tenant_id = req.body.tenantId
             const t = await sequelizeDB.transaction()
-            demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            // demographic_map.pid = await getUUID(uuidDict, { transaction: t })
+            demographic_map.pid = await getUUID(uuidDict)
             demographic_map.associated_list = "[]"
             await db_add_new_patient(demographic_map)
 
@@ -3599,9 +3600,9 @@ async function updatePatientMedicalHistory(req, res, next) {
 
 
 async function createPatientVitalThreshold(req, res, next) {
-    const t = await sequelizeDB.transaction()
+    // const t = await sequelizeDB.transaction()
     try {
-        await db_create_vital_threshold(req.body, t)
+        await db_create_vital_threshold(req.body)
         req.apiRes = TRANSACTION_CODE["0"]
         req.apiRes["response"] = {
             medical_history_data: req.body
@@ -3612,11 +3613,9 @@ async function createPatientVitalThreshold(req, res, next) {
             error: error
         }
         req.apiRes = TRANSACTION_CODE["1"]
-        await t.rollback()
     }
     global_variable.threshold_list = db_threshold_by_patient()
     console.log(global_variable.threshold_list)
-    await t.commit()
     return responseAPI(res, req.apiRes)
 }
 
