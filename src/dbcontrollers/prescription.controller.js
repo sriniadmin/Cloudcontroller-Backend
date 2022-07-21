@@ -60,34 +60,6 @@ var Prescription = function (prescriptionobj) {
 
 
 
-
-function get_endDate(presData, startDate) {
-    let daysToAdd = 0
-    presData.forEach(obj => {
-        const freq = obj['frequency']
-        const freqPeriod = parseInt(obj['frequencyPeriod'])
-        if (freq.includes('day')) {
-            const days = freqPeriod
-            if(daysToAdd < days){
-                daysToAdd = days
-            }
-        } else if (freq.includes('week')) {
-            const days = freqPeriod * 7
-            if(daysToAdd < days){
-                daysToAdd = days
-            }
-        } else if (freq.includes('month')) {
-            const days = freqPeriod * 30
-            if(daysToAdd < days){
-                daysToAdd = days
-            }
-        }
-    });
-
-    return new Date(startDate).setDate(new Date(startDate).getDate() + (daysToAdd-1))
-}
-
-
 async function db_update_prescription(
     tenant_id,
     prescription_data,
@@ -202,8 +174,6 @@ async function db_delete_prescription(given_pid, transaction) {
 async function db_create_prescription(params) {
     const t = await sequelizeDB.transaction()
     try {
-        let endDate = get_endDate(params.drug, params["date_added"])
-
         const data = await Prescriptions.create(
             {
                 prescription_uuid: params["prescription_uuid"],
@@ -238,7 +208,7 @@ async function db_create_prescription(params) {
                 erx_uploaded: params["erx_uploaded"],
                 drug_info_erx: params["drug_info_erx"],
                 external_id: params["external_id"],
-                end_date: endDate,
+                end_date: params["end_date"],
                 indication: params["indication"],
                 prn: params["prn"],
                 ntx: params["ntx"],

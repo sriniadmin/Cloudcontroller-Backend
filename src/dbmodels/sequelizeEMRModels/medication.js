@@ -64,9 +64,7 @@ module.exports = function (sequelize, DataTypes) {
     start_date: {
       type: DataTypes.DATE,
       allowNull: false,
-      validate: {
-          isDate: true
-      }
+      defaultValue: Sequelize.fn("now")
     },
     end_date: {
         type: DataTypes.DATE,
