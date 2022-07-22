@@ -3555,7 +3555,7 @@ function get_endDate(presData, startDate) {
                 daysToAdd = days
             }
         }
-        obj.end_date = new Date(startDate).setDate(new Date(startDate).getDate() + (daysToAdd-1))
+        obj.end_date = new Date().setDate(new Date(startDate).getDate() + (daysToAdd-1))
     });
 }
 

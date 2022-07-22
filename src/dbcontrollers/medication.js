@@ -18,17 +18,22 @@ async function db_get_medication_list(params) {
             pid: params.pid
         }
 
-        if(params.date){
+        if (params.date) {
             condition[Op.or] = [
-                { end_date: {
-                    [Op.gte]: new Date(moment(params.date).format('YYYY-MM-DD'))
-                }},
-                { end_date: {
-                    [Op.eq]: new Date(moment(params.date).format('YYYY-MM-DD'))
-                }},
-                { start_date: {
-                    [Op.eq]: new Date(moment(params.date).format('YYYY-MM-DD'))
-                }}
+                {
+                    end_date: {[Op.gte]: new Date(params.date)},
+                    [Op.and]: [{
+                        start_date: { 
+                            [Op.lte]: new Date(params.date) 
+                        }
+                    }]
+                },
+                {
+                    end_date: { [Op.eq]: new Date(params.date)}
+                },
+                {
+                    start_date: {[Op.eq]: new Date(params.date)}
+                }
             ]
         }
         const data = await Medication.findAll({

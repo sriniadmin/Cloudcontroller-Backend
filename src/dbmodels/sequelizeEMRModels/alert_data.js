@@ -54,6 +54,10 @@ module.exports = function (sequelize, DataTypes) {
             isAttended: {
                 type: DataTypes.STRING(15),
                 allowNull: true,
+            },
+            pratitioner: {
+                type: DataTypes.STRING(255),
+                allowNull: true,
             }
         },
         {
