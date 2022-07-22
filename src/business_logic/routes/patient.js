@@ -3509,7 +3509,7 @@ async function createPatientPrescription(req, res, next) {
     try {
         const uuidDict = { uuidType: UUID_CONST["prescription"], tenantID: 0 }
         req.body.prescription_uuid = await getUUID(uuidDict, { transaction: t })
-        req.body.end_date = get_endDate(req.body.drug, req.body["date_added"])
+        req.body.end_date = await get_endDate(req.body.drug, req.body["date_added"])
         await db_create_prescription(req.body)
         req.apiRes = PRESCRIPTION_CODE["3"]
         req.apiRes["response"] = {
@@ -3535,8 +3535,8 @@ async function createPatientPrescription(req, res, next) {
 
 
 function get_endDate(presData, startDate) {
-    let daysToAdd = 0
     presData.forEach(obj => {
+        let daysToAdd = 0
         const freq = obj['frequency']
         const freqPeriod = parseInt(obj['frequencyPeriod'])
         if (freq.includes('day')) {
@@ -3555,9 +3555,8 @@ function get_endDate(presData, startDate) {
                 daysToAdd = days
             }
         }
+        obj.end_date = new Date(startDate).setDate(new Date(startDate).getDate() + (daysToAdd-1))
     });
-
-    return new Date(startDate).setDate(new Date(startDate).getDate() + (daysToAdd-1))
 }
 
 
@@ -3574,7 +3573,7 @@ async function loopCreator(obj, req, res, stop) {
             dosage_afternoon: obj.dosage_afternoon,
             dosage_evening: obj.dosage_evening,
             dosage_night: obj.dosage_night,
-            end_date: req.body.end_date
+            end_date: obj.end_date
         })
         if(stop){
             return responseAPI(res, req.apiRes)
