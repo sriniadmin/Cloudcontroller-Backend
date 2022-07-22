@@ -3535,28 +3535,30 @@ async function createPatientPrescription(req, res, next) {
 
 
 function get_endDate(presData, startDate) {
+    let days = 0
     presData.forEach(obj => {
         let daysToAdd = 0
         const freq = obj['frequency']
         const freqPeriod = parseInt(obj['frequencyPeriod'])
         if (freq.includes('day')) {
-            const days = freqPeriod
+            days = freqPeriod
             if(daysToAdd < days){
                 daysToAdd = days
             }
         } else if (freq.includes('week')) {
-            const days = freqPeriod * 7
+            days = freqPeriod * 7
             if(daysToAdd < days){
                 daysToAdd = days
             }
         } else if (freq.includes('month')) {
-            const days = freqPeriod * 30
+            days = freqPeriod * 30
             if(daysToAdd < days){
                 daysToAdd = days
             }
         }
         obj.end_date = new Date().setDate(new Date(startDate).getDate() + (daysToAdd-1))
     });
+    return new Date().setDate(new Date(startDate).getDate() + (days-1))
 }
 
 
