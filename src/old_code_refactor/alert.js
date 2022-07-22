@@ -30,6 +30,10 @@ async function getAlertData(req, res, next) {
 
 async function editAlertData(req, res, next) {
     try {
+        if(!req.body.pratitioner){
+            req.body.pratitioner = null
+            req.body.isAttended = 'attended'
+        }
         await db_edit_alert_data(req.body)
         req.apiRes = ALERT_CODE["0"]
         req.apiRes["response"] = { 

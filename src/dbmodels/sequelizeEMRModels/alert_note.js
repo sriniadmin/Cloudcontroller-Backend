@@ -14,6 +14,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING(255),
                 allowNull: false
             },
+            userUuid: {
+                type: DataTypes.STRING(255),
+                allowNull: false
+            },
             note: {
                 type: DataTypes.TEXT,
                 allowNull: false

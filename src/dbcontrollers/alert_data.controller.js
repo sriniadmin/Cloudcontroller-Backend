@@ -12,6 +12,11 @@ models.alert_data.hasMany(models.alert_note, {
     sourceKey: "alert_uuid",
 })
 
+models.alert_note.hasMany(models.users, {
+    foreignKey: "user_uuid",
+    sourceKey: "userUuid",
+})
+
 async function db_get_alert_data(params) {
     const t = await sequelizeDB.transaction()
     try {
@@ -56,7 +61,13 @@ async function db_get_alert_data(params) {
                 include: [
                     {
                         model:models.alert_note,
-                        attributes:['id','note','date']
+                        attributes:['id','note','date'],
+                        include: [
+                            {
+                                model:models.users,
+                                attributes:['fname','mname','lname']
+                            }
+                        ]
                     }
                 ],
                 where: condition,
@@ -124,6 +135,7 @@ async function db_add_alert_note(params) {
     try {
         let data = await ALERT_NOTE.create(
             {
+                userUuid: params.userUuid,
                 alert_uuid: params.alert_uuid,
                 note: params.note
             },
