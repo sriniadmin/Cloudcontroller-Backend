@@ -8,6 +8,8 @@ const {
 const {
     ALERT_CODE
 } = require("../lib/constants/AppEnum")
+const user_controller = require("../dbcontrollers/user.controller")
+const db_get_user_profile = user_controller.db_get_user_profile
 
 async function getAlertData(req, res, next) {
     try {
@@ -51,9 +53,10 @@ async function editAlertData(req, res, next) {
 async function addAlertNote(req, res, next) {
     try {
         await db_add_alert_note(req.body)
+        const user = await db_get_user_profile({user_uuid: req.body.userUuid})
         req.apiRes = ALERT_CODE["0"]
         req.apiRes["response"] = { 
-            data: req.body
+            data: user
         }
     } catch (error) {
         console.log(error)
