@@ -437,6 +437,13 @@ async function db_get_billing_report_summary(params) {
     if(sort){
         arrSort = [sort, sortdir];
     }
+    let condition = {
+        disabled: 1
+    }
+
+    if(type){
+        condition.patient_type = type
+    }
     if(!params.bill_date) params.bill_date = moment().format('YYYY-MM-DD');
     if(!filter){
     billing = await BillingSummary.findAll({
@@ -446,10 +453,7 @@ async function db_get_billing_report_summary(params) {
                 {
                     model:models.patient_data,
                     attributes:['med_record','email','street','fname','lname','sex','DOB','phone_contact','admission_date', 'disabled', 'primary_consultant', 'secondary_consultant', 'tags'],
-                    where: {
-                        disabled: 1,
-                        patient_type: type
-                    }
+                    where: condition
                 }
                
             ],
@@ -482,6 +486,7 @@ async function db_get_billing_report_summary(params) {
                
             ],
             where: {
+                ...condition,
                 date: {
                     [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                 },
@@ -496,9 +501,7 @@ async function db_get_billing_report_summary(params) {
                         Sequelize.fn('CONCAT', Sequelize.col('fname'), ' ', Sequelize.col('lname')), 
                         { [Op.like]: `%${filter}%` }
                     )
-                ],
-                disabled: 1,
-                patient_type: type
+                ]
             },
             order: [
                 arrSort
@@ -509,7 +512,7 @@ async function db_get_billing_report_summary(params) {
     }
     }catch(err){
         console.log(err);
-        return false;
+        throw err;
     }
 }
 

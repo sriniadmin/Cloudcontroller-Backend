@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize")
 const sequelizeDB = require("../config/emrmysqldb")
 const Op = Sequelize.Op;
+const moment = require('moment');
 var initModels =
     require("../dbmodels/sequelizeEMRModels/init-models").initModels
 var models = initModels(sequelizeDB)
@@ -18,9 +19,17 @@ async function db_get_medication_list(params) {
         }
 
         if(params.date){
-            condition.end_date = {
-                [Op.gte]: new Date(moment(params.date).format('YYYY-MM-DD'))
-            }
+            condition[Op.or] = [
+                { end_date: {
+                    [Op.gte]: new Date(moment(params.date).format('YYYY-MM-DD'))
+                }},
+                { end_date: {
+                    [Op.eq]: new Date(moment(params.date).format('YYYY-MM-DD'))
+                }},
+                { start_date: {
+                    [Op.eq]: new Date(moment(params.date).format('YYYY-MM-DD'))
+                }}
+            ]
         }
         const data = await Medication.findAll({
             attributes: ['id','drug_name', 'type', 'occurrence', 'morning', 'afternoon', 'evening', 'night', 'dosage_morning', 'dosage_afternoon', 'dosage_evening', 'dosage_night', 'start_date', 'end_date'],
