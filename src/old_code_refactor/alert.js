@@ -54,9 +54,14 @@ async function addAlertNote(req, res, next) {
     try {
         await db_add_alert_note(req.body)
         const user = await db_get_user_profile({user_uuid: req.body.userUuid})
+        req.body.users = [{
+            fname: user.fname,
+            mname: user.mname,
+            lname: user.lname,
+        }]
         req.apiRes = ALERT_CODE["0"]
         req.apiRes["response"] = { 
-            data: user
+            data: req.body
         }
     } catch (error) {
         console.log(error)
