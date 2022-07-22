@@ -3573,6 +3573,7 @@ async function loopCreator(obj, req, res, stop) {
             dosage_morning: obj.dosage_morning,
             dosage_afternoon: obj.dosage_afternoon,
             dosage_evening: obj.dosage_evening,
+            dosage_night: obj.dosage_night,
             end_date: req.body.end_date
         })
         if(stop){
