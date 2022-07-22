@@ -99,7 +99,8 @@ async function db_edit_alert_data(params) {
     try {
         let data = await ALERT_DATA.update(
             {
-                isAttended: params.isAttended
+                isAttended: params.isAttended,
+                pratitioner: params.pratitioner
             },
             {
                 where: {
