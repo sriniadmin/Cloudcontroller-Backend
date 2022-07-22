@@ -49,6 +49,13 @@ module.exports = function (sequelize, DataTypes) {
             isDate: true
         }
     },
+    night: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate: {
+          isDate: true
+      }
+    },
     dosage_morning: {
       type: DataTypes.INTEGER,
       allowNull: false
@@ -58,6 +65,10 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false
     },
     dosage_evening: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    dosage_night: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
