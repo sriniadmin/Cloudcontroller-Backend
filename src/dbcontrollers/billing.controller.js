@@ -486,7 +486,6 @@ async function db_get_billing_report_summary(params) {
                
             ],
             where: {
-                ...condition,
                 date: {
                     [Op.gte]: new Date(moment(params.bill_date).startOf('month').format('YYYY-MM-DD'))
                 },
